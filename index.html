@@ -888,6 +888,9 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
     if (!cityLeaders[p.city]||p.score>cityLeaders[p.city].score) cityLeaders[p.city]=p;
   });
 
+  // Hall of Shame — bottom 5 pizzas
+  const shameList = [...allPizzas].sort((a,b)=>a.score-b.score).slice(0,5);
+
   const tabs = [["pizzas","Pizzas"],["restaurants","Spots"],["users","Inspectors"],["leaderboard","🏆 Board"]];
 
   return (
@@ -1150,42 +1153,39 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                   ))}
                 </div>
               )}
-              {/* Hall of Shame */}
-              {allPizzas.length>=3 && (()=>{
-                const shame = [...allPizzas].sort((a,b)=>a.score-b.score).slice(0,5);
-                return (
-                  <div style={{ marginTop:20 }}>
-                    <div style={{ fontSize:11, fontWeight:900, color:T.red,
-                      textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
-                      paddingBottom:5, borderBottom:`1px solid rgba(201,59,10,0.2)` }}>
-                      💀 Hall of Shame
-                    </div>
-                    {shame.map((p,i)=>(
-                      <div key={p.id}
-                        onClick={()=>{setSelectedPizza(p);setPage("pizza");}}
-                        style={{ display:"flex", justifyContent:"space-between",
-                          alignItems:"center", borderRadius:11, padding:"9px 13px",
-                          background:i===0?"rgba(201,59,10,0.06)":T.bgCard,
-                          border:`1px solid ${i===0?"rgba(201,59,10,0.25)":T.border}`,
-                          marginBottom:5, cursor:"pointer" }}>
-                        <div>
-                          <span style={{ fontWeight:900, marginRight:7, fontSize:13,
-                            color:i===0?"#c93b0a":T.textLight }}>{i===0?"☠️":`#${i+1}`}</span>
-                          <span style={{ color:T.textDark, fontWeight:700, fontSize:13 }}>
-                            {p.restaurant} – {p.name}
-                          </span>
-                          {(p.city||p.country) && (
-                            <span style={{ fontSize:11, color:T.textLight, marginLeft:5 }}>
-                              📍 {[p.city,p.country].filter(Boolean).join(", ")}
-                            </span>
-                          )}
-                        </div>
-                        <ScoreBadge score={p.score}/>
-                      </div>
-                    ))}
+              {/* Hall of Shame — computed above as shameList */}
+              {shameList.length>=3 && (
+                <div style={{ marginTop:20 }}>
+                  <div style={{ fontSize:11, fontWeight:900, color:T.red,
+                    textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
+                    paddingBottom:5, borderBottom:`1px solid rgba(201,59,10,0.2)` }}>
+                    💀 Hall of Shame
                   </div>
-                );
-              })()}
+                  {shameList.map((p,i)=>(
+                    <div key={p.id}
+                      onClick={()=>{setSelectedPizza(p);setPage("pizza");}}
+                      style={{ display:"flex", justifyContent:"space-between",
+                        alignItems:"center", borderRadius:11, padding:"9px 13px",
+                        background:i===0?"rgba(201,59,10,0.06)":T.bgCard,
+                        border:`1px solid ${i===0?"rgba(201,59,10,0.25)":T.border}`,
+                        marginBottom:5, cursor:"pointer" }}>
+                      <div>
+                        <span style={{ fontWeight:900, marginRight:7, fontSize:13,
+                          color:i===0?"#c93b0a":T.textLight }}>{i===0?"☠️":`#${i+1}`}</span>
+                        <span style={{ color:T.textDark, fontWeight:700, fontSize:13 }}>
+                          {p.restaurant} – {p.name}
+                        </span>
+                        {(p.city||p.country) && (
+                          <span style={{ fontSize:11, color:T.textLight, marginLeft:5 }}>
+                            📍 {[p.city,p.country].filter(Boolean).join(", ")}
+                          </span>
+                        )}
+                      </div>
+                      <ScoreBadge score={p.score}/>
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
       )}
     </div>
@@ -1427,6 +1427,43 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
   );
 }
 
+
+function BadgesDisplay({ myRatings }) {
+  const earned = getEarnedBadges(myRatings);
+  const locked = BADGE_DEFS.filter(b=>!earned.find(e=>e.id===b.id));
+  return (
+    <div style={{ marginBottom:8 }}>
+      {earned.length > 0 && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:7, justifyContent:"center", marginBottom:10 }}>
+          {earned.map(b=>(
+            <div key={b.id} title={b.desc}
+              style={{ display:"flex", flexDirection:"column", alignItems:"center",
+                background:"linear-gradient(135deg,rgba(201,59,10,0.09),rgba(184,134,11,0.09))",
+                border:"1.5px solid rgba(201,59,10,0.2)", borderRadius:12,
+                padding:"8px 10px", minWidth:60, gap:3 }}>
+              <span style={{ fontSize:22 }}>{b.icon}</span>
+              <span style={{ fontSize:9, fontWeight:800, color:T.textDark,
+                textAlign:"center", lineHeight:1.2, maxWidth:56 }}>{b.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {locked.length > 0 && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:4, justifyContent:"center", opacity:0.38 }}>
+          {locked.map(b=>(
+            <div key={b.id} title={b.desc}
+              style={{ display:"flex", alignItems:"center", gap:3, padding:"3px 9px",
+                borderRadius:99, border:"1px dashed rgba(180,120,60,0.4)" }}>
+              <span style={{ fontSize:12, filter:"grayscale(1)" }}>{b.icon}</span>
+              <span style={{ fontSize:10, fontWeight:700, color:T.textLight }}>{b.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── PROFILE PAGE ─────────────────────────────────────────────────────────────
 
 function ProfilePage({ username, isMe, myRatings, deleteRating, setPage, goRate, setSelectedPizza,
@@ -1463,41 +1500,9 @@ function ProfilePage({ username, isMe, myRatings, deleteRating, setPage, goRate,
           </div>
         </div>
         {/* Badges */}
-        {(() => {
-          const earned = getEarnedBadges(myRatings);
-          const locked = BADGE_DEFS.filter(b=>!earned.find(e=>e.id===b.id));
-          return rated > 0 ? (
-            <div style={{ marginBottom:8 }}>
-              {earned.length > 0 && (
-                <div style={{ display:"flex", flexWrap:"wrap", gap:7, justifyContent:"center", marginBottom:10 }}>
-                  {earned.map(b=>(
-                    <div key={b.id} title={b.desc}
-                      style={{ display:"flex", flexDirection:"column", alignItems:"center",
-                        background:"linear-gradient(135deg,rgba(201,59,10,0.09),rgba(184,134,11,0.09))",
-                        border:"1.5px solid rgba(201,59,10,0.2)", borderRadius:12,
-                        padding:"8px 10px", minWidth:60, gap:3 }}>
-                      <span style={{ fontSize:22 }}>{b.icon}</span>
-                      <span style={{ fontSize:9, fontWeight:800, color:T.textDark,
-                        textAlign:"center", lineHeight:1.2, maxWidth:56 }}>{b.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {locked.length > 0 && (
-                <div style={{ display:"flex", flexWrap:"wrap", gap:4, justifyContent:"center", opacity:0.38 }}>
-                  {locked.map(b=>(
-                    <div key={b.id} title={b.desc}
-                      style={{ display:"flex", alignItems:"center", gap:3, padding:"3px 9px",
-                        borderRadius:99, border:"1px dashed rgba(180,120,60,0.4)" }}>
-                      <span style={{ fontSize:12, filter:"grayscale(1)" }}>{b.icon}</span>
-                      <span style={{ fontSize:10, fontWeight:700, color:T.textLight }}>{b.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : null;
-        })()}
+        {rated > 0 && (
+          <BadgesDisplay myRatings={myRatings}/>
+        )}
       </div>
 
       {rated===0
