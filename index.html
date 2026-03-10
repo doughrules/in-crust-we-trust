@@ -190,6 +190,8 @@ function getLevel(count) {
   return LEVEL_THRESHOLDS.find(l=>count>=l.min) || LEVEL_THRESHOLDS[2];
 }
 
+function scoreToPercent(score) { return score; } // 0-100 pass-through
+
 // Pizza graphic behind score: emoji pizza as background, bold number on top
 function PizzaFill({ score, size=48 }) {
   const pct = scoreToPercent(score);
