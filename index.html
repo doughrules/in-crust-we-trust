@@ -555,8 +555,6 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
   const [restaurant, setRestaurant] = useState(isEdit ? editingRating.restaurant : "");
   const [city, setCity]             = useState(isEdit ? editingRating.city||""   : "");
   const [country, setCountry]       = useState(isEdit ? editingRating.country||"": "");
-  const [price, setPrice]           = useState(isEdit ? (editingRating.price||'') : '');
-  const [currency, setCurrency]     = useState(isEdit ? (editingRating.currency||'PHP') : 'PHP');
 
   // ── Current pizza being rated ──
   const [pizzaName, setPizzaName]   = useState(isEdit ? editingRating.pizzaName  : "");
@@ -564,7 +562,8 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
   const [cats, setCats]             = useState(isEdit ? {...editingRating.cats} : {crust:0,cheese:0,bake:0,toppings:0,vibes:0,pizzaz:0});
   const [review, setReview]         = useState(isEdit ? editingRating.review||"" : "");
   const [selectedTags, setSelectedTags] = useState(isEdit ? [...(editingRating.tags||[])] : []);
-
+  const [price, setPrice]           = useState(isEdit ? (editingRating.price||'') : '');
+  const [currency, setCurrency]     = useState(isEdit ? (editingRating.currency||'PHP') : 'PHP');
   // ── Multi-pizza queue (only used when not editing) ──
   const [queue, setQueue]   = useState([]); // [{pizzaName,style,cats,review,tags,score}]
   const [step, setStep]     = useState(1);  // 1=spot info, 2=score, 3=notes, 4=review queue
@@ -583,16 +582,16 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
     setSelectedTags(p=>p.includes(tag)?p.filter(t=>t!==tag):[...p,tag]);
   }
 
-  // Clear only the current-pizza fields, keep session fields
+  // Clear only the current-pizza fields, keep session fields + currency as default
   function clearPizza() {
     setPizzaName(""); setStyle("");
     setCats({crust:0,cheese:0,bake:0,toppings:0,vibes:0,pizzaz:0});
-    setReview(""); setSelectedTags([]);
+    setReview(""); setSelectedTags([]); setPrice('');
   }
 
   // Add current pizza to queue and go back to step 2 for the next one
   function addToQueue() {
-    const entry = { pizzaName, style, score:overall, cats:{...cats}, review, tags:[...selectedTags] };
+    const entry = { pizzaName, style, score:overall, cats:{...cats}, review, tags:[...selectedTags], price, currency };
     setQueue(q=>[...q, entry]);
     clearPizza();
     setStep(2);
@@ -613,10 +612,11 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
   // Submit the whole queue at once
   async function handleSubmitAll() {
     const date = new Date().toLocaleDateString();
-    const toSave = queue.length > 0 ? queue : [{ pizzaName, style, score:overall, cats:{...cats}, review, tags:[...selectedTags] }];
+    const toSave = queue.length > 0 ? queue : [{ pizzaName, style, score:overall, cats:{...cats}, review, tags:[...selectedTags], price, currency }];
     for (const p of toSave) {
       await addRating({ restaurant, pizzaName:p.pizzaName, style:p.style, city, country,
-        score:p.score, cats:p.cats, review:p.review, tags:p.tags, price, currency, date });
+        score:p.score, cats:p.cats, review:p.review, tags:p.tags,
+        price:p.price, currency:p.currency, date });
     }
     setSubmitted(true);
   }
@@ -680,11 +680,8 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
 
   // Steps: 1=spot, 2=pizza name+style, 3=score, 4=notes — then queue review before final submit
   // For edit mode, just 3 steps (no queue)
-  const totalSteps = isEdit ? 3 : 4;
-  // Which progress step we're on (steps 2-4 are per-pizza)
-  const progressStep = isEdit
-    ? step
-    : step === 1 ? 1 : step; // same numbering works
+  const totalSteps = 4;
+  const progressStep = step;
 
   return (
     <div style={{ maxWidth:480, margin:"0 auto", padding:"24px 16px 100px",
@@ -757,8 +754,8 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
                 <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                   {[
                     { icon:"📍", text:"Restaurant & location" },
-                    { icon:"💰", text:"Price paid" },
                     { icon:"🍕", text:"Rate multiple pizzas" },
+                    { icon:"💰", text:"Price per pizza" },
                   ].map(({icon,text})=>(
                     <div key={text} style={{ display:"flex", alignItems:"center", gap:4,
                       background:"rgba(255,255,255,0.12)", backdropFilter:"blur(4px)",
@@ -821,64 +818,19 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
                 suggestions={[...new Set([...pastCountries,"Italy","USA","Japan","UK","France","Australia","Germany","Spain","Singapore","Thailand","Hong Kong","Philippines"])].filter(c=>!["Italy","USA","Japan","UK","France","Australia","Germany","Spain","Singapore","Thailand","Hong Kong","Philippines"].includes(c)||pastCountries.includes(c))}
                 placeholder="Or type another country…" style={{ ...inp, fontSize:13 }}/>
             </div>
-            <div>
-              <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>
-                Price per pizza <span style={{fontWeight:400,color:T.textLight}}>(optional)</span>
-              </label>
-              <div style={{ display:"flex", gap:8 }}>
-                <select value={currency} onChange={e=>setCurrency(e.target.value)}
-                  style={{ ...inp, width:"auto", padding:"11px 10px", flexShrink:0, fontSize:13 }}>
-                  {[["PHP","₱ PHP"],["USD","$ USD"],["JPY","¥ JPY"],["SGD","S$ SGD"],
-                    ["THB","฿ THB"],["HKD","HK$ HKD"],["EUR","€ EUR"],["GBP","£ GBP"],
-                    ["AUD","A$ AUD"]].map(([c,l])=>(
-                    <option key={c} value={c}>{l}</option>
-                  ))}
-                </select>
-                <input type="number" min="0" step="1" value={price}
-                  onChange={e=>setPrice(e.target.value)}
-                  placeholder="e.g. 450"
-                  style={{ ...inp, flex:1 }}/>
-              </div>
-            </div>
-            {/* Edit mode also needs pizza name + style here */}
-            {isEdit && (<>
-              <div>
-                <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                  marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Pizza Name</label>
-                <AutocompleteInput value={pizzaName} onChange={setPizzaName}
-                  suggestions={pastPizzaNames} placeholder="e.g. Margherita" style={inp}/>
-              </div>
-              <div>
-                <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                  marginBottom:7, letterSpacing:"0.06em", textTransform:"uppercase" }}>Style</label>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                  {STYLES.map(s=>(
-                    <button key={s} onClick={()=>setStyle(s)}
-                      style={{ padding:"7px 12px", borderRadius:10, fontSize:12, fontWeight:800,
-                        cursor:"pointer", transition:"all 0.13s",
-                        border:`1.5px solid ${style===s?T.red:T.borderMed}`,
-                        background:style===s?T.red:"white",
-                        color:style===s?"white":T.textMid }}>
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>)}
             <button onClick={()=>setStep(2)}
-              disabled={isEdit ? (!restaurant||!pizzaName||!style) : !restaurant}
+              disabled={isEdit ? (!restaurant) : !restaurant}
               style={{ marginTop:6, padding:"13px", borderRadius:12, fontWeight:900, fontSize:15,
                 background:T.red, color:"white", border:"none", cursor:"pointer",
-                opacity:(isEdit ? (!restaurant||!pizzaName||!style) : !restaurant)?0.3:1 }}>
-              {isEdit ? "Rate It →" : "Start Rating →"}
+                opacity:(!restaurant)?0.3:1 }}>
+              {isEdit ? "Next →" : "Start Rating →"}
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 2: Pizza name + style (new session only) */}
-      {!isEdit && step===2 && (
+      {/* STEP 2: Pizza ID — name, style, price (new session + edit) */}
+      {step===2 && (
         <div>
           <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:4 }}>
             Pizza ID
@@ -909,6 +861,26 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
                 ))}
               </div>
             </div>
+            <div>
+              <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+                marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>
+                Price paid <span style={{fontWeight:400,color:T.textLight}}>(optional)</span>
+              </label>
+              <div style={{ display:"flex", gap:8 }}>
+                <select value={currency} onChange={e=>setCurrency(e.target.value)}
+                  style={{ ...inp, width:"auto", padding:"11px 10px", flexShrink:0, fontSize:13 }}>
+                  {[["PHP","₱ PHP"],["USD","$ USD"],["JPY","¥ JPY"],["SGD","S$ SGD"],
+                    ["THB","฿ THB"],["HKD","HK$ HKD"],["EUR","€ EUR"],["GBP","£ GBP"],
+                    ["AUD","A$ AUD"]].map(([c,l])=>(
+                    <option key={c} value={c}>{l}</option>
+                  ))}
+                </select>
+                <input type="number" min="0" step="1" value={price}
+                  onChange={e=>setPrice(e.target.value)}
+                  placeholder="e.g. 450"
+                  style={{ ...inp, flex:1 }}/>
+              </div>
+            </div>
             <button onClick={()=>setStep(3)} disabled={!pizzaName||!style}
               style={{ marginTop:6, padding:"13px", borderRadius:12, fontWeight:900, fontSize:15,
                 background:T.red, color:"white", border:"none", cursor:"pointer",
@@ -920,7 +892,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
       )}
 
       {/* STEP 3: Score categories */}
-      {step===(isEdit?2:3) && (
+      {step===3 && (
         <div>
           <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:3 }}>
             Score each category
@@ -947,7 +919,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
               </div>
             </div>
           )}
-          <button onClick={()=>setStep(isEdit?3:4)} disabled={!allCatsRated}
+          <button onClick={()=>setStep(4)} disabled={!allCatsRated}
             style={{ width:"100%", padding:"13px", borderRadius:12, fontWeight:900, fontSize:15,
               background:T.red, color:"white", border:"none", cursor:"pointer",
               opacity:allCatsRated?1:0.3 }}>
@@ -956,8 +928,8 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
         </div>
       )}
 
-      {/* STEP 4: Notes + tags — then either queue another or go to review */}
-      {step===(isEdit?3:4) && (
+      {/* STEP 4: Notes + tags */}
+      {step===4 && (
         <div>
           <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:3 }}>Pizza Bytes</h2>
           <div style={{ fontSize:12, color:T.textLight, marginBottom:14 }}>
