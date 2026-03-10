@@ -728,22 +728,47 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
         <div>
           {/* Hero image — only on fresh sessions, not edit */}
           {!isEdit && (
-            <div style={{ borderRadius:16, overflow:"hidden", marginBottom:20, position:"relative",
-              height:160 }}>
+            <div style={{ borderRadius:18, overflow:"hidden", marginBottom:24, position:"relative",
+              height:280 }}>
               <img src={PIZZA_HERO} alt="Pizza"
                 style={{ width:"100%", height:"100%", objectFit:"cover",
-                  objectPosition:"center 40%", display:"block" }}/>
-              {/* Dark gradient overlay at bottom for text legibility */}
+                  objectPosition:"center 35%", display:"block" }}/>
+              {/* Heavy darkening layer — top clear, bottom near-black */}
               <div style={{ position:"absolute", inset:0,
-                background:"linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(15,5,1,0.55) 100%)",
-                borderRadius:16 }}/>
-              <div style={{ position:"absolute", bottom:12, left:14 }}>
-                <div style={{ fontSize:22, fontWeight:900, color:"white",
-                  letterSpacing:"-0.5px", textShadow:"0 1px 6px rgba(0,0,0,0.5)" }}>
-                  Where did you eat?
+                background:"linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.45) 45%, rgba(5,1,0,0.93) 100%)" }}/>
+              {/* Text block */}
+              <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"18px 18px 20px" }}>
+                {/* Eyebrow */}
+                <div style={{ display:"inline-flex", alignItems:"center", gap:6,
+                  background:"rgba(201,59,10,0.85)", borderRadius:6,
+                  padding:"3px 9px", marginBottom:10 }}>
+                  <span style={{ fontSize:10, fontWeight:900, color:"white",
+                    letterSpacing:"0.12em", textTransform:"uppercase" }}>
+                    Step 1 · Spot Info
+                  </span>
                 </div>
-                <div style={{ fontSize:12, color:"rgba(255,220,180,0.8)", marginTop:1 }}>
-                  Set the spot — then rate each pizza
+                {/* Main title */}
+                <div style={{ fontSize:40, fontWeight:900, color:"white", lineHeight:1,
+                  letterSpacing:"-1.5px", marginBottom:8,
+                  textShadow:"0 2px 0 rgba(0,0,0,0.9), 0 4px 20px rgba(0,0,0,0.8)" }}>
+                  Pizza ID
+                </div>
+                {/* Detail pills */}
+                <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                  {[
+                    { icon:"📍", text:"Restaurant & location" },
+                    { icon:"💰", text:"Price paid" },
+                    { icon:"🍕", text:"Rate multiple pizzas" },
+                  ].map(({icon,text})=>(
+                    <div key={text} style={{ display:"flex", alignItems:"center", gap:4,
+                      background:"rgba(255,255,255,0.12)", backdropFilter:"blur(4px)",
+                      border:"1px solid rgba(255,255,255,0.18)",
+                      borderRadius:20, padding:"4px 10px" }}>
+                      <span style={{ fontSize:12 }}>{icon}</span>
+                      <span style={{ fontSize:11, fontWeight:700, color:"rgba(255,230,190,0.95)",
+                        letterSpacing:"0.02em" }}>{text}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
