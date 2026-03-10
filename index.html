@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -19,136 +20,134 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
-const STYLES = ["Neapolitan","New York","Detroit","Roman","Sicilian","Tokyo","Grandma","Wildcard"];
+const STYLES = [“Neapolitan”,“New York”,“Detroit”,“Roman”,“Sicilian”,“Tokyo”,“Grandma”,“Wildcard”];
 
 const CATEGORIES = [
-  { key:"crust",    label:"Crust",    icon:"🥖", desc:"Texture, char, chew" },
-  { key:"cheese",   label:"Cheese",   icon:"🧀", desc:"Melt, stretch, quality" },
-  { key:"bake",     label:"Bake",     icon:"🔥", desc:"Doneness, bottom, leopard" },
-  { key:"toppings", label:"Toppings", icon:"🍅", desc:"Quality, balance, coverage" },
-  { key:"vibes",    label:"Vibes",    icon:"✨", desc:"Atmosphere, experience" },
-  { key:"pizzaz",   label:"PIZZAZ!",  icon:"⚡", desc:"The wow factor. IYKYK." },
+{ key:“crust”,    label:“Crust”,    icon:“🥖”, desc:“Texture, char, chew” },
+{ key:“cheese”,   label:“Cheese”,   icon:“🧀”, desc:“Melt, stretch, quality” },
+{ key:“bake”,     label:“Bake”,     icon:“🔥”, desc:“Doneness, bottom, leopard” },
+{ key:“toppings”, label:“Toppings”, icon:“🍅”, desc:“Quality, balance, coverage” },
+{ key:“vibes”,    label:“Vibes”,    icon:“✨”, desc:“Atmosphere, experience” },
+{ key:“pizzaz”,   label:“PIZZAZ!”,  icon:“⚡”, desc:“The wow factor. IYKYK.” },
 ];
 
 // Score labels with tier styling
 const SCORE_TIERS = [
-  { min:93, label:"🧀 Cheesus Crust!", color:"#c93b0a", bg:"rgba(201,59,10,0.12)", size:22, weight:900, glow:true },
-  { min:85, label:"✨ Upper Crust",    color:"#9a3bc9", bg:"rgba(154,59,201,0.10)", size:19, weight:900, glow:true },
-  { min:80, label:"👑 Upper Crust",    color:"#b8860b", bg:"rgba(184,134,11,0.12)", size:17, weight:900, glow:false },
-  { min:70, label:"Great",             color:"#2d7a8a", bg:"rgba(45,122,138,0.10)", size:14, weight:800, glow:false },
-  { min:60, label:"Good",              color:"#2d8a4e", bg:"transparent",           size:13, weight:700, glow:false },
-  { min:50, label:"Decent",            color:"#9a5c1a", bg:"transparent",           size:13, weight:700, glow:false },
-  { min:40, label:"Just Okay",         color:"#888",    bg:"transparent",           size:12, weight:600, glow:false },
-  { min:30, label:"Meh",               color:"#888",    bg:"transparent",           size:12, weight:600, glow:false },
-  { min:20, label:"Poor",              color:"#c93b0a", bg:"transparent",           size:12, weight:600, glow:false },
-  { min:0,  label:"Tragic",            color:"#c93b0a", bg:"transparent",           size:12, weight:600, glow:false },
+{ min:93, label:“🧀 Cheesus Crust!”, color:”#c93b0a”, bg:“rgba(201,59,10,0.12)”, size:22, weight:900, glow:true },
+{ min:85, label:“✨ Almost Holy”,    color:”#9a3bc9”, bg:“rgba(154,59,201,0.10)”, size:19, weight:900, glow:true },
+{ min:80, label:“👑 Upper Crust”,    color:”#b8860b”, bg:“rgba(184,134,11,0.12)”, size:17, weight:900, glow:false },
+{ min:70, label:“Great”,             color:”#2d7a8a”, bg:“rgba(45,122,138,0.10)”, size:14, weight:800, glow:false },
+{ min:60, label:“Good”,              color:”#2d8a4e”, bg:“transparent”,           size:13, weight:700, glow:false },
+{ min:50, label:“Decent”,            color:”#9a5c1a”, bg:“transparent”,           size:13, weight:700, glow:false },
+{ min:40, label:“Just Okay”,         color:”#888”,    bg:“transparent”,           size:12, weight:600, glow:false },
+{ min:30, label:“Meh”,               color:”#888”,    bg:“transparent”,           size:12, weight:600, glow:false },
+{ min:20, label:“Poor”,              color:”#c93b0a”, bg:“transparent”,           size:12, weight:600, glow:false },
+{ min:0,  label:“Tragic”,            color:”#c93b0a”, bg:“transparent”,           size:12, weight:600, glow:false },
 ];
 function scoreTier(s) {
-  return SCORE_TIERS.find(t => s >= t.min) || SCORE_TIERS[SCORE_TIERS.length-1];
+return SCORE_TIERS.find(t => s >= t.min) || SCORE_TIERS[SCORE_TIERS.length-1];
 }
 function scoreLabel(s) { return scoreTier(s).label; }
 
 function ScoreLabel({ score, style: extraStyle }) {
-  const tier = scoreTier(score);
-  return (
-    <span style={{
-      fontSize: tier.size,
-      fontWeight: tier.weight,
-      color: tier.color,
-      background: "transparent",
-      borderRadius: 0,
-      padding: 0,
-      display: "inline-block",
-      letterSpacing: "-0.01em",
-      fontFamily: "Georgia,serif",
-      boxShadow: "none",
-      border: "none",
-      ...extraStyle
-    }}>
-      {tier.label}
-    </span>
-  );
+const tier = scoreTier(score);
+return (
+<span style={{
+fontSize: tier.size,
+fontWeight: tier.weight,
+color: tier.color,
+background: “transparent”,
+borderRadius: 0,
+padding: 0,
+display: “inline-block”,
+letterSpacing: “-0.01em”,
+fontFamily: “Georgia,serif”,
+boxShadow: “none”,
+border: “none”,
+…extraStyle
+}}>
+{tier.label}
+</span>
+);
 }
 
 const POSITIVE_TAGS = [
-  { label:"Perfect Char",        icon:"🔥" },
-  { label:"Crispy Crust",        icon:"🥖" },
-  { label:"Cheesy Heaven",       icon:"🧀" },
-  { label:"Balanced",            icon:"⚖️" },
-  { label:"Great Dough",         icon:"💪" },
-  { label:"Flavor Bomb",         icon:"💥" },
-  { label:"Topping Harmony",     icon:"🎯" },
-  { label:"Quality Ingredients", icon:"✨" },
-  { label:"Worth the Trip",      icon:"🗺️" },
+{ label:“Perfect Char”,        icon:“🔥” },
+{ label:“Crispy Crust”,        icon:“🥖” },
+{ label:“Cheesy Heaven”,       icon:“🧀” },
+{ label:“Balanced”,            icon:“⚖️” },
+{ label:“Great Dough”,         icon:“💪” },
+{ label:“Flavor Bomb”,         icon:“💥” },
+{ label:“Topping Harmony”,     icon:“🎯” },
+{ label:“Quality Ingredients”, icon:“✨” },
+{ label:“Worth the Trip”,      icon:“🗺️” },
 ];
 const NEGATIVE_TAGS = [
-  { label:"Soggy Slice", icon:"💧" },
-  { label:"Burnt",       icon:"🪨" },
-  { label:"Too Salty",   icon:"🧂" },
-  { label:"Bland",       icon:"😶" },
-  { label:"Grease Bomb", icon:"🛢️" },
-  { label:"Hate Crime",  icon:"🚫" },
+{ label:“Soggy Slice”, icon:“💧” },
+{ label:“Burnt”,       icon:“🪨” },
+{ label:“Too Salty”,   icon:“🧂” },
+{ label:“Bland”,       icon:“😶” },
+{ label:“Grease Bomb”, icon:“🛢️” },
+{ label:“Hate Crime”,  icon:“🚫” },
 ];
-const ALL_TAGS = [...POSITIVE_TAGS, ...NEGATIVE_TAGS];
-
+const ALL_TAGS = […POSITIVE_TAGS, …NEGATIVE_TAGS];
 
 // ── BADGES ────────────────────────────────────────────────────────────────────
 const BADGE_DEFS = [
-  { id:"first_bite",       icon:"🍕", name:"First Bite",       desc:"Rated your first pizza",             check:r=>r.length>=1 },
-  { id:"ten_slices",       icon:"🍕", name:"Pizza Tenthusiast",  desc:"Rated 10 pizzas",                    check:r=>r.length>=10 },
-  { id:"twenty_twenty",    icon:"👁️", name:"20/20 Vision",       desc:"Rated 20 pizzas",                    check:r=>r.length>=20 },
-  { id:"pizza_centurion",  icon:"💯", name:"Pizza Centurion",   desc:"Rated 100 pizzas",                   check:r=>r.length>=100 },
-  { id:"style_master",     icon:"👑", name:"Style Master",      desc:"Rated all 8 pizza styles",           check:r=>STYLES.every(s=>r.some(x=>x.style===s)) },
-  { id:"globe_trotter",    icon:"🌍", name:"Globe Trotter",     desc:"Rated pizzas in 5+ countries",       check:r=>new Set(r.map(x=>x.country).filter(Boolean)).size>=5 },
-  { id:"harsh_critic",     icon:"💀", name:"Harsh Critic",      desc:"Avg score under 60 (min 5 ratings)", check:r=>r.length>=5&&r.reduce((a,x)=>a+x.score,0)/r.length<60 },
-  { id:"creature_of_habit",icon:"🔁", name:"Creature of Habit", desc:"Visited the same spot 3+ times",     check:r=>{ const c={}; r.forEach(x=>c[x.restaurant]=(c[x.restaurant]||0)+1); return Object.values(c).some(v=>v>=3); }},
-  { id:"value_hunter",     icon:"🎯", name:"Value Hunter",      desc:"Score ≥90 for under $10 USD",         check:r=>r.some(x=>{ const p=parseFloat(x.price); if(!p||p<=0) return false; const usd=p*(CURRENCY_TO_USD[x.currency]||1); return x.score>=90&&usd<10; })},
-  { id:"high_roller",      icon:"💎", name:"High Roller",       desc:"Paid over $50 USD for a pizza",       check:r=>r.some(x=>{ const p=parseFloat(x.price); const usd=p*(CURRENCY_TO_USD[x.currency]||1); return p>0&&usd>=50; })},
+{ id:“first_bite”,       icon:“🍕”, name:“First Bite”,       desc:“Rated your first pizza”,             check:r=>r.length>=1 },
+{ id:“ten_slices”,       icon:“🍕”, name:“Pizza Tenthusiast”,  desc:“Rated 10 pizzas”,                    check:r=>r.length>=10 },
+{ id:“twenty_twenty”,    icon:“👁️”, name:“20/20 Vision”,       desc:“Rated 20 pizzas”,                    check:r=>r.length>=20 },
+{ id:“pizza_centurion”,  icon:“💯”, name:“Pizza Centurion”,   desc:“Rated 100 pizzas”,                   check:r=>r.length>=100 },
+{ id:“style_master”,     icon:“👑”, name:“Style Master”,      desc:“Rated all 8 pizza styles”,           check:r=>STYLES.every(s=>r.some(x=>x.style===s)) },
+{ id:“globe_trotter”,    icon:“🌍”, name:“Globe Trotter”,     desc:“Rated pizzas in 5+ countries”,       check:r=>new Set(r.map(x=>x.country).filter(Boolean)).size>=5 },
+{ id:“harsh_critic”,     icon:“💀”, name:“Harsh Critic”,      desc:“Avg score under 60 (min 5 ratings)”, check:r=>r.length>=5&&r.reduce((a,x)=>a+x.score,0)/r.length<60 },
+{ id:“creature_of_habit”,icon:“🔁”, name:“Creature of Habit”, desc:“Visited the same spot 3+ times”,     check:r=>{ const c={}; r.forEach(x=>c[x.restaurant]=(c[x.restaurant]||0)+1); return Object.values(c).some(v=>v>=3); }},
+{ id:“value_hunter”,     icon:“🎯”, name:“Value Hunter”,      desc:“Score ≥90 for under $10 USD”,         check:r=>r.some(x=>{ const p=parseFloat(x.price); if(!p||p<=0) return false; const usd=p*(CURRENCY_TO_USD[x.currency]||1); return x.score>=90&&usd<10; })},
+{ id:“high_roller”,      icon:“💎”, name:“High Roller”,       desc:“Paid over $50 USD for a pizza”,       check:r=>r.some(x=>{ const p=parseFloat(x.price); const usd=p*(CURRENCY_TO_USD[x.currency]||1); return p>0&&usd>=50; })},
 ];
 function getEarnedBadges(ratings) { return BADGE_DEFS.filter(b=>b.check(ratings)); }
 
 const LEVEL_THRESHOLDS = [
-  { min:200, label:"Cheesus Crust Superstar", icon:"🌍" },
-  { min:100, label:"Pizza Overlord",          icon:"👑" },
-  { min:50,  label:"Pizza Inspector",         icon:"⭐" },
-  { min:25,  label:"Dough Scholar",           icon:"🏅" },
-  { min:15,  label:"Crust Apprentice",        icon:"🧎" },
-  { min:5,   label:"Pie Curious",             icon:"😜" },
-  { min:0,   label:"Rookie",                  icon:"🍕" },
+{ min:200, label:“Cheesus Crust Superstar”, icon:“🌍” },
+{ min:100, label:“Pizza Overlord”,          icon:“👑” },
+{ min:50,  label:“Pizza Inspector”,         icon:“⭐” },
+{ min:25,  label:“Dough Scholar”,           icon:“🏅” },
+{ min:15,  label:“Crust Apprentice”,        icon:“🧎” },
+{ min:5,   label:“Pie Curious”,             icon:“😜” },
+{ min:0,   label:“Rookie”,                  icon:“🍕” },
 ];
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
 // Warm parchment + terracotta — no black
 const T = {
-  bg:        "#fdf6ec",   // warm parchment
-  bgCard:    "#fff8f0",
-  bgDeep:    "#f5e8d4",
-  border:    "rgba(180,120,60,0.18)",
-  borderMed: "rgba(180,120,60,0.32)",
-  red:       "#c93b0a",
-  redLight:  "rgba(201,59,10,0.12)",
-  amber:     "#9a5c1a",
-  amberMid:  "#c17b3a",
-  textDark:  "#2a1a08",
-  textMid:   "#7a4f28",
-  textLight: "#b08050",
-  green:     "#2d8a4e",
-  greenBg:   "rgba(45,138,78,0.1)",
-  deleteBg:  "rgba(201,59,10,0.1)",
-  header:    "rgba(253,246,236,0.94)",
+bg:        “#fdf6ec”,   // warm parchment
+bgCard:    “#fff8f0”,
+bgDeep:    “#f5e8d4”,
+border:    “rgba(180,120,60,0.18)”,
+borderMed: “rgba(180,120,60,0.32)”,
+red:       “#c93b0a”,
+redLight:  “rgba(201,59,10,0.12)”,
+amber:     “#9a5c1a”,
+amberMid:  “#c17b3a”,
+textDark:  “#2a1a08”,
+textMid:   “#7a4f28”,
+textLight: “#b08050”,
+green:     “#2d8a4e”,
+greenBg:   “rgba(45,138,78,0.1)”,
+deleteBg:  “rgba(201,59,10,0.1)”,
+header:    “rgba(253,246,236,0.94)”,
 };
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
 function calcOverall(cats) {
-  const vals = Object.values(cats).filter(Boolean);
-  if (!vals.length) return 0;
-  return Math.round(vals.reduce((a,b)=>a+b,0) / 30 * 100);
+const vals = Object.values(cats).filter(v=>v>0);
+if (!vals.length) return 0;
+// Always divide by 30 (max possible) so partial ratings aren’t inflated
+return Math.round(vals.reduce((a,b)=>a+b,0) / 30 * 100);
 }
-
 
 // ── Value Score: pure ratio score/price (currency-agnostic for sorting)
 // Normalise to USD-equivalent for rough comparison
@@ -156,2010 +155,1921 @@ const CURRENCY_TO_USD = { PHP:0.017, USD:1, JPY:0.0067, SGD:0.74, THB:0.028, HKD
 // Worth It thresholds by price in USD:
 // ≤$10→70, ≤$25→75, ≤$30→85, ≤$40→90, ≤$60→95, $61+→never worth it
 function worthItThreshold(usd) {
-  if (usd >= 61) return Infinity; // never worth it
-  if (usd >= 50) return 95;
-  if (usd >= 40) return 90;
-  if (usd >= 30) return 85;
-  if (usd >= 20) return 75;
-  if (usd >= 10) return 70;
-  return 60;
+if (usd >= 61) return Infinity; // never worth it
+if (usd >= 50) return 95;
+if (usd >= 40) return 90;
+if (usd >= 30) return 85;
+if (usd >= 20) return 75;
+if (usd >= 10) return 70;
+return 60;
 }
 function isWorthIt(score, price, currency) {
-  const p = parseFloat(price);
-  if (!p || p <= 0) return null;
-  const usd = p * (CURRENCY_TO_USD[currency] || 1);
-  return score >= worthItThreshold(usd);
+const p = parseFloat(price);
+if (!p || p <= 0) return null;
+const usd = p * (CURRENCY_TO_USD[currency] || 1);
+return score >= worthItThreshold(usd);
 }
 function valueLabel(score, price, currency) {
-  const w = isWorthIt(score, price, currency);
-  if (w === null) return null;
-  return w
-    ? { text:"✅ Worth It",     color:"#2d8a4e" }
-    : { text:"❌ Not Worth It", color:"#c93b0a" };
+const w = isWorthIt(score, price, currency);
+if (w === null) return null;
+return w
+? { text:“✅ Worth It”,     color:”#2d8a4e” }
+: { text:“❌ Not Worth It”, color:”#c93b0a” };
 }
 // Keep a ratio for sort purposes only
 function valueRatio(score, price, currency) {
-  const p = parseFloat(price);
-  if (!p || p <= 0) return null;
-  const usd = p * (CURRENCY_TO_USD[currency] || 1);
-  return score / usd;
+const p = parseFloat(price);
+if (!p || p <= 0) return null;
+const usd = p * (CURRENCY_TO_USD[currency] || 1);
+return score / usd;
 }
 
-// score is already 0-100 integer
-function scoreTo10(score) { return score; }        // display as-is
-function scoreToPercent(score) { return score; }   // ring fill as-is
-
 function getLevel(count) {
-  return LEVEL_THRESHOLDS.find(l=>count>=l.min) || LEVEL_THRESHOLDS[2];
+return LEVEL_THRESHOLDS.find(l=>count>=l.min) || LEVEL_THRESHOLDS[2];
 }
 
 // Pizza graphic behind score: emoji pizza as background, bold number on top
 function PizzaFill({ score, size=48 }) {
-  const pct = scoreToPercent(score);
-  const color = pct>=80?"#c93b0a" : pct>=60?"#c17b3a" : pct>=40?"#9a5c1a" : "#b08050";
-  const fontSize = size >= 70 ? size*0.26 : size >= 40 ? size*0.28 : size*0.32;
-  return (
-    <div style={{ position:"relative", width:size, height:size, display:"inline-flex",
-      alignItems:"center", justifyContent:"center" }}>
-      {/* Pizza emoji as the graphic background */}
-      <span style={{ position:"absolute", fontSize:size*0.92, lineHeight:1,
-        userSelect:"none", filter:"saturate(1.1)" }}>🍕</span>
-      {/* Score number on top */}
-      <span style={{ position:"relative", zIndex:1, fontSize, fontWeight:900,
-        color:"white", lineHeight:1, fontFamily:"Georgia,serif",
-        letterSpacing:"-0.02em",
-        textShadow:`0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.3)` }}>
-        {score}
-      </span>
-    </div>
-  );
+const pct = scoreToPercent(score);
+const color = pct>=80?”#c93b0a” : pct>=60?”#c17b3a” : pct>=40?”#9a5c1a” : “#b08050”;
+const fontSize = size >= 70 ? size*0.26 : size >= 40 ? size*0.28 : size*0.32;
+return (
+<div style={{ position:“relative”, width:size, height:size, display:“inline-flex”,
+alignItems:“center”, justifyContent:“center” }}>
+{/* Pizza emoji as the graphic background */}
+<span style={{ position:“absolute”, fontSize:size*0.92, lineHeight:1,
+userSelect:“none”, filter:“saturate(1.1)” }}>🍕</span>
+{/* Score number on top */}
+<span style={{ position:“relative”, zIndex:1, fontSize, fontWeight:900,
+color:“white”, lineHeight:1, fontFamily:“Georgia,serif”,
+letterSpacing:”-0.02em”,
+textShadow:`0 1px 4px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.3)` }}>
+{score}
+</span>
+</div>
+);
 }
 
 // Card badge: bold number + small 🍕 to the right (Infatuation style)
 function ScoreBadge({ score, large=false }) {
-  const num   = score;
-  const pct   = score;
-  const color = pct>=80?"#c93b0a" : pct>=60?"#c17b3a" : "#9a5c1a";
-  const fs    = large ? 28 : 20;
-  const efs   = large ? 14 : 11;
-  return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:3 }}>
-      <span style={{ fontSize:fs, fontWeight:900, color, fontFamily:"Georgia,serif",
-        letterSpacing:"-0.03em", lineHeight:1 }}>{num}</span>
-      <span style={{ fontSize:efs, lineHeight:1 }}>🍕</span>
-    </span>
-  );
-}
-
-// 5-slice score row with half-slice clipping
-function PizzaScore({ score, size="md" }) {
-  const em = { sm:"1.05rem", md:"1.6rem", lg:"2.5rem" }[size];
-  const full  = Math.floor(score);
-  const half  = (score%1)>=0.5;
-  const empty = 5-full-(half?1:0);
-  return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:1 }}>
-      {Array(full).fill(0).map((_,i)=>(
-        <span key={`f${i}`} style={{ fontSize:em, lineHeight:1 }}>🍕</span>
-      ))}
-      {half && (
-        <span style={{ fontSize:em, lineHeight:1, display:"inline-block",
-          width:`calc(${em} * 0.52)`, overflow:"hidden", verticalAlign:"middle" }}>🍕</span>
-      )}
-      {Array(empty).fill(0).map((_,i)=>(
-        <span key={`e${i}`} style={{ fontSize:em, lineHeight:1, opacity:0.2 }}>🍕</span>
-      ))}
-    </span>
-  );
+const num   = score;
+const pct   = score;
+const color = pct>=80?”#c93b0a” : pct>=60?”#c17b3a” : “#9a5c1a”;
+const fs    = large ? 28 : 20;
+const efs   = large ? 14 : 11;
+return (
+<span style={{ display:“inline-flex”, alignItems:“center”, gap:3 }}>
+<span style={{ fontSize:fs, fontWeight:900, color, fontFamily:“Georgia,serif”,
+letterSpacing:”-0.03em”, lineHeight:1 }}>{num}</span>
+<span style={{ fontSize:efs, lineHeight:1 }}>🍕</span>
+</span>
+);
 }
 
 // Horizontal progress bar for category breakdown (score is 0-5 per category)
 function PizzaMeter({ score, label, showLabel=true }) {
-  const pct = Math.round((score||0) / 5 * 100);
-  const bg = pct>=80?"linear-gradient(90deg,#c93b0a,#e8600a)"
-           : pct>=60?"linear-gradient(90deg,#9a5c1a,#c17b3a)"
-           :          "linear-gradient(90deg,#b08050,#c8a070)";
-  return (
-    <div style={{ width:"100%" }}>
-      {showLabel && (
-        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-          <span style={{ fontSize:11, fontWeight:800, color:T.textMid }}>{label}</span>
-          <span style={{ fontSize:11, fontWeight:900, color:T.red }}>{pct}%</span>
-        </div>
-      )}
-      <div style={{ height:7, borderRadius:99, background:T.bgDeep, overflow:"hidden" }}>
-        <div style={{ height:"100%", borderRadius:99, width:`${pct}%`, background:bg,
-          transition:"width 0.5s cubic-bezier(.4,0,.2,1)" }}/>
-      </div>
-    </div>
-  );
+const pct = Math.round((score||0) / 5 * 100);
+const bg = pct>=80?“linear-gradient(90deg,#c93b0a,#e8600a)”
+: pct>=60?“linear-gradient(90deg,#9a5c1a,#c17b3a)”
+:          “linear-gradient(90deg,#b08050,#c8a070)”;
+return (
+<div style={{ width:“100%” }}>
+{showLabel && (
+<div style={{ display:“flex”, justifyContent:“space-between”, marginBottom:3 }}>
+<span style={{ fontSize:11, fontWeight:800, color:T.textMid }}>{label}</span>
+<span style={{ fontSize:11, fontWeight:900, color:T.red }}>{pct}%</span>
+</div>
+)}
+<div style={{ height:7, borderRadius:99, background:T.bgDeep, overflow:“hidden” }}>
+<div style={{ height:“100%”, borderRadius:99, width:`${pct}%`, background:bg,
+transition:“width 0.5s cubic-bezier(.4,0,.2,1)” }}/>
+</div>
+</div>
+);
 }
 
 // Per-criterion interactive slice picker
 function CategoryRater({ cat, value, onChange }) {
-  const [hover, setHover] = useState(null);
-  const display = hover ?? value;
-  function resolve(e,i) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    return e.clientX < rect.left+rect.width/2 ? i-0.5 : i;
-  }
-  return (
-    <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 0",
-      borderBottom:`1px solid ${T.border}` }}>
-      <div style={{ width:26, textAlign:"center", fontSize:17 }}>{cat.icon}</div>
-      <div style={{ flex:1 }}>
-        <div style={{ fontSize:11, fontWeight:900, color:T.amberMid, letterSpacing:"0.07em",
-          textTransform:"uppercase" }}>{cat.label}</div>
-        <div style={{ fontSize:10, color:T.textLight, marginTop:1 }}>{cat.desc}</div>
-      </div>
-      <div style={{ display:"flex", gap:3, cursor:"pointer" }} onMouseLeave={()=>setHover(null)}>
-        {[1,2,3,4,5].map(i=>(
-          <span key={i}
-            style={{ fontSize:"1.3rem", userSelect:"none", lineHeight:1,
-              transition:"transform 0.07s",
-              transform:display>=i-0.4?"scale(1.2)":"scale(1)",
-              opacity:display>=i?1:display>=i-0.5?0.5:0.18 }}
-            onMouseMove={e=>setHover(resolve(e,i))}
-            onClick={e=>onChange(resolve(e,i))}
-            onTouchEnd={e=>{ e.preventDefault(); const t=e.changedTouches[0];
-              const rect=e.currentTarget.getBoundingClientRect();
-              onChange(t.clientX<rect.left+rect.width/2?i-0.5:i); setHover(null); }}
-          >🍕</span>
-        ))}
-      </div>
-      <div style={{ width:28, textAlign:"right", fontSize:13, fontWeight:900,
-        color:display?T.red:T.textLight }}>
-        {display||"—"}
-      </div>
-    </div>
-  );
+const [hover, setHover] = useState(null);
+const display = hover ?? value;
+function resolve(e,i) {
+const rect = e.currentTarget.getBoundingClientRect();
+return e.clientX < rect.left+rect.width/2 ? i-0.5 : i;
+}
+return (
+<div style={{ display:“flex”, alignItems:“center”, gap:10, padding:“11px 0”,
+borderBottom:`1px solid ${T.border}` }}>
+<div style={{ width:26, textAlign:“center”, fontSize:17 }}>{cat.icon}</div>
+<div style={{ flex:1 }}>
+<div style={{ fontSize:11, fontWeight:900, color:T.amberMid, letterSpacing:“0.07em”,
+textTransform:“uppercase” }}>{cat.label}</div>
+<div style={{ fontSize:10, color:T.textLight, marginTop:1 }}>{cat.desc}</div>
+</div>
+<div style={{ display:“flex”, gap:3, cursor:“pointer” }} onMouseLeave={()=>setHover(null)}>
+{[1,2,3,4,5].map(i=>(
+<span key={i}
+style={{ fontSize:“1.3rem”, userSelect:“none”, lineHeight:1,
+transition:“transform 0.07s”,
+transform:display>=i-0.4?“scale(1.2)”:“scale(1)”,
+opacity:display>=i?1:display>=i-0.5?0.5:0.18 }}
+onMouseMove={e=>setHover(resolve(e,i))}
+onClick={e=>onChange(resolve(e,i))}
+onTouchEnd={e=>{ e.preventDefault(); const t=e.changedTouches[0];
+const rect=e.currentTarget.getBoundingClientRect();
+onChange(t.clientX<rect.left+rect.width/2?i-0.5:i); setHover(null); }}
+>🍕</span>
+))}
+</div>
+<div style={{ width:28, textAlign:“right”, fontSize:13, fontWeight:900,
+color:display?T.red:T.textLight }}>
+{display||”—”}
+</div>
+</div>
+);
 }
 
 function Tag({ label, icon, selected, onClick, negative }) {
-  const ac  = negative ? T.red : T.green;
-  const abg = negative ? T.deleteBg : T.greenBg;
-  const border = selected
-    ? `2px solid ${ac}`
-    : negative ? "2px solid rgba(201,59,10,0.25)" : "2px solid rgba(45,138,78,0.25)";
-  const bg = selected ? abg : negative ? "rgba(201,59,10,0.04)" : "rgba(45,138,78,0.04)";
-  return (
-    <button onClick={onClick} style={{ padding:"5px 11px", borderRadius:99, fontSize:12,
-      fontWeight:800, border, background:bg, color:ac,
-      display:"flex", alignItems:"center", gap:4, cursor:"pointer",
-      opacity: selected ? 1 : 0.6,
-      transition:"all 0.12s" }}>
-      {icon} {label}
-    </button>
-  );
+const ac  = negative ? T.red : T.green;
+const abg = negative ? T.deleteBg : T.greenBg;
+const border = selected
+? `2px solid ${ac}`
+: negative ? “2px solid rgba(201,59,10,0.25)” : “2px solid rgba(45,138,78,0.25)”;
+const bg = selected ? abg : negative ? “rgba(201,59,10,0.04)” : “rgba(45,138,78,0.04)”;
+return (
+<button onClick={onClick} style={{ padding:“5px 11px”, borderRadius:99, fontSize:12,
+fontWeight:800, border, background:bg, color:ac,
+display:“flex”, alignItems:“center”, gap:4, cursor:“pointer”,
+opacity: selected ? 1 : 0.6,
+transition:“all 0.12s” }}>
+{icon} {label}
+</button>
+);
 }
 
 function PizzaCard({ pizza, onClick }) {
-  const [hov, setHov] = useState(false);
-  return (
-    <div onClick={()=>onClick(pizza)}
-      onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-      style={{ borderRadius:16, padding:15, cursor:"pointer",
-        background:hov?T.bgDeep:T.bgCard,
-        border:`1px solid ${T.border}`,
-        boxShadow:hov?"0 4px 18px rgba(180,100,30,0.12)":"0 1px 4px rgba(180,100,30,0.07)",
-        transition:"all 0.14s" }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:7 }}>
-        <div>
-          <div style={{ fontWeight:900, fontSize:15, color:T.textDark }}>{pizza.restaurant}</div>
-          <div style={{ fontSize:12, color:T.textMid }}>{pizza.name}
-            <span style={{ color:T.textLight }}> · {pizza.style}</span>
-          </div>
-          {(pizza.city||pizza.country) && (
-            <div style={{ fontSize:11, color:T.textLight, marginTop:1 }}>
-              📍 {[pizza.city,pizza.country].filter(Boolean).join(", ")}
-            </div>
-          )}
+const [hov, setHov] = useState(false);
+return (
+<div onClick={()=>onClick(pizza)}
+onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+style={{ borderRadius:16, padding:15, cursor:“pointer”,
+background:hov?T.bgDeep:T.bgCard,
+border:`1px solid ${T.border}`,
+boxShadow:hov?“0 4px 18px rgba(180,100,30,0.12)”:“0 1px 4px rgba(180,100,30,0.07)”,
+transition:“all 0.14s” }}>
+<div style={{ display:“flex”, justifyContent:“space-between”, alignItems:“flex-start”, marginBottom:7 }}>
+<div>
+<div style={{ fontWeight:900, fontSize:15, color:T.textDark }}>{pizza.restaurant}</div>
+<div style={{ fontSize:12, color:T.textMid }}>{pizza.name}
+<span style={{ color:T.textLight }}> · {pizza.style}</span>
+</div>
+{(pizza.city||pizza.country) && (
+<div style={{ fontSize:11, color:T.textLight, marginTop:1 }}>
+📍 {[pizza.city,pizza.country].filter(Boolean).join(”, “)}
+</div>
+)}
+</div>
+<div style={{ display:“flex”, alignItems:“center”, gap:8 }}>
+<ScoreBadge score={pizza.score} large/>
+<div style={{ fontSize:10, color:T.textLight, marginTop:2 }}>{pizza.ratingCount} rating{pizza.ratingCount!==1?“s”:””}</div>
+</div>
+</div>
+<div style={{ display:“flex”, flexWrap:“wrap”, gap:4, marginTop:8 }}>
+{(pizza.tags||[]).slice(0,3).map(t=>{
+const isNeg = NEGATIVE_TAGS.some(n=>n.label===t.label);
+const tagColor = isNeg ? “#c93b0a” : “#2d8a4e”;
+const tagBg    = isNeg ? “rgba(201,59,10,0.09)” : “rgba(45,138,78,0.09)”;
+return (
+<span key={t.label} style={{ fontSize:11, padding:“2px 8px”, borderRadius:99,
+background:tagBg, color:tagColor,
+display:“inline-flex”, alignItems:“center”, gap:3, fontWeight:700 }}>
+{t.icon} {t.label}
+</span>
+);
+})}
+</div>
+</div>
+);
+}
+
+// ─── AUTOCOMPLETE INPUT ───────────────────────────────────────────────────────
+
+function AutocompleteInput({ value, onChange, suggestions, placeholder, style: extraStyle }) {
+const [open, setOpen] = useState(false);
+const filtered = value.length > 0
+? […new Set(suggestions)].filter(s => s.toLowerCase().includes(value.toLowerCase()) && s.toLowerCase() !== value.toLowerCase()).slice(0, 6)
+: [];
+
+return (
+<div style={{ position:“relative” }}>
+<input
+value={value}
+onChange={e => { onChange(e.target.value); setOpen(true); }}
+onFocus={() => setOpen(true)}
+onBlur={() => setTimeout(() => setOpen(false), 150)}
+placeholder={placeholder}
+style={extraStyle}
+autoComplete=“off”
+/>
+{open && filtered.length > 0 && (
+<div style={{ position:“absolute”, top:“calc(100% + 4px)”, left:0, right:0, zIndex:100,
+background:“white”, border:`1.5px solid ${T.borderMed}`, borderRadius:12,
+boxShadow:“0 6px 24px rgba(180,100,30,0.14)”, overflow:“hidden” }}>
+{filtered.map(s => (
+<div key={s}
+onMouseDown={() => { onChange(s); setOpen(false); }}
+style={{ padding:“10px 14px”, cursor:“pointer”, fontSize:14,
+color:T.textDark, fontFamily:“Georgia,serif”,
+borderBottom:`1px solid ${T.border}`,
+transition:“background 0.1s” }}
+onMouseEnter={e => e.currentTarget.style.background = T.bgDeep}
+onMouseLeave={e => e.currentTarget.style.background = “white”}>
+{s}
+</div>
+))}
+</div>
+)}
+</div>
+);
+}
+
+function EmptyState({ icon, title, sub, action, onAction }) {
+return (
+<div style={{ textAlign:“center”, padding:“50px 20px” }}>
+<div style={{ fontSize:48, marginBottom:10, opacity:0.35 }}>{icon}</div>
+<div style={{ fontSize:16, fontWeight:900, color:T.textDark, marginBottom:6 }}>{title}</div>
+<div style={{ fontSize:13, color:T.textLight, maxWidth:240, margin:“0 auto”,
+lineHeight:1.5, marginBottom:action?20:0 }}>{sub}</div>
+{action && (
+<button onClick={onAction} style={{ marginTop:18, padding:“10px 22px”, borderRadius:12,
+fontWeight:900, fontSize:13, background:T.red, color:“white”, border:“none”, cursor:“pointer” }}>
+{action}
+</button>
+)}
+</div>
+);
+}
+
+// ─── USERNAME SCREEN ──────────────────────────────────────────────────────────
+
+// ─── HOME PAGE ────────────────────────────────────────────────────────────────
+
+function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings }) {
+const recent = […allRatings].reverse().slice(0,6);
+return (
+<div>
+{/* ── BOLD DARK LANDING HERO ── */}
+<div style={{ position:“relative”, overflow:“hidden”,
+background:“linear-gradient(150deg, #0f0501 0%, #1e0a03 45%, #2a0f04 100%)”,
+minHeight:420 }}>
+{/* Scattered background pizzas */}
+{[{t:“8%”,l:“5%”,s:110,r:-20,o:0.06},{t:“55%”,l:“3%”,s:60,r:15,o:0.04},
+{t:“12%”,l:“72%”,s:140,r:25,o:0.07},{t:“60%”,l:“65%”,s:75,r:-10,o:0.04},
+{t:“35%”,l:“38%”,s:50,r:40,o:0.03}].map((p,i)=>(
+<span key={i} style={{ position:“absolute”, fontSize:p.s, top:p.t, left:p.l,
+transform:`rotate(${p.r}deg)`, opacity:p.o, pointerEvents:“none”,
+lineHeight:1, userSelect:“none” }}>🍕</span>
+))}
+{/* Subtle red glow top-left */}
+<div style={{ position:“absolute”, top:-80, left:-80, width:300, height:300,
+background:“radial-gradient(circle, rgba(201,59,10,0.18) 0%, transparent 70%)”,
+pointerEvents:“none” }}/>
+<div style={{ position:“relative”, zIndex:1,
+maxWidth:640, margin:“0 auto”, padding:“52px 24px 48px” }}>
+{/* Private Beta badge */}
+<div style={{ marginBottom:28 }}>
+<span style={{ display:“inline-flex”, alignItems:“center”, gap:6,
+background:“rgba(201,59,10,0.18)”, border:“1px solid rgba(201,59,10,0.35)”,
+borderRadius:99, padding:“5px 14px”,
+fontSize:11, fontWeight:800, color:”#f08060”,
+letterSpacing:“0.12em”, textTransform:“uppercase” }}>
+🍕 Private Beta
+</span>
+</div>
+{/* All-red headline */}
+<h1 style={{ fontFamily:“Georgia,serif”, fontWeight:900,
+lineHeight:0.95, letterSpacing:”-3px”, marginBottom:24 }}>
+<span style={{ display:“block”, fontSize:“clamp(58px,15vw,110px)”,
+color:”#e8390e”, textShadow:“0 0 80px rgba(232,57,14,0.35)” }}>
+Slice,
+</span>
+<span style={{ display:“block”, fontSize:“clamp(58px,15vw,110px)”,
+color:”#e8390e”, textShadow:“0 0 80px rgba(232,57,14,0.35)” }}>
+Slice,
+</span>
+<span style={{ display:“block”, fontSize:“clamp(64px,16vw,120px)”,
+color:”#e8390e”, textShadow:“0 2px 60px rgba(232,57,14,0.5)” }}>
+Baby!
+</span>
+</h1>
+{/* Thin red rule */}
+<div style={{ width:48, height:3,
+background:“linear-gradient(90deg,#e8390e,#c93b0a)”,
+borderRadius:99, marginBottom:18 }}/>
+{/* Bylines */}
+<p style={{ fontSize:18, color:“rgba(245,220,190,0.85)”, marginBottom:4,
+fontFamily:“Georgia,serif”, fontWeight:400, letterSpacing:“0.01em” }}>
+Rate every pie.
+</p>
+<p style={{ fontSize:14, color:“rgba(245,220,190,0.45)”, marginBottom:36,
+fontStyle:“italic”, fontFamily:“Georgia,serif” }}>
+Pizza never lies.
+</p>
+{/* CTAs */}
+<div style={{ display:“flex”, gap:12, flexWrap:“wrap” }}>
+<button onClick={goRate}
+style={{ padding:“15px 32px”, borderRadius:12, fontWeight:900, color:“white”,
+fontSize:15, background:”#e8390e”, border:“none”, cursor:“pointer”,
+boxShadow:“0 6px 28px rgba(232,57,14,0.55)”, letterSpacing:“0.01em”,
+fontFamily:“Georgia,serif” }}>
+Rate a Pizza 🍕
+</button>
+<button onClick={()=>setPage(“explore”)}
+style={{ padding:“15px 32px”, borderRadius:12, fontWeight:900, fontSize:15,
+background:“rgba(255,255,255,0.07)”, border:“1px solid rgba(255,255,255,0.18)”,
+color:“rgba(245,220,190,0.8)”, cursor:“pointer”, fontFamily:“Georgia,serif”,
+backdropFilter:“blur(8px)” }}>
+Explore
+</button>
+</div>
+</div>
+</div>
+
+```
+  <div style={{ maxWidth:640, margin:"0 auto", padding:"0 16px 90px" }}>
+    {allPizzas.length===0 ? (
+      <EmptyState icon="🍕" title="No pizzas rated yet"
+        sub="Be the first to rate a pizza. Your verdict starts the leaderboard."
+        action="Rate a Pizza" onAction={goRate}/>
+    ) : (
+      <>
+        <h2 style={{ fontSize:18, fontWeight:900, color:T.textDark, margin:"8px 0 12px" }}>
+          🔥 Top Rated
+        </h2>
+        <div style={{ display:"grid", gap:9 }}>
+          {allPizzas.slice(0,5).map(p=>(
+            <PizzaCard key={p.id} pizza={p}
+              onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
+          ))}
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <ScoreBadge score={pizza.score} large/>
-          <div style={{ fontSize:10, color:T.textLight, marginTop:2 }}>{pizza.ratingCount} rating{pizza.ratingCount!==1?"s":""}</div>
+      </>
+    )}
+    {recent.length>0 && (
+      <>
+        <h2 style={{ fontSize:18, fontWeight:900, color:T.textDark, margin:"28px 0 12px" }}>
+          🕐 Recent Activity
+        </h2>
+        <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+          {recent.map((r,i)=>(
+            <div key={i} style={{ borderRadius:12, padding:"11px 14px",
+              background:T.bgCard, border:`1px solid ${T.border}`,
+              display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div style={{ fontSize:13 }}>
+                <span style={{ fontWeight:900, color:T.amberMid }}>@{r.user}</span>
+                <span style={{ color:T.textLight }}> rated </span>
+                <span style={{ fontWeight:700, color:T.textDark }}>
+                  {r.restaurant} – {r.pizzaName}
+                </span>
+              </div>
+              <ScoreBadge score={r.score}/>
+            </div>
+          ))}
+        </div>
+      </>
+    )}
+  </div>
+</div>
+```
+
+);
+}
+
+// ─── RATE PAGE ────────────────────────────────────────────────────────────────
+
+function RatePage({ setPage, addRating, editRating, editingRating, setEditingRating, allRatings }) {
+const isEdit = !!editingRating;
+const [step, setStep] = useState(1);
+const [restaurant, setRestaurant] = useState(isEdit ? editingRating.restaurant : “”);
+const [pizzaName, setPizzaName]   = useState(isEdit ? editingRating.pizzaName  : “”);
+const [style, setStyle]           = useState(isEdit ? editingRating.style      : “”);
+const [city, setCity]             = useState(isEdit ? editingRating.city||””   : “”);
+const [country, setCountry]       = useState(isEdit ? editingRating.country||””: “”);
+const [cats, setCats]  = useState(isEdit ? {…editingRating.cats} : {crust:0,cheese:0,bake:0,toppings:0,vibes:0,pizzaz:0});
+const [review, setReview]         = useState(isEdit ? editingRating.review||”” : “”);
+const [selectedTags, setSelectedTags] = useState(isEdit ? […(editingRating.tags||[])] : []);
+const [price, setPrice]       = useState(isEdit ? (editingRating.price||’’) : ‘’);
+const [currency, setCurrency] = useState(isEdit ? (editingRating.currency||‘PHP’) : ‘PHP’);
+const [saved, setSaved]           = useState(false);
+
+// Build suggestion lists from past ratings
+const pastRestaurants = […new Set(allRatings.map(r => r.restaurant).filter(Boolean))];
+const pastPizzaNames  = […new Set(allRatings.filter(r => !restaurant || r.restaurant === restaurant).map(r => r.pizzaName).filter(Boolean))];
+const pastCities      = […new Set(allRatings.map(r => r.city).filter(Boolean))];
+const pastCountries   = […new Set(allRatings.map(r => r.country).filter(Boolean))];
+
+const overall = calcOverall(cats);
+const allCatsRated = Object.values(cats).every(v=>v>0);
+function toggleTag(tag) {
+setSelectedTags(p=>p.includes(tag)?p.filter(t=>t!==tag):[…p,tag]);
+}
+function handleSave() {
+const payload = { restaurant, pizzaName, style, city, country, score:overall, cats:{…cats},
+review, tags:selectedTags, price, currency, date: isEdit ? editingRating.date : new Date().toLocaleDateString() };
+if (isEdit) { editRating(editingRating.id, payload); }
+else        { addRating(payload); }
+setSaved(true);
+}
+function reset() {
+setStep(1); setRestaurant(””); setPizzaName(””); setStyle(””);
+setCity(””); setCountry(””);
+setCats({crust:0,cheese:0,bake:0,toppings:0,vibes:0,pizzaz:0});
+setReview(””); setSelectedTags([]); setPrice(’’); setCurrency(‘PHP’); setSaved(false);
+if (setEditingRating) setEditingRating(null);
+}
+
+const inp = { width:“100%”, borderRadius:12, padding:“11px 13px”, color:T.textDark,
+outline:“none”, background:“white”, border:`1.5px solid ${T.borderMed}`,
+fontSize:15, boxSizing:“border-box”, fontFamily:“Georgia,serif” };
+
+if (saved) return (
+<div style={{ maxWidth:420, margin:“0 auto”, padding:“48px 20px 90px”, textAlign:“center”,
+fontFamily:“Georgia,serif” }}>
+<PizzaFill score={overall} size={90}/>
+<div style={{ marginTop:12 }}>
+<div style={{ fontSize:14, color:T.textLight, marginBottom:6 }}>
+{isEdit ? “✏️ Rating updated” : “Rating saved”}
+</div>
+<ScoreLabel score={overall}/>
+</div>
+<h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:2, marginTop:10 }}>
+{restaurant} — {pizzaName}
+</h2>
+<div style={{ fontSize:12, color:T.textLight, marginBottom:2 }}>{style}</div>
+{(city||country) && <div style={{ fontSize:12, color:T.textLight, marginBottom:14 }}>📍 {[city,country].filter(Boolean).join(”, “)}</div>}
+<div style={{ marginTop:10, marginBottom:18 }}><ScoreBadge score={overall} large/></div>
+<div style={{ background:T.bgDeep, borderRadius:16, padding:“14px 16px”, marginBottom:22,
+textAlign:“left”, border:`1px solid ${T.border}` }}>
+<div style={{ fontSize:10, fontWeight:900, color:T.red, letterSpacing:“0.1em”,
+textTransform:“uppercase”, marginBottom:10 }}>Breakdown</div>
+{CATEGORIES.map(c=>(
+<div key={c.key} style={{ display:“flex”, alignItems:“center”, gap:8, marginBottom:8 }}>
+<span style={{ width:20 }}>{c.icon}</span>
+<span style={{ fontSize:11, fontWeight:800, color:T.textMid, width:60 }}>{c.label}</span>
+<div style={{ flex:1 }}><PizzaMeter score={cats[c.key]} showLabel={false}/></div>
+<span style={{ fontSize:11, fontWeight:900, color:T.red, width:24, textAlign:“right” }}>
+{cats[c.key]}
+</span>
+</div>
+))}
+</div>
+<div style={{ display:“flex”, gap:10, justifyContent:“center” }}>
+{!isEdit && (
+<button onClick={reset} style={{ padding:“11px 20px”, borderRadius:12, fontWeight:900,
+background:T.red, color:“white”, border:“none”, cursor:“pointer” }}>
+Rate Another
+</button>
+)}
+<button onClick={()=>{ reset(); setPage(“profile”); }} style={{ padding:“11px 20px”, borderRadius:12,
+fontWeight:900, background:“white”, border:`2px solid ${T.amberMid}`,
+color:T.amberMid, cursor:“pointer” }}>
+{isEdit ? “← Back to Profile” : “My Profile”}
+</button>
+</div>
+</div>
+);
+
+return (
+<div style={{ maxWidth:480, margin:“0 auto”, padding:“24px 16px 100px”,
+fontFamily:“Georgia,serif” }}>
+{/* Progress bar */}
+<div style={{ display:“flex”, gap:5, marginBottom:24 }}>
+{[1,2,3].map(s=>(
+<div key={s} style={{ flex:1, height:4, borderRadius:99,
+background:step>=s?T.red:T.bgDeep, transition:“background 0.3s” }}/>
+))}
+</div>
+
+```
+  {/* STEP 1 */}
+  {step===1 && (
+    <div>
+      <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:20 }}>
+        {isEdit ? "Edit pizza" : "Identify the pizza"}
+      </h2>
+      <div style={{ display:"flex", flexDirection:"column", gap:13 }}>
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+            marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Restaurant</label>
+          <AutocompleteInput value={restaurant} onChange={setRestaurant}
+            suggestions={pastRestaurants} placeholder="e.g. Crosta" style={inp}/>
+        </div>
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+            marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Pizza Name</label>
+          <AutocompleteInput value={pizzaName} onChange={setPizzaName}
+            suggestions={pastPizzaNames} placeholder="e.g. Margherita" style={inp}/>
+        </div>
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+            marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>City</label>
+          <AutocompleteInput value={city} onChange={setCity}
+            suggestions={pastCities} placeholder="e.g. New York" style={inp}/>
+        </div>
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+            marginBottom:6, letterSpacing:"0.06em", textTransform:"uppercase" }}>Country</label>
+          {/* Quick-tap popular countries */}
+          <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:8 }}>
+            {["🇵🇭 Philippines","🇺🇸 USA","🇯🇵 Japan","🇸🇬 Singapore","🇹🇭 Thailand","🇭🇰 Hong Kong","🇮🇹 Italy","🇬🇧 UK","🇦🇺 Australia","🇫🇷 France","🇩🇪 Germany","🇪🇸 Spain"].map(opt => {
+              const label = opt.split(" ").slice(1).join(" ");
+              const active = country === label;
+              return (
+                <button key={label} onClick={() => setCountry(active ? "" : label)}
+                  style={{ padding:"5px 10px", borderRadius:9, fontSize:12, fontWeight:700,
+                    cursor:"pointer", border:`1.5px solid ${active ? T.red : T.borderMed}`,
+                    background: active ? T.redLight : "white",
+                    color: active ? T.red : T.textMid, transition:"all 0.12s" }}>
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+          <AutocompleteInput value={country} onChange={setCountry}
+            suggestions={[...new Set([...pastCountries,"Italy","USA","Japan","UK","France","Australia","Germany","Spain","Singapore","Thailand","Hong Kong","Philippines"])].filter(c=>!["Italy","USA","Japan","UK","France","Australia","Germany","Spain","Singapore","Thailand","Hong Kong","Philippines"].includes(c)||pastCountries.includes(c))}
+            placeholder="Or type another country…" style={{ ...inp, fontSize:13 }}/>
+        </div>
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+            marginBottom:7, letterSpacing:"0.06em", textTransform:"uppercase" }}>Style</label>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+            {STYLES.map(s=>(
+              <button key={s} onClick={()=>setStyle(s)}
+                style={{ padding:"7px 12px", borderRadius:10, fontSize:12, fontWeight:800,
+                  cursor:"pointer", transition:"all 0.13s",
+                  border:`1.5px solid ${style===s?T.red:T.borderMed}`,
+                  background:style===s?T.red:"white",
+                  color:style===s?"white":T.textMid }}>
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+            marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>
+            Price Paid <span style={{fontWeight:400,color:T.textLight}}>(optional)</span>
+          </label>
+          <div style={{ display:"flex", gap:8 }}>
+            <select value={currency} onChange={e=>setCurrency(e.target.value)}
+              style={{ ...inp, width:"auto", padding:"11px 10px", flexShrink:0, fontSize:13 }}>
+              {[["PHP","₱ PHP"],["USD","$ USD"],["JPY","¥ JPY"],["SGD","S$ SGD"],
+                ["THB","฿ THB"],["HKD","HK$ HKD"],["EUR","€ EUR"],["GBP","£ GBP"],
+                ["AUD","A$ AUD"]].map(([c,l])=>(
+                <option key={c} value={c}>{l}</option>
+              ))}
+            </select>
+            <input type="number" min="0" step="1" value={price}
+              onChange={e=>setPrice(e.target.value)}
+              placeholder="e.g. 450"
+              style={{ ...inp, flex:1 }}/>
+          </div>
+        </div>
+        <button onClick={()=>setStep(2)} disabled={!restaurant||!pizzaName||!style}
+          style={{ marginTop:6, padding:"13px", borderRadius:12, fontWeight:900, fontSize:15,
+            background:T.red, color:"white", border:"none", cursor:"pointer",
+            opacity:(!restaurant||!pizzaName||!style)?0.3:1 }}>
+          Rate It →
+        </button>
+      </div>
+    </div>
+  )}
+
+  {/* STEP 2 */}
+  {step===2 && (
+    <div>
+      <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:3 }}>
+        Score each category
+      </h2>
+      <div style={{ fontSize:12, color:T.textLight, marginBottom:16 }}>
+        {restaurant} · {pizzaName} · {style}
+      </div>
+      <div style={{ background:"white", borderRadius:16, padding:"2px 14px 6px",
+        marginBottom:16, border:`1px solid ${T.border}`,
+        boxShadow:"0 1px 8px rgba(180,100,30,0.08)" }}>
+        {CATEGORIES.map(c=>(
+          <CategoryRater key={c.key} cat={c} value={cats[c.key]}
+            onChange={v=>setCats(p=>({...p,[c.key]:v}))}/>
+        ))}
+      </div>
+      {overall>0 && (
+        <div style={{ background:T.redLight, borderRadius:14, padding:"14px 16px",
+          marginBottom:14, border:`1px solid rgba(201,59,10,0.2)`, textAlign:"center" }}>
+          <div style={{ fontSize:10, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+            textTransform:"uppercase", marginBottom:8 }}>Overall</div>
+          <PizzaFill score={overall} size={60}/>
+          <div style={{ marginTop:8, display:"flex", justifyContent:"center",
+            alignItems:"baseline", gap:10 }}>
+            <span style={{ fontSize:30, fontWeight:900, color:T.red, lineHeight:1 }}>{overall}</span>
+          </div>
+          <div style={{ fontSize:13, fontWeight:700, color:T.textMid, marginTop:3 }}>
+            <ScoreLabel score={overall}/>
+          </div>
+        </div>
+      )}
+      <button onClick={()=>setStep(3)} disabled={!allCatsRated}
+        style={{ width:"100%", padding:"13px", borderRadius:12, fontWeight:900, fontSize:15,
+          background:T.red, color:"white", border:"none", cursor:"pointer",
+          opacity:allCatsRated?1:0.3 }}>
+        Write Your Verdict →
+      </button>
+    </div>
+  )}
+
+  {/* STEP 3 */}
+  {step===3 && (
+    <div>
+      <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:3 }}>Pizza Bytes</h2>
+      <div style={{ fontSize:12, color:T.textLight, marginBottom:14 }}>{restaurant} · {pizzaName} · {overall} overall</div>
+      <textarea value={review} onChange={e=>setReview(e.target.value)}
+        placeholder='"Perfect char, great crust chew."'
+        style={{ ...inp, resize:"none", height:84, marginBottom:14 }}/>
+      <div style={{ marginBottom:12 }}>
+        <div style={{ fontSize:11, fontWeight:900, color:T.green, letterSpacing:"0.1em",
+          textTransform:"uppercase", marginBottom:7 }}>🍕 The Good</div>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+          {POSITIVE_TAGS.map(t=>(
+            <Tag key={t.label} label={t.label} icon={t.icon}
+              selected={selectedTags.includes(t.label)}
+              onClick={()=>toggleTag(t.label)} negative={false}/>
+          ))}
         </div>
       </div>
-      <div style={{ display:"flex", flexWrap:"wrap", gap:4, marginTop:8 }}>
-        {(pizza.tags||[]).slice(0,3).map(t=>{
-          const isNeg = NEGATIVE_TAGS.some(n=>n.label===t.label);
-          const tagColor = isNeg ? "#c93b0a" : "#2d8a4e";
-          const tagBg    = isNeg ? "rgba(201,59,10,0.09)" : "rgba(45,138,78,0.09)";
+      <div style={{ marginBottom:22 }}>
+        <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+          textTransform:"uppercase", marginBottom:7 }}>🚫 The Bad</div>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+          {NEGATIVE_TAGS.map(t=>(
+            <Tag key={t.label} label={t.label} icon={t.icon}
+              selected={selectedTags.includes(t.label)}
+              onClick={()=>toggleTag(t.label)} negative={true}/>
+          ))}
+        </div>
+      </div>
+      <button onClick={handleSave}
+        style={{ width:"100%", padding:"14px", borderRadius:12, fontWeight:900,
+          fontSize:15, background:T.red, color:"white", border:"none", cursor:"pointer",
+          boxShadow:"0 4px 18px rgba(201,59,10,0.35)" }}>
+        {isEdit ? "Save Changes ✓" : "Save Rating 🍕"}
+      </button>
+    </div>
+  )}
+</div>
+```
+
+);
+}
+
+// ─── EXPLORE PAGE ─────────────────────────────────────────────────────────────
+
+function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant, setSelectedUser,
+allPizzas, allUsers, allRatings }) {
+const [tab, setTab]           = useState(“pizzas”);
+const [filter, setFilter]     = useState(“All”);
+const [search, setSearch]     = useState(””);
+const [locFilter, setLocFilter] = useState(””);
+const [sort, setSort]         = useState(“score”);
+
+// Derive restaurants from ratings (no object shape issues)
+const restaurantData = {};
+allRatings.forEach(r => {
+if (!restaurantData[r.restaurant]) {
+restaurantData[r.restaurant] = { name:r.restaurant, pizzaNames:new Set(), city:r.city||””, country:r.country||”” };
+}
+restaurantData[r.restaurant].pizzaNames.add(r.pizzaName);
+});
+const restaurants = Object.values(restaurantData).map(r => ({
+name: r.name, city: r.city, country: r.country,
+pizzaCount: r.pizzaNames.size,
+pizzas: allPizzas.filter(p=>p.restaurant===r.name),
+})).sort((a,b)=>{
+const avgA = a.pizzas.length ? a.pizzas.reduce((s,p)=>s+p.score,0)/a.pizzas.length : 0;
+const avgB = b.pizzas.length ? b.pizzas.reduce((s,p)=>s+p.score,0)/b.pizzas.length : 0;
+return avgB-avgA;
+});
+
+// All known locations for filter chips
+const allLocations = […new Set(allRatings.flatMap(r=>[r.city,r.country].filter(Boolean)))].sort();
+
+const filtered = allPizzas
+.filter(p=>filter===“All”||p.style===filter)
+.filter(p=>!search||`${p.restaurant} ${p.name}`.toLowerCase().includes(search.toLowerCase()))
+.filter(p=>!locFilter||[p.city,p.country].some(l=>l&&l.toLowerCase().includes(locFilter.toLowerCase())))
+.sort((a,b)=>{
+if (sort===“score”) return b.score-a.score;
+if (sort===“ratingCount”) return b.ratingCount-a.ratingCount;
+// value sorts: use the avg value ratio of all ratings for this pizza
+const vA = a.ratings.map(r=>valueRatio(r.score,r.price,r.currency)).filter(v=>v!==null);
+const vB = b.ratings.map(r=>valueRatio(r.score,r.price,r.currency)).filter(v=>v!==null);
+const avgA = vA.length ? vA.reduce((x,y)=>x+y,0)/vA.length : null;
+const avgB = vB.length ? vB.reduce((x,y)=>x+y,0)/vB.length : null;
+// pizzas without price go to the end
+if (avgA===null && avgB===null) return 0;
+if (avgA===null) return 1;
+if (avgB===null) return -1;
+return sort===“value_best” ? avgB-avgA : avgA-avgB;
+});
+
+// Style leaderboard — top 3 per style
+const styleLeaders = {};
+STYLES.forEach(s=>{
+const top = allPizzas.filter(p=>p.style===s).sort((a,b)=>b.score-a.score).slice(0,3);
+if (top.length) styleLeaders[s] = top;
+});
+
+// Location leaderboard — top pizza per city
+const cityLeaders = {};
+allPizzas.forEach(p=>{
+if (!p.city) return;
+if (!cityLeaders[p.city]||p.score>cityLeaders[p.city].score) cityLeaders[p.city]=p;
+});
+
+const tabs = [[“pizzas”,“Pizzas”],[“restaurants”,“Spots”],[“users”,“Inspectors”],[“leaderboard”,“🏆 Board”]];
+
+return (
+<div style={{ maxWidth:640, margin:“0 auto”, padding:“24px 16px 90px”,
+fontFamily:“Georgia,serif” }}>
+<h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:14 }}>Explore</h2>
+
+```
+  {/* Tab bar */}
+  <div style={{ display:"flex", marginBottom:16, borderRadius:12, overflow:"hidden",
+    border:`1px solid ${T.borderMed}`, background:T.bgDeep }}>
+    {tabs.map(([id,label])=>(
+      <button key={id} onClick={()=>setTab(id)}
+        style={{ flex:1, padding:"10px 4px", fontSize:11, fontWeight:900, cursor:"pointer",
+          border:"none", background:tab===id?"white":"transparent",
+          color:tab===id?T.red:T.textLight,
+          borderBottom:tab===id?`2px solid ${T.red}`:"2px solid transparent",
+          transition:"all 0.13s" }}>
+        {label}
+      </button>
+    ))}
+  </div>
+
+  {/* PIZZAS TAB */}
+  {tab==="pizzas" && (
+    <>
+      <input value={search} onChange={e=>setSearch(e.target.value)}
+        placeholder="Search restaurants or pizzas..."
+        style={{ width:"100%", borderRadius:12, padding:"10px 13px", color:T.textDark,
+          outline:"none", background:"white", border:`1.5px solid ${T.borderMed}`,
+          marginBottom:10, boxSizing:"border-box", fontFamily:"Georgia,serif" }}/>
+      <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:8 }}>
+        {["All",...STYLES].map(s=>(
+          <button key={s} onClick={()=>setFilter(s)}
+            style={{ padding:"5px 10px", borderRadius:9, fontSize:11, fontWeight:800,
+              cursor:"pointer",
+              border:`1px solid ${filter===s?T.red:T.borderMed}`,
+              background:filter===s?T.red:"white",
+              color:filter===s?"white":T.textMid }}>
+            {s}
+          </button>
+        ))}
+      </div>
+      <div style={{ display:"flex", gap:5, marginBottom:14 }}>
+        {[["score","Top Rated"],["ratingCount","Most Rated"],["value_best","Best Value 🎯"],["value_worst","Least Value 💸"]].map(([v,l])=>(
+          <button key={v} onClick={()=>setSort(v)}
+            style={{ padding:"5px 11px", borderRadius:9, fontSize:11, fontWeight:800,
+              cursor:"pointer", border:`1px solid ${sort===v?T.amberMid:"transparent"}`,
+              background:T.bgDeep, color:sort===v?T.amberMid:T.textLight }}>
+            {l}
+          </button>
+        ))}
+      </div>
+      {allLocations.length>0 && (
+        <div style={{ marginBottom:12 }}>
+          <div style={{ fontSize:10, fontWeight:800, color:T.textLight, letterSpacing:"0.07em",
+            textTransform:"uppercase", marginBottom:6 }}>📍 Filter by Location</div>
+          <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
+            <button onClick={()=>setLocFilter("")}
+              style={{ padding:"4px 10px", borderRadius:9, fontSize:11, fontWeight:800,
+                cursor:"pointer", border:`1px solid ${locFilter===""?T.amberMid:T.borderMed}`,
+                background:locFilter===""?T.amberMid:"white",
+                color:locFilter===""?"white":T.textMid }}>
+              All
+            </button>
+            {allLocations.map(loc=>(
+              <button key={loc} onClick={()=>setLocFilter(locFilter===loc?"":loc)}
+                style={{ padding:"4px 10px", borderRadius:9, fontSize:11, fontWeight:800,
+                  cursor:"pointer",
+                  border:`1px solid ${locFilter===loc?T.amberMid:T.borderMed}`,
+                  background:locFilter===loc?T.amberMid:"white",
+                  color:locFilter===loc?"white":T.textMid }}>
+                {loc}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {filtered.length===0
+        ? <EmptyState icon="🔍" title="No pizzas yet"
+            sub={filter!=="All"?`No ${filter} pizzas rated yet.`:"Rate your first pizza to see it here."}
+            action="Rate a Pizza" onAction={goRate}/>
+        : <div style={{ display:"grid", gap:9 }}>
+            {filtered.map((p,i)=>(
+              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <div style={{ fontSize:14, fontWeight:900, width:18, textAlign:"right",
+                  color:T.textLight }}>#{i+1}</div>
+                <div style={{ flex:1 }}>
+                  <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+      }
+    </>
+  )}
+
+  {/* RESTAURANTS TAB */}
+  {tab==="restaurants" && (
+    restaurants.length===0
+      ? <EmptyState icon="🏠" title="No restaurants yet"
+          sub="Restaurants appear when someone rates a pizza from there."
+          action="Rate a Pizza" onAction={goRate}/>
+      : <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+          {restaurants.map(r=>{
+            const restRatings = allRatings.filter(x=>x.restaurant===r.name);
+            const avgScore = r.pizzas.length ? Math.round(r.pizzas.reduce((a,p)=>a+p.score,0)/r.pizzas.length) : 0;
+            const scores = restRatings.map(x=>x.score);
+
+            const catAvgs = {};
+            CATEGORIES.forEach(c=>{
+              const vals = restRatings.map(x=>x.cats?.[c.key]).filter(Boolean);
+              catAvgs[c.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+            });
+            return (
+              <div key={r.name}
+                onClick={()=>{setSelectedRestaurant(r.name);setPage("restaurant");}}
+                style={{ borderRadius:14, cursor:"pointer", background:T.bgCard,
+                  border:`1px solid ${T.border}`, overflow:"hidden",
+                  boxShadow:"0 1px 6px rgba(180,100,30,0.07)" }}>
+                {/* Header row */}
+                <div style={{ display:"flex", justifyContent:"space-between",
+                  alignItems:"flex-start", padding:"13px 15px 10px" }}>
+                  <div>
+                    <div style={{ fontWeight:900, color:T.textDark, fontSize:15 }}>{r.name}</div>
+                    {(r.city||r.country) && (
+                      <div style={{ fontSize:11, color:T.textLight, marginTop:1 }}>
+                        📍 {[r.city,r.country].filter(Boolean).join(", ")}
+                      </div>
+                    )}
+                    <div style={{ fontSize:11, color:T.textLight, marginTop:4, display:"flex", flexWrap:"wrap", gap:6 }}>
+                      <span>{restRatings.length} visit{restRatings.length!==1?"s":""}</span>
+                      <span>·</span>
+                      <span>{r.pizzaCount} pizza{r.pizzaCount!==1?"s":""}</span>
+
+                    </div>
+                  </div>
+                  {avgScore>0 && (
+                    <div style={{ textAlign:"right", flexShrink:0 }}>
+                      <ScoreBadge score={avgScore} large/>
+                      <div style={{ fontSize:9, color:T.textLight, marginTop:3 }}>avg score</div>
+                    </div>
+                  )}
+                </div>
+                {/* Category mini-bars */}
+                {restRatings.length>0 && (
+                  <div style={{ padding:"8px 15px 12px",
+                    borderTop:`1px solid ${T.border}`,
+                    display:"grid", gridTemplateColumns:"1fr 1fr", gap:"5px 14px" }}>
+                    {CATEGORIES.map(c=>(
+                      <div key={c.key} style={{ display:"flex", alignItems:"center", gap:5 }}>
+                        <span style={{ fontSize:11 }}>{c.icon}</span>
+                        <div style={{ flex:1, height:4, borderRadius:99, background:T.bgDeep }}>
+                          <div style={{ width:`${(catAvgs[c.key]/5)*100}%`, height:"100%",
+                            borderRadius:99,
+                            background:catAvgs[c.key]>=4?"#2d8a4e":catAvgs[c.key]>=3?T.amberMid:T.red }}/>
+                        </div>
+                        <span style={{ fontSize:10, fontWeight:800, color:T.textLight,
+                          width:22, textAlign:"right" }}>{catAvgs[c.key].toFixed(1)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+  )}
+
+  {/* INSPECTORS TAB */}
+  {tab==="users" && (
+    allUsers.length===0
+      ? <EmptyState icon="👤" title="No inspectors yet"
+          sub="Users appear here after rating their first pizza."/>
+      : <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {allUsers.map((u,i)=>(
+            <div key={u.username}
+              onClick={()=>{setSelectedUser(u.username);setPage("profile");}}
+              style={{ display:"flex", alignItems:"center", gap:10, borderRadius:12,
+                padding:"12px 14px", background:T.bgCard, border:`1px solid ${T.border}`,
+                cursor:"pointer" }}>
+              <div style={{ fontSize:13, fontWeight:900, width:20,
+                color:i===0?T.red:T.textLight }}>#{i+1}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontWeight:900, color:T.textDark }}>@{u.username}</div>
+                <div style={{ fontSize:11, color:T.textLight }}>
+                  {getLevel(u.rated).label} · {u.rated} pizza{u.rated!==1?"s":""}
+                </div>
+              </div>
+              <div style={{ textAlign:"right" }}>
+                <div style={{ fontWeight:900, color:T.red, fontSize:15 }}>{u.avg}</div>
+                <div style={{ fontSize:10, color:T.textLight }}>avg</div>
+              </div>
+            </div>
+          ))}
+        </div>
+  )}
+
+  {/* LEADERBOARD TAB */}
+  {tab==="leaderboard" && (
+    Object.keys(styleLeaders).length===0
+      ? <EmptyState icon="🏆" title="Leaderboard is empty"
+          sub="Rate pizzas across different styles to populate the leaderboard."
+          action="Rate a Pizza" onAction={goRate}/>
+      : <>
+          {Object.entries(styleLeaders).map(([style,list])=>(
+            <div key={style} style={{ marginBottom:22 }}>
+              <div style={{ fontSize:11, fontWeight:900, color:T.red,
+                textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
+                paddingBottom:5, borderBottom:`1px solid ${T.border}` }}>
+                {style}
+              </div>
+              {list.map((p,i)=>(
+                <div key={i}
+                  onClick={()=>{setSelectedPizza(p);setPage("pizza");}}
+                  style={{ display:"flex", justifyContent:"space-between",
+                    alignItems:"center", borderRadius:11, padding:"9px 13px",
+                    background:i===0?T.redLight:T.bgCard,
+                    border:`1px solid ${i===0?"rgba(201,59,10,0.2)":T.border}`,
+                    marginBottom:5, cursor:"pointer" }}>
+                  <div>
+                    <span style={{ fontWeight:900, marginRight:7,
+                      color:i===0?T.red:T.textLight }}>#{i+1}</span>
+                    <span style={{ color:T.textDark, fontWeight:700, fontSize:13 }}>
+                      {p.restaurant} – {p.name}
+                    </span>
+                    {(p.city||p.country) && (
+                      <span style={{ fontSize:11, color:T.textLight, marginLeft:5 }}>
+                        📍 {[p.city,p.country].filter(Boolean).join(", ")}
+                      </span>
+                    )}
+                  </div>
+                  <ScoreBadge score={p.score}/>
+                </div>
+              ))}
+            </div>
+          ))}
+          {Object.keys(cityLeaders).length>0 && (
+            <div style={{ marginTop:8 }}>
+              <div style={{ fontSize:11, fontWeight:900, color:T.amberMid,
+                textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
+                paddingBottom:5, borderBottom:`1px solid ${T.border}` }}>
+                📍 Best by City
+              </div>
+              {Object.entries(cityLeaders).sort((a,b)=>b[1].score-a[1].score).map(([city,p],i)=>(
+                <div key={city}
+                  onClick={()=>{setSelectedPizza(p);setPage("pizza");}}
+                  style={{ display:"flex", justifyContent:"space-between",
+                    alignItems:"center", borderRadius:11, padding:"9px 13px",
+                    background:T.bgCard, border:`1px solid ${T.border}`,
+                    marginBottom:5, cursor:"pointer" }}>
+                  <div>
+                    <span style={{ fontWeight:900, color:T.amberMid, marginRight:7,
+                      fontSize:12 }}>📍 {city}</span>
+                    <span style={{ color:T.textDark, fontWeight:700, fontSize:13 }}>
+                      {p.restaurant} – {p.name}
+                    </span>
+                  </div>
+                  <ScoreBadge score={p.score}/>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Hall of Shame */}
+          {allPizzas.length>=3 && (()=>{
+            const shame = [...allPizzas].sort((a,b)=>a.score-b.score).slice(0,5);
+            return (
+              <div style={{ marginTop:20 }}>
+                <div style={{ fontSize:11, fontWeight:900, color:T.red,
+                  textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
+                  paddingBottom:5, borderBottom:`1px solid rgba(201,59,10,0.2)` }}>
+                  💀 Hall of Shame
+                </div>
+                {shame.map((p,i)=>(
+                  <div key={p.id}
+                    onClick={()=>{setSelectedPizza(p);setPage("pizza");}}
+                    style={{ display:"flex", justifyContent:"space-between",
+                      alignItems:"center", borderRadius:11, padding:"9px 13px",
+                      background:i===0?"rgba(201,59,10,0.06)":T.bgCard,
+                      border:`1px solid ${i===0?"rgba(201,59,10,0.25)":T.border}`,
+                      marginBottom:5, cursor:"pointer" }}>
+                    <div>
+                      <span style={{ fontWeight:900, marginRight:7, fontSize:13,
+                        color:i===0?"#c93b0a":T.textLight }}>{i===0?"☠️":`#${i+1}`}</span>
+                      <span style={{ color:T.textDark, fontWeight:700, fontSize:13 }}>
+                        {p.restaurant} – {p.name}
+                      </span>
+                      {(p.city||p.country) && (
+                        <span style={{ fontSize:11, color:T.textLight, marginLeft:5 }}>
+                          📍 {[p.city,p.country].filter(Boolean).join(", ")}
+                        </span>
+                      )}
+                    </div>
+                    <ScoreBadge score={p.score}/>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </>
+  )}
+</div>
+```
+
+);
+}
+
+// ─── PIZZA PAGE ───────────────────────────────────────────────────────────────
+
+function PizzaPage({ pizza, setSelectedUser, setPage }) {
+if (!pizza) return <EmptyState icon="🍕" title="No pizza selected" sub=""/>;
+return (
+<div style={{ maxWidth:600, margin:“0 auto”, padding:“24px 16px 90px”,
+fontFamily:“Georgia,serif” }}>
+<div style={{ textAlign:“center”, marginBottom:22 }}>
+<PizzaFill score={pizza.score} size={90}/>
+<div style={{ marginTop:8 }}>
+<div style={{ fontSize:20, fontWeight:700, color:T.amberMid }}><ScoreLabel score={pizza.score}/></div>
+</div>
+<h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginTop:10, marginBottom:2 }}>
+{pizza.restaurant}
+</h2>
+<div style={{ fontSize:16, color:T.textMid, marginBottom:2 }}>{pizza.name}</div>
+<div style={{ fontSize:12, color:T.textLight, marginBottom:12 }}>{pizza.style}</div>
+{(pizza.city||pizza.country) && (
+<div style={{ fontSize:13, color:T.textMid, marginBottom:12 }}>
+📍 {[pizza.city,pizza.country].filter(Boolean).join(”, “)}
+</div>
+)}
+<div style={{ fontSize:11, color:T.textLight }}>
+{pizza.ratingCount} rating{pizza.ratingCount!==1?“s”:””}
+</div>
+</div>
+
+```
+  {pizza.cats && (
+    <div style={{ background:"white", borderRadius:16, padding:"14px 16px",
+      marginBottom:18, border:`1px solid ${T.border}`,
+      boxShadow:"0 1px 8px rgba(180,100,30,0.06)" }}>
+      <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+        textTransform:"uppercase", marginBottom:12 }}>Score Breakdown</div>
+      <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
+        {CATEGORIES.map(c=>(
+          <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <span style={{ fontSize:16, width:22 }}>{c.icon}</span>
+            <span style={{ fontSize:11, fontWeight:800, color:T.textMid, width:62 }}>
+              {c.label}
+            </span>
+            <div style={{ flex:1 }}><PizzaMeter score={pizza.cats[c.key]} showLabel={false}/></div>
+            <span style={{ fontSize:11, fontWeight:900, color:T.red, width:28,
+              textAlign:"right" }}>{pizza.cats[c.key]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {(pizza.tags||[]).length>0 && (
+    <div style={{ marginBottom:18 }}>
+      <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+        textTransform:"uppercase", marginBottom:9 }}>Top Notes</div>
+      <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+        {pizza.tags.map(t=>{
+          const neg = NEGATIVE_TAGS.some(n=>n.label===t.label);
           return (
-            <span key={t.label} style={{ fontSize:11, padding:"2px 8px", borderRadius:99,
-              background:tagBg, color:tagColor,
-              display:"inline-flex", alignItems:"center", gap:3, fontWeight:700 }}>
+            <span key={t.label} style={{ padding:"5px 11px", borderRadius:99, fontSize:12,
+              fontWeight:800, display:"inline-flex", alignItems:"center", gap:4,
+              background:neg?T.deleteBg:T.greenBg,
+              color:neg?T.red:T.green,
+              border:`1px solid ${neg?"rgba(201,59,10,0.2)":"rgba(45,138,78,0.2)"}` }}>
               {t.icon} {t.label}
             </span>
           );
         })}
       </div>
     </div>
-  );
-}
+  )}
 
-// ─── AUTOCOMPLETE INPUT ───────────────────────────────────────────────────────
-
-function AutocompleteInput({ value, onChange, suggestions, placeholder, style: extraStyle }) {
-  const [open, setOpen] = useState(false);
-  const filtered = value.length > 0
-    ? [...new Set(suggestions)].filter(s => s.toLowerCase().includes(value.toLowerCase()) && s.toLowerCase() !== value.toLowerCase()).slice(0, 6)
-    : [];
-
-  return (
-    <div style={{ position:"relative" }}>
-      <input
-        value={value}
-        onChange={e => { onChange(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-        placeholder={placeholder}
-        style={extraStyle}
-        autoComplete="off"
-      />
-      {open && filtered.length > 0 && (
-        <div style={{ position:"absolute", top:"calc(100% + 4px)", left:0, right:0, zIndex:100,
-          background:"white", border:`1.5px solid ${T.borderMed}`, borderRadius:12,
-          boxShadow:"0 6px 24px rgba(180,100,30,0.14)", overflow:"hidden" }}>
-          {filtered.map(s => (
-            <div key={s}
-              onMouseDown={() => { onChange(s); setOpen(false); }}
-              style={{ padding:"10px 14px", cursor:"pointer", fontSize:14,
-                color:T.textDark, fontFamily:"Georgia,serif",
-                borderBottom:`1px solid ${T.border}`,
-                transition:"background 0.1s" }}
-              onMouseEnter={e => e.currentTarget.style.background = T.bgDeep}
-              onMouseLeave={e => e.currentTarget.style.background = "white"}>
-              {s}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EmptyState({ icon, title, sub, action, onAction }) {
-  return (
-    <div style={{ textAlign:"center", padding:"50px 20px" }}>
-      <div style={{ fontSize:48, marginBottom:10, opacity:0.35 }}>{icon}</div>
-      <div style={{ fontSize:16, fontWeight:900, color:T.textDark, marginBottom:6 }}>{title}</div>
-      <div style={{ fontSize:13, color:T.textLight, maxWidth:240, margin:"0 auto",
-        lineHeight:1.5, marginBottom:action?20:0 }}>{sub}</div>
-      {action && (
-        <button onClick={onAction} style={{ marginTop:18, padding:"10px 22px", borderRadius:12,
-          fontWeight:900, fontSize:13, background:T.red, color:"white", border:"none", cursor:"pointer" }}>
-          {action}
-        </button>
-      )}
-    </div>
-  );
-}
-
-// ─── USERNAME SCREEN ──────────────────────────────────────────────────────────
-
-// ─── PASSWORD GATE ────────────────────────────────────────────────────────────
-
-function PasswordGate({ onUnlock }) {
-  const [input, setInput]   = useState("");
-  const [shake, setShake]   = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
-
-  function attempt() {
-    if (input.trim().toUpperCase() === "PIZZA4LIFE") {
-      setUnlocked(true);
-      setTimeout(() => onUnlock(), 500);
-    } else {
-      setShake(true);
-      setInput("");
-      setTimeout(() => setShake(false), 500);
-    }
-  }
-
-  return (
-    <div style={{ minHeight:"100vh", background:T.bg, display:"flex", flexDirection:"column",
-      alignItems:"center", justifyContent:"center", padding:24, fontFamily:"Georgia,serif" }}>
-      <div style={{ fontSize:72, marginBottom:14,
-        filter:"drop-shadow(0 4px 18px rgba(201,59,10,0.3))",
-        animation: unlocked ? "none" : undefined }}>🍕</div>
-      <h1 style={{ fontSize:26, fontWeight:900, color:T.textDark, textAlign:"center",
-        marginBottom:6, letterSpacing:"-0.5px" }}>
-        In <span style={{ color:T.red }}>Crust</span> We Trust
-      </h1>
-      <p style={{ color:T.textMid, fontSize:13, textAlign:"center",
-        marginBottom:28, maxWidth:240, lineHeight:1.5 }}>
-        Private beta. Enter the password to get in.
-      </p>
-      <div style={{ width:"100%", maxWidth:300,
-        transform: shake ? "translateX(0)" : "none",
-        animation: shake ? "shake 0.4s ease" : "none" }}>
-        <style>{`
-          @keyframes shake {
-            0%,100%{transform:translateX(0)}
-            20%{transform:translateX(-8px)}
-            40%{transform:translateX(8px)}
-            60%{transform:translateX(-6px)}
-            80%{transform:translateX(6px)}
-          }
-        `}</style>
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && attempt()}
-          placeholder="Password"
-          type="password"
-          style={{ width:"100%", borderRadius:12, padding:"12px 14px",
-            color:T.textDark, outline:"none", background:"white",
-            border:`1.5px solid ${shake ? T.red : T.borderMed}`,
-            fontSize:15, fontFamily:"Georgia,serif", boxSizing:"border-box",
-            textAlign:"center", letterSpacing:"0.1em",
-            transition:"border 0.2s" }}/>
-        {shake && (
-          <div style={{ fontSize:11, color:T.red, textAlign:"center", marginTop:6 }}>
-            Wrong password. Try again.
-          </div>
-        )}
-        <button onClick={attempt}
-          style={{ marginTop:10, width:"100%", padding:"13px", borderRadius:12, fontWeight:900,
-            fontSize:15, background: unlocked ? T.green : T.red, color:"white",
-            border:"none", cursor:"pointer",
-            boxShadow:`0 4px 20px rgba(201,59,10,0.35)`,
-            transition:"background 0.3s" }}>
-          {unlocked ? "✓ Let's go!" : "Enter →"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function UsernameScreen({ onJoin }) {
-  const [name, setName] = useState("");
-  const clean = name.trim().replace(/\s+/g,"_").toLowerCase();
-  const valid = clean.length>=2 && clean.length<=20 && /^[a-z0-9_]+$/.test(clean);
-  return (
-    <div style={{ minHeight:"100vh", background:T.bg, display:"flex", flexDirection:"column",
-      alignItems:"center", justifyContent:"center", padding:24, fontFamily:"Georgia,serif" }}>
-      <div style={{ fontSize:72, marginBottom:14,
-        filter:"drop-shadow(0 4px 18px rgba(201,59,10,0.3))" }}>🍕</div>
-      <h1 style={{ fontSize:28, fontWeight:900, color:T.textDark, textAlign:"center",
-        marginBottom:6, letterSpacing:"-0.5px" }}>
-        In <span style={{ color:T.red }}>Crust</span> We Trust
-      </h1>
-      <p style={{ color:T.textMid, fontSize:14, textAlign:"center", marginBottom:32,
-        maxWidth:280, lineHeight:1.5 }}>
-        Pick a username. No password, no email.<br/>Just you and pizza.
-      </p>
-      <div style={{ width:"100%", maxWidth:320 }}>
-        <div style={{ position:"relative", marginBottom:8 }}>
-          <span style={{ position:"absolute", left:13, top:"50%",
-            transform:"translateY(-50%)", color:T.textLight, fontSize:15,
-            fontFamily:"monospace", fontWeight:700 }}>@</span>
-          <input value={name} onChange={e=>setName(e.target.value)}
-            onKeyDown={e=>e.key==="Enter"&&valid&&onJoin(clean)}
-            placeholder="yourname" maxLength={20}
-            style={{ width:"100%", borderRadius:12, padding:"12px 14px 12px 30px",
-              color:T.textDark, outline:"none",
-              background:"white",
-              border:`1.5px solid ${valid?T.red:T.borderMed}`,
-              fontSize:16, fontFamily:"monospace", boxSizing:"border-box",
-              transition:"border 0.2s" }}/>
-        </div>
-        {name && !valid && <div style={{ fontSize:11, color:T.red, marginBottom:8, paddingLeft:2 }}>
-          2–20 chars · letters, numbers, underscores only
-        </div>}
-        {valid && <div style={{ fontSize:11, color:T.green, marginBottom:8, paddingLeft:2 }}>
-          @{clean} — looks good 🍕
-        </div>}
-        <button onClick={()=>valid&&onJoin(clean)} disabled={!valid}
-          style={{ width:"100%", padding:"13px", borderRadius:12, fontWeight:900, fontSize:15,
-            background:T.red, color:"white", border:"none",
-            cursor:valid?"pointer":"not-allowed", opacity:valid?1:0.35,
-            boxShadow:valid?"0 4px 20px rgba(201,59,10,0.35)":"none",
-            transition:"opacity 0.2s" }}>
-          Let's eat →
-        </button>
-        <p style={{ fontSize:11, color:T.textLight, textAlign:"center", marginTop:12 }}>
-          Private beta — invite only
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── HOME PAGE ────────────────────────────────────────────────────────────────
-
-function HomePage({ setPage, setSelectedPizza, allPizzas, allRatings }) {
-  const recent = [...allRatings].reverse().slice(0,6);
-  return (
+  {(pizza.reviews||[]).filter(r=>r.text).length>0 && (
     <div>
-      {/* ── BOLD DARK LANDING HERO ── */}
-      <div style={{ position:"relative", overflow:"hidden",
-        background:"linear-gradient(150deg, #0f0501 0%, #1e0a03 45%, #2a0f04 100%)",
-        minHeight:420 }}>
-        {/* Scattered background pizzas */}
-        {[{t:"8%",l:"5%",s:110,r:-20,o:0.06},{t:"55%",l:"3%",s:60,r:15,o:0.04},
-          {t:"12%",l:"72%",s:140,r:25,o:0.07},{t:"60%",l:"65%",s:75,r:-10,o:0.04},
-          {t:"35%",l:"38%",s:50,r:40,o:0.03}].map((p,i)=>(
-          <span key={i} style={{ position:"absolute", fontSize:p.s, top:p.t, left:p.l,
-            transform:`rotate(${p.r}deg)`, opacity:p.o, pointerEvents:"none",
-            lineHeight:1, userSelect:"none" }}>🍕</span>
-        ))}
-        {/* Subtle red glow top-left */}
-        <div style={{ position:"absolute", top:-80, left:-80, width:300, height:300,
-          background:"radial-gradient(circle, rgba(201,59,10,0.18) 0%, transparent 70%)",
-          pointerEvents:"none" }}/>
-        <div style={{ position:"relative", zIndex:1,
-          maxWidth:640, margin:"0 auto", padding:"52px 24px 48px" }}>
-          {/* Private Beta badge */}
-          <div style={{ marginBottom:28 }}>
-            <span style={{ display:"inline-flex", alignItems:"center", gap:6,
-              background:"rgba(201,59,10,0.18)", border:"1px solid rgba(201,59,10,0.35)",
-              borderRadius:99, padding:"5px 14px",
-              fontSize:11, fontWeight:800, color:"#f08060",
-              letterSpacing:"0.12em", textTransform:"uppercase" }}>
-              🍕 Private Beta
+      <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+        textTransform:"uppercase", marginBottom:9 }}>Reviews</div>
+      {pizza.reviews.filter(r=>r.text).map((r,i)=>(
+        <div key={i} style={{ borderRadius:13, padding:13, background:"white",
+          border:`1px solid ${T.border}`, marginBottom:8 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5 }}>
+            <span onClick={()=>{setSelectedUser(r.user);setPage("profile");}}
+              style={{ fontWeight:900, color:T.amberMid, fontSize:13, cursor:"pointer",
+                textDecoration:"underline",
+                textDecorationColor:"rgba(154,92,26,0.3)" }}>
+              @{r.user}
             </span>
+            <ScoreBadge score={r.score}/>
           </div>
-          {/* All-red headline */}
-          <h1 style={{ fontFamily:"Georgia,serif", fontWeight:900,
-            lineHeight:0.95, letterSpacing:"-3px", marginBottom:24 }}>
-            <span style={{ display:"block", fontSize:"clamp(58px,15vw,110px)",
-              color:"#e8390e", textShadow:"0 0 80px rgba(232,57,14,0.35)" }}>
-              Slice,
-            </span>
-            <span style={{ display:"block", fontSize:"clamp(58px,15vw,110px)",
-              color:"#e8390e", textShadow:"0 0 80px rgba(232,57,14,0.35)" }}>
-              Slice,
-            </span>
-            <span style={{ display:"block", fontSize:"clamp(64px,16vw,120px)",
-              color:"#e8390e", textShadow:"0 2px 60px rgba(232,57,14,0.5)" }}>
-              Baby!
-            </span>
-          </h1>
-          {/* Thin red rule */}
-          <div style={{ width:48, height:3,
-            background:"linear-gradient(90deg,#e8390e,#c93b0a)",
-            borderRadius:99, marginBottom:18 }}/>
-          {/* Bylines */}
-          <p style={{ fontSize:18, color:"rgba(245,220,190,0.85)", marginBottom:4,
-            fontFamily:"Georgia,serif", fontWeight:400, letterSpacing:"0.01em" }}>
-            Rate every pie.
+          <p style={{ color:T.textDark, margin:0, fontSize:14, fontStyle:"italic" }}>
+            "{r.text}"
           </p>
-          <p style={{ fontSize:14, color:"rgba(245,220,190,0.45)", marginBottom:36,
-            fontStyle:"italic", fontFamily:"Georgia,serif" }}>
-            Pizza never lies.
-          </p>
-          {/* CTAs */}
-          <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-            <button onClick={()=>setPage("rate")}
-              style={{ padding:"15px 32px", borderRadius:12, fontWeight:900, color:"white",
-                fontSize:15, background:"#e8390e", border:"none", cursor:"pointer",
-                boxShadow:"0 6px 28px rgba(232,57,14,0.55)", letterSpacing:"0.01em",
-                fontFamily:"Georgia,serif" }}>
-              Rate a Pizza 🍕
-            </button>
-            <button onClick={()=>setPage("explore")}
-              style={{ padding:"15px 32px", borderRadius:12, fontWeight:900, fontSize:15,
-                background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.18)",
-                color:"rgba(245,220,190,0.8)", cursor:"pointer", fontFamily:"Georgia,serif",
-                backdropFilter:"blur(8px)" }}>
-              Explore
-            </button>
-          </div>
         </div>
-      </div>
-
-      <div style={{ maxWidth:640, margin:"0 auto", padding:"0 16px 90px" }}>
-        {allPizzas.length===0 ? (
-          <EmptyState icon="🍕" title="No pizzas rated yet"
-            sub="Be the first to rate a pizza. Your verdict starts the leaderboard."
-            action="Rate a Pizza" onAction={()=>setPage("rate")}/>
-        ) : (
-          <>
-            <h2 style={{ fontSize:18, fontWeight:900, color:T.textDark, margin:"8px 0 12px" }}>
-              🔥 Top Rated
-            </h2>
-            <div style={{ display:"grid", gap:9 }}>
-              {allPizzas.slice(0,5).map(p=>(
-                <PizzaCard key={p.id} pizza={p}
-                  onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
-              ))}
-            </div>
-          </>
-        )}
-        {recent.length>0 && (
-          <>
-            <h2 style={{ fontSize:18, fontWeight:900, color:T.textDark, margin:"28px 0 12px" }}>
-              🕐 Recent Activity
-            </h2>
-            <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-              {recent.map((r,i)=>(
-                <div key={i} style={{ borderRadius:12, padding:"11px 14px",
-                  background:T.bgCard, border:`1px solid ${T.border}`,
-                  display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                  <div style={{ fontSize:13 }}>
-                    <span style={{ fontWeight:900, color:T.amberMid }}>@{r.user}</span>
-                    <span style={{ color:T.textLight }}> rated </span>
-                    <span style={{ fontWeight:700, color:T.textDark }}>
-                      {r.restaurant} – {r.pizzaName}
-                    </span>
-                  </div>
-                  <ScoreBadge score={r.score}/>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+      ))}
     </div>
-  );
-}
+  )}
+</div>
+```
 
-// ─── RATE PAGE ────────────────────────────────────────────────────────────────
-
-function RatePage({ setPage, addRating, editRating, editingRating, setEditingRating, allRatings }) {
-  const isEdit = !!editingRating;
-  const [step, setStep] = useState(1);
-  const [restaurant, setRestaurant] = useState(isEdit ? editingRating.restaurant : "");
-  const [pizzaName, setPizzaName]   = useState(isEdit ? editingRating.pizzaName  : "");
-  const [style, setStyle]           = useState(isEdit ? editingRating.style      : "");
-  const [city, setCity]             = useState(isEdit ? editingRating.city||""   : "");
-  const [country, setCountry]       = useState(isEdit ? editingRating.country||"": "");
-  const [cats, setCats]  = useState(isEdit ? {...editingRating.cats} : {crust:0,cheese:0,bake:0,toppings:0,vibes:0,pizzaz:0});
-  const [review, setReview]         = useState(isEdit ? editingRating.review||"" : "");
-  const [selectedTags, setSelectedTags] = useState(isEdit ? [...(editingRating.tags||[])] : []);
-  const [price, setPrice]       = useState(isEdit ? (editingRating.price||'') : '');
-  const [currency, setCurrency] = useState(isEdit ? (editingRating.currency||'PHP') : 'PHP');
-  const [saved, setSaved]           = useState(false);
-
-  // Build suggestion lists from past ratings
-  const pastRestaurants = [...new Set(allRatings.map(r => r.restaurant).filter(Boolean))];
-  const pastPizzaNames  = [...new Set(allRatings.filter(r => !restaurant || r.restaurant === restaurant).map(r => r.pizzaName).filter(Boolean))];
-  const pastCities      = [...new Set(allRatings.map(r => r.city).filter(Boolean))];
-  const pastCountries   = [...new Set(allRatings.map(r => r.country).filter(Boolean))];
-
-  const overall = calcOverall(cats);
-  const allCatsRated = Object.values(cats).every(v=>v>0);
-  function toggleTag(tag) {
-    setSelectedTags(p=>p.includes(tag)?p.filter(t=>t!==tag):[...p,tag]);
-  }
-  function handleSave() {
-    const payload = { restaurant, pizzaName, style, city, country, score:overall, cats:{...cats},
-      review, tags:selectedTags, price, currency, date: isEdit ? editingRating.date : new Date().toLocaleDateString() };
-    if (isEdit) { editRating(editingRating.id, payload); }
-    else        { addRating(payload); }
-    setSaved(true);
-  }
-  function reset() {
-    setStep(1); setRestaurant(""); setPizzaName(""); setStyle("");
-    setCity(""); setCountry("");
-    setCats({crust:0,cheese:0,bake:0,toppings:0,vibes:0,pizzaz:0});
-    setReview(""); setSelectedTags([]); setPrice(''); setCurrency('PHP'); setSaved(false);
-    if (setEditingRating) setEditingRating(null);
-  }
-
-  const inp = { width:"100%", borderRadius:12, padding:"11px 13px", color:T.textDark,
-    outline:"none", background:"white", border:`1.5px solid ${T.borderMed}`,
-    fontSize:15, boxSizing:"border-box", fontFamily:"Georgia,serif" };
-
-  if (saved) return (
-    <div style={{ maxWidth:420, margin:"0 auto", padding:"48px 20px 90px", textAlign:"center",
-      fontFamily:"Georgia,serif" }}>
-      <PizzaFill score={overall} size={90}/>
-      <div style={{ marginTop:12 }}>
-        <div style={{ fontSize:14, color:T.textLight, marginBottom:6 }}>
-          {isEdit ? "✏️ Rating updated" : "Rating saved"}
-        </div>
-        <ScoreLabel score={overall}/>
-      </div>
-      <h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:2, marginTop:10 }}>
-        {restaurant} — {pizzaName}
-      </h2>
-      <div style={{ fontSize:12, color:T.textLight, marginBottom:2 }}>{style}</div>
-      {(city||country) && <div style={{ fontSize:12, color:T.textLight, marginBottom:14 }}>📍 {[city,country].filter(Boolean).join(", ")}</div>}
-      <div style={{ marginTop:10, marginBottom:18 }}><ScoreBadge score={overall} large/></div>
-      <div style={{ background:T.bgDeep, borderRadius:16, padding:"14px 16px", marginBottom:22,
-        textAlign:"left", border:`1px solid ${T.border}` }}>
-        <div style={{ fontSize:10, fontWeight:900, color:T.red, letterSpacing:"0.1em",
-          textTransform:"uppercase", marginBottom:10 }}>Breakdown</div>
-        {CATEGORIES.map(c=>(
-          <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-            <span style={{ width:20 }}>{c.icon}</span>
-            <span style={{ fontSize:11, fontWeight:800, color:T.textMid, width:60 }}>{c.label}</span>
-            <div style={{ flex:1 }}><PizzaMeter score={cats[c.key]} showLabel={false}/></div>
-            <span style={{ fontSize:11, fontWeight:900, color:T.red, width:24, textAlign:"right" }}>
-              {cats[c.key]}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
-        {!isEdit && (
-          <button onClick={reset} style={{ padding:"11px 20px", borderRadius:12, fontWeight:900,
-            background:T.red, color:"white", border:"none", cursor:"pointer" }}>
-            Rate Another
-          </button>
-        )}
-        <button onClick={()=>{ reset(); setPage("profile"); }} style={{ padding:"11px 20px", borderRadius:12,
-          fontWeight:900, background:"white", border:`2px solid ${T.amberMid}`,
-          color:T.amberMid, cursor:"pointer" }}>
-          {isEdit ? "← Back to Profile" : "My Profile"}
-        </button>
-      </div>
-    </div>
-  );
-
-  return (
-    <div style={{ maxWidth:480, margin:"0 auto", padding:"24px 16px 100px",
-      fontFamily:"Georgia,serif" }}>
-      {/* Progress bar */}
-      <div style={{ display:"flex", gap:5, marginBottom:24 }}>
-        {[1,2,3].map(s=>(
-          <div key={s} style={{ flex:1, height:4, borderRadius:99,
-            background:step>=s?T.red:T.bgDeep, transition:"background 0.3s" }}/>
-        ))}
-      </div>
-
-      {/* STEP 1 */}
-      {step===1 && (
-        <div>
-          <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:20 }}>
-            {isEdit ? "Edit pizza" : "Identify the pizza"}
-          </h2>
-          <div style={{ display:"flex", flexDirection:"column", gap:13 }}>
-            <div>
-              <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Restaurant</label>
-              <AutocompleteInput value={restaurant} onChange={setRestaurant}
-                suggestions={pastRestaurants} placeholder="e.g. Crosta" style={inp}/>
-            </div>
-            <div>
-              <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Pizza Name</label>
-              <AutocompleteInput value={pizzaName} onChange={setPizzaName}
-                suggestions={pastPizzaNames} placeholder="e.g. Margherita" style={inp}/>
-            </div>
-            <div>
-              <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>City</label>
-              <AutocompleteInput value={city} onChange={setCity}
-                suggestions={pastCities} placeholder="e.g. New York" style={inp}/>
-            </div>
-            <div>
-              <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                marginBottom:6, letterSpacing:"0.06em", textTransform:"uppercase" }}>Country</label>
-              {/* Quick-tap popular countries */}
-              <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:8 }}>
-                {["🇵🇭 Philippines","🇺🇸 USA","🇯🇵 Japan","🇸🇬 Singapore","🇹🇭 Thailand","🇭🇰 Hong Kong","🇮🇹 Italy","🇬🇧 UK","🇦🇺 Australia","🇫🇷 France","🇩🇪 Germany","🇪🇸 Spain"].map(opt => {
-                  const label = opt.split(" ").slice(1).join(" ");
-                  const active = country === label;
-                  return (
-                    <button key={label} onClick={() => setCountry(active ? "" : label)}
-                      style={{ padding:"5px 10px", borderRadius:9, fontSize:12, fontWeight:700,
-                        cursor:"pointer", border:`1.5px solid ${active ? T.red : T.borderMed}`,
-                        background: active ? T.redLight : "white",
-                        color: active ? T.red : T.textMid, transition:"all 0.12s" }}>
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
-              <AutocompleteInput value={country} onChange={setCountry}
-                suggestions={[...new Set([...pastCountries,"Italy","USA","Japan","UK","France","Australia","Germany","Spain","Singapore","Thailand","Hong Kong","Philippines"])].filter(c=>!["Italy","USA","Japan","UK","France","Australia","Germany","Spain","Singapore","Thailand","Hong Kong","Philippines"].includes(c)||pastCountries.includes(c))}
-                placeholder="Or type another country…" style={{ ...inp, fontSize:13 }}/>
-            </div>
-            <div>
-              <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                marginBottom:7, letterSpacing:"0.06em", textTransform:"uppercase" }}>Style</label>
-              <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                {STYLES.map(s=>(
-                  <button key={s} onClick={()=>setStyle(s)}
-                    style={{ padding:"7px 12px", borderRadius:10, fontSize:12, fontWeight:800,
-                      cursor:"pointer", transition:"all 0.13s",
-                      border:`1.5px solid ${style===s?T.red:T.borderMed}`,
-                      background:style===s?T.red:"white",
-                      color:style===s?"white":T.textMid }}>
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-                marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>
-                Price Paid <span style={{fontWeight:400,color:T.textLight}}>(optional)</span>
-              </label>
-              <div style={{ display:"flex", gap:8 }}>
-                <select value={currency} onChange={e=>setCurrency(e.target.value)}
-                  style={{ ...inp, width:"auto", padding:"11px 10px", flexShrink:0, fontSize:13 }}>
-                  {[["PHP","₱ PHP"],["USD","$ USD"],["JPY","¥ JPY"],["SGD","S$ SGD"],
-                    ["THB","฿ THB"],["HKD","HK$ HKD"],["EUR","€ EUR"],["GBP","£ GBP"],
-                    ["AUD","A$ AUD"]].map(([c,l])=>(
-                    <option key={c} value={c}>{l}</option>
-                  ))}
-                </select>
-                <input type="number" min="0" step="1" value={price}
-                  onChange={e=>setPrice(e.target.value)}
-                  placeholder="e.g. 450"
-                  style={{ ...inp, flex:1 }}/>
-              </div>
-            </div>
-            <button onClick={()=>setStep(2)} disabled={!restaurant||!pizzaName||!style}
-              style={{ marginTop:6, padding:"13px", borderRadius:12, fontWeight:900, fontSize:15,
-                background:T.red, color:"white", border:"none", cursor:"pointer",
-                opacity:(!restaurant||!pizzaName||!style)?0.3:1 }}>
-              Rate It →
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* STEP 2 */}
-      {step===2 && (
-        <div>
-          <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:3 }}>
-            Score each category
-          </h2>
-          <div style={{ fontSize:12, color:T.textLight, marginBottom:16 }}>
-            {restaurant} · {pizzaName} · {style}
-          </div>
-          <div style={{ background:"white", borderRadius:16, padding:"2px 14px 6px",
-            marginBottom:16, border:`1px solid ${T.border}`,
-            boxShadow:"0 1px 8px rgba(180,100,30,0.08)" }}>
-            {CATEGORIES.map(c=>(
-              <CategoryRater key={c.key} cat={c} value={cats[c.key]}
-                onChange={v=>setCats(p=>({...p,[c.key]:v}))}/>
-            ))}
-          </div>
-          {overall>0 && (
-            <div style={{ background:T.redLight, borderRadius:14, padding:"14px 16px",
-              marginBottom:14, border:`1px solid rgba(201,59,10,0.2)`, textAlign:"center" }}>
-              <div style={{ fontSize:10, fontWeight:900, color:T.red, letterSpacing:"0.1em",
-                textTransform:"uppercase", marginBottom:8 }}>Overall</div>
-              <PizzaFill score={overall} size={60}/>
-              <div style={{ marginTop:8, display:"flex", justifyContent:"center",
-                alignItems:"baseline", gap:10 }}>
-                <span style={{ fontSize:30, fontWeight:900, color:T.red, lineHeight:1 }}>{overall}</span>
-              </div>
-              <div style={{ fontSize:13, fontWeight:700, color:T.textMid, marginTop:3 }}>
-                <ScoreLabel score={overall}/>
-              </div>
-            </div>
-          )}
-          <button onClick={()=>setStep(3)} disabled={!allCatsRated}
-            style={{ width:"100%", padding:"13px", borderRadius:12, fontWeight:900, fontSize:15,
-              background:T.red, color:"white", border:"none", cursor:"pointer",
-              opacity:allCatsRated?1:0.3 }}>
-            Write Your Verdict →
-          </button>
-        </div>
-      )}
-
-      {/* STEP 3 */}
-      {step===3 && (
-        <div>
-          <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:3 }}>Pizza Bytes</h2>
-          <div style={{ fontSize:12, color:T.textLight, marginBottom:14 }}>{restaurant} · {pizzaName} · {overall} overall</div>
-          <textarea value={review} onChange={e=>setReview(e.target.value)}
-            placeholder='"Perfect char, great crust chew."'
-            style={{ ...inp, resize:"none", height:84, marginBottom:14 }}/>
-          <div style={{ marginBottom:12 }}>
-            <div style={{ fontSize:11, fontWeight:900, color:T.green, letterSpacing:"0.1em",
-              textTransform:"uppercase", marginBottom:7 }}>🍕 The Good</div>
-            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-              {POSITIVE_TAGS.map(t=>(
-                <Tag key={t.label} label={t.label} icon={t.icon}
-                  selected={selectedTags.includes(t.label)}
-                  onClick={()=>toggleTag(t.label)} negative={false}/>
-              ))}
-            </div>
-          </div>
-          <div style={{ marginBottom:22 }}>
-            <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
-              textTransform:"uppercase", marginBottom:7 }}>🚫 The Bad</div>
-            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-              {NEGATIVE_TAGS.map(t=>(
-                <Tag key={t.label} label={t.label} icon={t.icon}
-                  selected={selectedTags.includes(t.label)}
-                  onClick={()=>toggleTag(t.label)} negative={true}/>
-              ))}
-            </div>
-          </div>
-          <button onClick={handleSave}
-            style={{ width:"100%", padding:"14px", borderRadius:12, fontWeight:900,
-              fontSize:15, background:T.red, color:"white", border:"none", cursor:"pointer",
-              boxShadow:"0 4px 18px rgba(201,59,10,0.35)" }}>
-            {isEdit ? "Save Changes ✓" : "Save Rating 🍕"}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── EXPLORE PAGE ─────────────────────────────────────────────────────────────
-
-function ExplorePage({ setPage, setSelectedPizza, setSelectedRestaurant, setSelectedUser,
-                       allPizzas, allUsers, allRatings }) {
-  const [tab, setTab]           = useState("pizzas");
-  const [filter, setFilter]     = useState("All");
-  const [search, setSearch]     = useState("");
-  const [locFilter, setLocFilter] = useState("");
-  const [sort, setSort]         = useState("score");
-
-  // Derive restaurants from ratings (no object shape issues)
-  const restaurantData = {};
-  allRatings.forEach(r => {
-    if (!restaurantData[r.restaurant]) {
-      restaurantData[r.restaurant] = { name:r.restaurant, pizzaNames:new Set(), city:r.city||"", country:r.country||"" };
-    }
-    restaurantData[r.restaurant].pizzaNames.add(r.pizzaName);
-  });
-  const restaurants = Object.values(restaurantData).map(r => ({
-    name: r.name, city: r.city, country: r.country,
-    pizzaCount: r.pizzaNames.size,
-    pizzas: allPizzas.filter(p=>p.restaurant===r.name),
-  })).sort((a,b)=>{
-    const avgA = a.pizzas.length ? a.pizzas.reduce((s,p)=>s+p.score,0)/a.pizzas.length : 0;
-    const avgB = b.pizzas.length ? b.pizzas.reduce((s,p)=>s+p.score,0)/b.pizzas.length : 0;
-    return avgB-avgA;
-  });
-
-  // All known locations for filter chips
-  const allLocations = [...new Set(allRatings.flatMap(r=>[r.city,r.country].filter(Boolean)))].sort();
-
-  const filtered = allPizzas
-    .filter(p=>filter==="All"||p.style===filter)
-    .filter(p=>!search||`${p.restaurant} ${p.name}`.toLowerCase().includes(search.toLowerCase()))
-    .filter(p=>!locFilter||[p.city,p.country].some(l=>l&&l.toLowerCase().includes(locFilter.toLowerCase())))
-    .sort((a,b)=>{
-      if (sort==="score") return b.score-a.score;
-      if (sort==="ratingCount") return b.ratingCount-a.ratingCount;
-      // value sorts: use the avg value ratio of all ratings for this pizza
-      const vA = a.ratings.map(r=>valueRatio(r.score,r.price,r.currency)).filter(v=>v!==null);
-      const vB = b.ratings.map(r=>valueRatio(r.score,r.price,r.currency)).filter(v=>v!==null);
-      const avgA = vA.length ? vA.reduce((x,y)=>x+y,0)/vA.length : null;
-      const avgB = vB.length ? vB.reduce((x,y)=>x+y,0)/vB.length : null;
-      // pizzas without price go to the end
-      if (avgA===null && avgB===null) return 0;
-      if (avgA===null) return 1;
-      if (avgB===null) return -1;
-      return sort==="value_best" ? avgB-avgA : avgA-avgB;
-    });
-
-  // Style leaderboard — top 3 per style
-  const styleLeaders = {};
-  STYLES.forEach(s=>{
-    const top = allPizzas.filter(p=>p.style===s).sort((a,b)=>b.score-a.score).slice(0,3);
-    if (top.length) styleLeaders[s] = top;
-  });
-
-  // Location leaderboard — top pizza per city
-  const cityLeaders = {};
-  allPizzas.forEach(p=>{
-    if (!p.city) return;
-    if (!cityLeaders[p.city]||p.score>cityLeaders[p.city].score) cityLeaders[p.city]=p;
-  });
-
-  const tabs = [["pizzas","Pizzas"],["restaurants","Spots"],["users","Inspectors"],["leaderboard","🏆 Board"]];
-
-  return (
-    <div style={{ maxWidth:640, margin:"0 auto", padding:"24px 16px 90px",
-      fontFamily:"Georgia,serif" }}>
-      <h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:14 }}>Explore</h2>
-
-      {/* Tab bar */}
-      <div style={{ display:"flex", marginBottom:16, borderRadius:12, overflow:"hidden",
-        border:`1px solid ${T.borderMed}`, background:T.bgDeep }}>
-        {tabs.map(([id,label])=>(
-          <button key={id} onClick={()=>setTab(id)}
-            style={{ flex:1, padding:"10px 4px", fontSize:11, fontWeight:900, cursor:"pointer",
-              border:"none", background:tab===id?"white":"transparent",
-              color:tab===id?T.red:T.textLight,
-              borderBottom:tab===id?`2px solid ${T.red}`:"2px solid transparent",
-              transition:"all 0.13s" }}>
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* PIZZAS TAB */}
-      {tab==="pizzas" && (
-        <>
-          <input value={search} onChange={e=>setSearch(e.target.value)}
-            placeholder="Search restaurants or pizzas..."
-            style={{ width:"100%", borderRadius:12, padding:"10px 13px", color:T.textDark,
-              outline:"none", background:"white", border:`1.5px solid ${T.borderMed}`,
-              marginBottom:10, boxSizing:"border-box", fontFamily:"Georgia,serif" }}/>
-          <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:8 }}>
-            {["All",...STYLES].map(s=>(
-              <button key={s} onClick={()=>setFilter(s)}
-                style={{ padding:"5px 10px", borderRadius:9, fontSize:11, fontWeight:800,
-                  cursor:"pointer",
-                  border:`1px solid ${filter===s?T.red:T.borderMed}`,
-                  background:filter===s?T.red:"white",
-                  color:filter===s?"white":T.textMid }}>
-                {s}
-              </button>
-            ))}
-          </div>
-          <div style={{ display:"flex", gap:5, marginBottom:14 }}>
-            {[["score","Top Rated"],["ratingCount","Most Rated"],["value_best","Best Value 🎯"],["value_worst","Least Value 💸"]].map(([v,l])=>(
-              <button key={v} onClick={()=>setSort(v)}
-                style={{ padding:"5px 11px", borderRadius:9, fontSize:11, fontWeight:800,
-                  cursor:"pointer", border:`1px solid ${sort===v?T.amberMid:"transparent"}`,
-                  background:T.bgDeep, color:sort===v?T.amberMid:T.textLight }}>
-                {l}
-              </button>
-            ))}
-          </div>
-          {allLocations.length>0 && (
-            <div style={{ marginBottom:12 }}>
-              <div style={{ fontSize:10, fontWeight:800, color:T.textLight, letterSpacing:"0.07em",
-                textTransform:"uppercase", marginBottom:6 }}>📍 Filter by Location</div>
-              <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
-                <button onClick={()=>setLocFilter("")}
-                  style={{ padding:"4px 10px", borderRadius:9, fontSize:11, fontWeight:800,
-                    cursor:"pointer", border:`1px solid ${locFilter===""?T.amberMid:T.borderMed}`,
-                    background:locFilter===""?T.amberMid:"white",
-                    color:locFilter===""?"white":T.textMid }}>
-                  All
-                </button>
-                {allLocations.map(loc=>(
-                  <button key={loc} onClick={()=>setLocFilter(locFilter===loc?"":loc)}
-                    style={{ padding:"4px 10px", borderRadius:9, fontSize:11, fontWeight:800,
-                      cursor:"pointer",
-                      border:`1px solid ${locFilter===loc?T.amberMid:T.borderMed}`,
-                      background:locFilter===loc?T.amberMid:"white",
-                      color:locFilter===loc?"white":T.textMid }}>
-                    {loc}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          {filtered.length===0
-            ? <EmptyState icon="🔍" title="No pizzas yet"
-                sub={filter!=="All"?`No ${filter} pizzas rated yet.`:"Rate your first pizza to see it here."}
-                action="Rate a Pizza" onAction={()=>setPage("rate")}/>
-            : <div style={{ display:"grid", gap:9 }}>
-                {filtered.map((p,i)=>(
-                  <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <div style={{ fontSize:14, fontWeight:900, width:18, textAlign:"right",
-                      color:T.textLight }}>#{i+1}</div>
-                    <div style={{ flex:1 }}>
-                      <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
-                    </div>
-                  </div>
-                ))}
-              </div>
-          }
-        </>
-      )}
-
-      {/* RESTAURANTS TAB */}
-      {tab==="restaurants" && (
-        restaurants.length===0
-          ? <EmptyState icon="🏠" title="No restaurants yet"
-              sub="Restaurants appear when someone rates a pizza from there."
-              action="Rate a Pizza" onAction={()=>setPage("rate")}/>
-          : <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-              {restaurants.map(r=>{
-                const restRatings = allRatings.filter(x=>x.restaurant===r.name);
-                const avgScore = r.pizzas.length ? Math.round(r.pizzas.reduce((a,p)=>a+p.score,0)/r.pizzas.length) : 0;
-                const scores = restRatings.map(x=>x.score);
-
-                const catAvgs = {};
-                CATEGORIES.forEach(c=>{
-                  const vals = restRatings.map(x=>x.cats?.[c.key]).filter(Boolean);
-                  catAvgs[c.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
-                });
-                return (
-                  <div key={r.name}
-                    onClick={()=>{setSelectedRestaurant(r.name);setPage("restaurant");}}
-                    style={{ borderRadius:14, cursor:"pointer", background:T.bgCard,
-                      border:`1px solid ${T.border}`, overflow:"hidden",
-                      boxShadow:"0 1px 6px rgba(180,100,30,0.07)" }}>
-                    {/* Header row */}
-                    <div style={{ display:"flex", justifyContent:"space-between",
-                      alignItems:"flex-start", padding:"13px 15px 10px" }}>
-                      <div>
-                        <div style={{ fontWeight:900, color:T.textDark, fontSize:15 }}>{r.name}</div>
-                        {(r.city||r.country) && (
-                          <div style={{ fontSize:11, color:T.textLight, marginTop:1 }}>
-                            📍 {[r.city,r.country].filter(Boolean).join(", ")}
-                          </div>
-                        )}
-                        <div style={{ fontSize:11, color:T.textLight, marginTop:4, display:"flex", flexWrap:"wrap", gap:6 }}>
-                          <span>{restRatings.length} visit{restRatings.length!==1?"s":""}</span>
-                          <span>·</span>
-                          <span>{r.pizzaCount} pizza{r.pizzaCount!==1?"s":""}</span>
-
-                        </div>
-                      </div>
-                      {avgScore>0 && (
-                        <div style={{ textAlign:"right", flexShrink:0 }}>
-                          <ScoreBadge score={avgScore} large/>
-                          <div style={{ fontSize:9, color:T.textLight, marginTop:3 }}>avg score</div>
-                        </div>
-                      )}
-                    </div>
-                    {/* Category mini-bars */}
-                    {restRatings.length>0 && (
-                      <div style={{ padding:"8px 15px 12px",
-                        borderTop:`1px solid ${T.border}`,
-                        display:"grid", gridTemplateColumns:"1fr 1fr", gap:"5px 14px" }}>
-                        {CATEGORIES.map(c=>(
-                          <div key={c.key} style={{ display:"flex", alignItems:"center", gap:5 }}>
-                            <span style={{ fontSize:11 }}>{c.icon}</span>
-                            <div style={{ flex:1, height:4, borderRadius:99, background:T.bgDeep }}>
-                              <div style={{ width:`${(catAvgs[c.key]/5)*100}%`, height:"100%",
-                                borderRadius:99,
-                                background:catAvgs[c.key]>=4?"#2d8a4e":catAvgs[c.key]>=3?T.amberMid:T.red }}/>
-                            </div>
-                            <span style={{ fontSize:10, fontWeight:800, color:T.textLight,
-                              width:22, textAlign:"right" }}>{catAvgs[c.key].toFixed(1)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-      )}
-
-      {/* INSPECTORS TAB */}
-      {tab==="users" && (
-        allUsers.length===0
-          ? <EmptyState icon="👤" title="No inspectors yet"
-              sub="Users appear here after rating their first pizza."/>
-          : <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-              {allUsers.map((u,i)=>(
-                <div key={u.username}
-                  onClick={()=>{setSelectedUser(u.username);setPage("profile");}}
-                  style={{ display:"flex", alignItems:"center", gap:10, borderRadius:12,
-                    padding:"12px 14px", background:T.bgCard, border:`1px solid ${T.border}`,
-                    cursor:"pointer" }}>
-                  <div style={{ fontSize:13, fontWeight:900, width:20,
-                    color:i===0?T.red:T.textLight }}>#{i+1}</div>
-                  <div style={{ flex:1 }}>
-                    <div style={{ fontWeight:900, color:T.textDark }}>@{u.username}</div>
-                    <div style={{ fontSize:11, color:T.textLight }}>
-                      {getLevel(u.rated).label} · {u.rated} pizza{u.rated!==1?"s":""}
-                    </div>
-                  </div>
-                  <div style={{ textAlign:"right" }}>
-                    <div style={{ fontWeight:900, color:T.red, fontSize:15 }}>{u.avg}</div>
-                    <div style={{ fontSize:10, color:T.textLight }}>avg</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-      )}
-
-      {/* LEADERBOARD TAB */}
-      {tab==="leaderboard" && (
-        Object.keys(styleLeaders).length===0
-          ? <EmptyState icon="🏆" title="Leaderboard is empty"
-              sub="Rate pizzas across different styles to populate the leaderboard."
-              action="Rate a Pizza" onAction={()=>setPage("rate")}/>
-          : <>
-              {Object.entries(styleLeaders).map(([style,list])=>(
-                <div key={style} style={{ marginBottom:22 }}>
-                  <div style={{ fontSize:11, fontWeight:900, color:T.red,
-                    textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
-                    paddingBottom:5, borderBottom:`1px solid ${T.border}` }}>
-                    {style}
-                  </div>
-                  {list.map((p,i)=>(
-                    <div key={i}
-                      onClick={()=>{setSelectedPizza(p);setPage("pizza");}}
-                      style={{ display:"flex", justifyContent:"space-between",
-                        alignItems:"center", borderRadius:11, padding:"9px 13px",
-                        background:i===0?T.redLight:T.bgCard,
-                        border:`1px solid ${i===0?"rgba(201,59,10,0.2)":T.border}`,
-                        marginBottom:5, cursor:"pointer" }}>
-                      <div>
-                        <span style={{ fontWeight:900, marginRight:7,
-                          color:i===0?T.red:T.textLight }}>#{i+1}</span>
-                        <span style={{ color:T.textDark, fontWeight:700, fontSize:13 }}>
-                          {p.restaurant} – {p.name}
-                        </span>
-                        {(p.city||p.country) && (
-                          <span style={{ fontSize:11, color:T.textLight, marginLeft:5 }}>
-                            📍 {[p.city,p.country].filter(Boolean).join(", ")}
-                          </span>
-                        )}
-                      </div>
-                      <ScoreBadge score={p.score}/>
-                    </div>
-                  ))}
-                </div>
-              ))}
-              {Object.keys(cityLeaders).length>0 && (
-                <div style={{ marginTop:8 }}>
-                  <div style={{ fontSize:11, fontWeight:900, color:T.amberMid,
-                    textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
-                    paddingBottom:5, borderBottom:`1px solid ${T.border}` }}>
-                    📍 Best by City
-                  </div>
-                  {Object.entries(cityLeaders).sort((a,b)=>b[1].score-a[1].score).map(([city,p],i)=>(
-                    <div key={city}
-                      onClick={()=>{setSelectedPizza(p);setPage("pizza");}}
-                      style={{ display:"flex", justifyContent:"space-between",
-                        alignItems:"center", borderRadius:11, padding:"9px 13px",
-                        background:T.bgCard, border:`1px solid ${T.border}`,
-                        marginBottom:5, cursor:"pointer" }}>
-                      <div>
-                        <span style={{ fontWeight:900, color:T.amberMid, marginRight:7,
-                          fontSize:12 }}>📍 {city}</span>
-                        <span style={{ color:T.textDark, fontWeight:700, fontSize:13 }}>
-                          {p.restaurant} – {p.name}
-                        </span>
-                      </div>
-                      <ScoreBadge score={p.score}/>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-      )}
-    </div>
-  );
-}
-
-// ─── PIZZA PAGE ───────────────────────────────────────────────────────────────
-
-function PizzaPage({ pizza, setSelectedUser, setPage }) {
-  if (!pizza) return <EmptyState icon="🍕" title="No pizza selected" sub=""/>;
-  return (
-    <div style={{ maxWidth:600, margin:"0 auto", padding:"24px 16px 90px",
-      fontFamily:"Georgia,serif" }}>
-      <div style={{ textAlign:"center", marginBottom:22 }}>
-        <PizzaFill score={pizza.score} size={90}/>
-        <div style={{ marginTop:8 }}>
-          <div style={{ fontSize:20, fontWeight:700, color:T.amberMid }}><ScoreLabel score={pizza.score}/></div>
-        </div>
-        <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginTop:10, marginBottom:2 }}>
-          {pizza.restaurant}
-        </h2>
-        <div style={{ fontSize:16, color:T.textMid, marginBottom:2 }}>{pizza.name}</div>
-        <div style={{ fontSize:12, color:T.textLight, marginBottom:12 }}>{pizza.style}</div>
-        {(pizza.city||pizza.country) && (
-          <div style={{ fontSize:13, color:T.textMid, marginBottom:12 }}>
-            📍 {[pizza.city,pizza.country].filter(Boolean).join(", ")}
-          </div>
-        )}
-        <div style={{ fontSize:11, color:T.textLight }}>
-          {pizza.ratingCount} rating{pizza.ratingCount!==1?"s":""}
-        </div>
-      </div>
-
-      {pizza.cats && (
-        <div style={{ background:"white", borderRadius:16, padding:"14px 16px",
-          marginBottom:18, border:`1px solid ${T.border}`,
-          boxShadow:"0 1px 8px rgba(180,100,30,0.06)" }}>
-          <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
-            textTransform:"uppercase", marginBottom:12 }}>Score Breakdown</div>
-          <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
-            {CATEGORIES.map(c=>(
-              <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <span style={{ fontSize:16, width:22 }}>{c.icon}</span>
-                <span style={{ fontSize:11, fontWeight:800, color:T.textMid, width:62 }}>
-                  {c.label}
-                </span>
-                <div style={{ flex:1 }}><PizzaMeter score={pizza.cats[c.key]} showLabel={false}/></div>
-                <span style={{ fontSize:11, fontWeight:900, color:T.red, width:28,
-                  textAlign:"right" }}>{pizza.cats[c.key]}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {(pizza.tags||[]).length>0 && (
-        <div style={{ marginBottom:18 }}>
-          <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
-            textTransform:"uppercase", marginBottom:9 }}>Top Notes</div>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-            {pizza.tags.map(t=>{
-              const neg = NEGATIVE_TAGS.some(n=>n.label===t.label);
-              return (
-                <span key={t.label} style={{ padding:"5px 11px", borderRadius:99, fontSize:12,
-                  fontWeight:800, display:"inline-flex", alignItems:"center", gap:4,
-                  background:neg?T.deleteBg:T.greenBg,
-                  color:neg?T.red:T.green,
-                  border:`1px solid ${neg?"rgba(201,59,10,0.2)":"rgba(45,138,78,0.2)"}` }}>
-                  {t.icon} {t.label}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {(pizza.reviews||[]).filter(r=>r.text).length>0 && (
-        <div>
-          <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
-            textTransform:"uppercase", marginBottom:9 }}>Reviews</div>
-          {pizza.reviews.filter(r=>r.text).map((r,i)=>(
-            <div key={i} style={{ borderRadius:13, padding:13, background:"white",
-              border:`1px solid ${T.border}`, marginBottom:8 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5 }}>
-                <span onClick={()=>{setSelectedUser(r.user);setPage("profile");}}
-                  style={{ fontWeight:900, color:T.amberMid, fontSize:13, cursor:"pointer",
-                    textDecoration:"underline",
-                    textDecorationColor:"rgba(154,92,26,0.3)" }}>
-                  @{r.user}
-                </span>
-                <ScoreBadge score={r.score}/>
-              </div>
-              <p style={{ color:T.textDark, margin:0, fontSize:14, fontStyle:"italic" }}>
-                "{r.text}"
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+);
 }
 
 // ─── RESTAURANT PAGE ──────────────────────────────────────────────────────────
 
 function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, setPage }) {
-  const [tab, setTab] = useState("menu");
-  const pizzas = allPizzas.filter(p=>p.restaurant===restaurant).sort((a,b)=>b.score-a.score);
-  const visits = (allRatings||[]).filter(r=>r.restaurant===restaurant).sort((a,b)=>b.id-a.id);
-  const avg = pizzas.length ? Math.round(pizzas.reduce((a,p)=>a+p.score,0)/pizzas.length) : 0;
-  const loc = visits.length ? [visits[0].city, visits[0].country].filter(Boolean).join(", ") : "";
+const [tab, setTab] = useState(“menu”);
+const pizzas = allPizzas.filter(p=>p.restaurant===restaurant).sort((a,b)=>b.score-a.score);
+const visits = (allRatings||[]).filter(r=>r.restaurant===restaurant).sort((a,b)=>0);
+const avg = pizzas.length ? Math.round(pizzas.reduce((a,p)=>a+p.score,0)/pizzas.length) : 0;
+const loc = visits.length ? [visits[0].city, visits[0].country].filter(Boolean).join(”, “) : “”;
 
-  if (!restaurant) return <EmptyState icon="🏠" title="No restaurant selected" sub=""/>;
+if (!restaurant) return <EmptyState icon="🏠" title="No restaurant selected" sub=""/>;
 
-  const catAvgs = {};
-  CATEGORIES.forEach(c=>{
-    const vals = visits.map(r=>r.cats?.[c.key]).filter(Boolean);
-    catAvgs[c.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
-  });
+const catAvgs = {};
+CATEGORIES.forEach(c=>{
+const vals = visits.map(r=>r.cats?.[c.key]).filter(Boolean);
+catAvgs[c.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+});
 
-  return (
-    <div style={{ maxWidth:600, margin:"0 auto", padding:"0 0 90px", fontFamily:"Georgia,serif" }}>
-      {/* Header */}
-      <div style={{ background:"linear-gradient(160deg,#1a0a02,#2d1208)",
-        padding:"32px 20px 24px", textAlign:"center", position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", right:-10, bottom:-10, fontSize:100,
-          opacity:0.06, transform:"rotate(-10deg)", pointerEvents:"none" }}>🏠</div>
-        <div style={{ position:"relative", zIndex:1 }}>
-          {avg>0 && <PizzaFill score={avg} size={70}/>}
-          <h2 style={{ fontSize:24, fontWeight:900, color:"white", margin:"10px 0 2px",
-            letterSpacing:"-0.5px" }}>{restaurant}</h2>
-          {loc && <div style={{ fontSize:12, color:"rgba(245,220,190,0.6)", marginBottom:6 }}>📍 {loc}</div>}
-          <div style={{ display:"flex", justifyContent:"center", gap:24, marginTop:8 }}>
-            <div>
-              <div style={{ fontSize:22, fontWeight:900, color:"#e8390e" }}>{avg||"—"}</div>
-              <div style={{ fontSize:10, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>avg score</div>
-            </div>
-            <div>
-              <div style={{ fontSize:22, fontWeight:900, color:"rgba(245,220,190,0.9)" }}>{pizzas.length}</div>
-              <div style={{ fontSize:10, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>pizza{pizzas.length!==1?"s":""}</div>
-            </div>
-            <div>
-              <div style={{ fontSize:22, fontWeight:900, color:"rgba(245,220,190,0.9)" }}>{visits.length}</div>
-              <div style={{ fontSize:10, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>visit{visits.length!==1?"s":""}</div>
-            </div>
+return (
+<div style={{ maxWidth:600, margin:“0 auto”, padding:“0 0 90px”, fontFamily:“Georgia,serif” }}>
+{/* Header */}
+<div style={{ background:“linear-gradient(160deg,#1a0a02,#2d1208)”,
+padding:“32px 20px 24px”, textAlign:“center”, position:“relative”, overflow:“hidden” }}>
+<div style={{ position:“absolute”, right:-10, bottom:-10, fontSize:100,
+opacity:0.06, transform:“rotate(-10deg)”, pointerEvents:“none” }}>🏠</div>
+<div style={{ position:“relative”, zIndex:1 }}>
+{avg>0 && <PizzaFill score={avg} size={70}/>}
+<h2 style={{ fontSize:24, fontWeight:900, color:“white”, margin:“10px 0 2px”,
+letterSpacing:”-0.5px” }}>{restaurant}</h2>
+{loc && <div style={{ fontSize:12, color:“rgba(245,220,190,0.6)”, marginBottom:6 }}>📍 {loc}</div>}
+<div style={{ display:“flex”, justifyContent:“center”, gap:24, marginTop:8 }}>
+<div>
+<div style={{ fontSize:22, fontWeight:900, color:”#e8390e” }}>{avg||”—”}</div>
+<div style={{ fontSize:10, color:“rgba(245,220,190,0.5)”, textTransform:“uppercase”, letterSpacing:“0.07em” }}>avg score</div>
+</div>
+<div>
+<div style={{ fontSize:22, fontWeight:900, color:“rgba(245,220,190,0.9)” }}>{pizzas.length}</div>
+<div style={{ fontSize:10, color:“rgba(245,220,190,0.5)”, textTransform:“uppercase”, letterSpacing:“0.07em” }}>pizza{pizzas.length!==1?“s”:””}</div>
+</div>
+<div>
+<div style={{ fontSize:22, fontWeight:900, color:“rgba(245,220,190,0.9)” }}>{visits.length}</div>
+<div style={{ fontSize:10, color:“rgba(245,220,190,0.5)”, textTransform:“uppercase”, letterSpacing:“0.07em” }}>visit{visits.length!==1?“s”:””}</div>
+</div>
+</div>
+</div>
+</div>
+
+```
+  {/* Category mini-bars */}
+  {visits.length > 0 && (
+    <div style={{ background:T.bgDeep, padding:"12px 20px",
+      borderBottom:`1px solid ${T.border}`,
+      display:"grid", gridTemplateColumns:"1fr 1fr", gap:"5px 16px" }}>
+      {CATEGORIES.map(c=>(
+        <div key={c.key} style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <span style={{ fontSize:12 }}>{c.icon}</span>
+          <div style={{ flex:1, height:4, borderRadius:99, background:"rgba(180,120,60,0.15)" }}>
+            <div style={{ width:`${(catAvgs[c.key]/5)*100}%`, height:"100%", borderRadius:99,
+              background:catAvgs[c.key]>=4?T.green:catAvgs[c.key]>=3?T.amberMid:T.red }}/>
           </div>
+          <span style={{ fontSize:10, fontWeight:800, color:T.textLight, width:24, textAlign:"right" }}>
+            {catAvgs[c.key]>0 ? catAvgs[c.key].toFixed(1) : "—"}
+          </span>
         </div>
-      </div>
-
-      {/* Category mini-bars */}
-      {visits.length > 0 && (
-        <div style={{ background:T.bgDeep, padding:"12px 20px",
-          borderBottom:`1px solid ${T.border}`,
-          display:"grid", gridTemplateColumns:"1fr 1fr", gap:"5px 16px" }}>
-          {CATEGORIES.map(c=>(
-            <div key={c.key} style={{ display:"flex", alignItems:"center", gap:6 }}>
-              <span style={{ fontSize:12 }}>{c.icon}</span>
-              <div style={{ flex:1, height:4, borderRadius:99, background:"rgba(180,120,60,0.15)" }}>
-                <div style={{ width:`${(catAvgs[c.key]/5)*100}%`, height:"100%", borderRadius:99,
-                  background:catAvgs[c.key]>=4?T.green:catAvgs[c.key]>=3?T.amberMid:T.red }}/>
-              </div>
-              <span style={{ fontSize:10, fontWeight:800, color:T.textLight, width:24, textAlign:"right" }}>
-                {catAvgs[c.key]>0 ? catAvgs[c.key].toFixed(1) : "—"}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div style={{ display:"flex", borderBottom:`1px solid ${T.border}`,
-        background:T.bgCard, padding:"0 20px" }}>
-        {[["menu","🍕 Menu"],["visits","📋 Visits"]].map(([id,label])=>(
-          <button key={id} onClick={()=>setTab(id)}
-            style={{ padding:"11px 16px", fontSize:13, fontWeight:800, cursor:"pointer",
-              background:"none", border:"none", borderBottom:`2px solid ${tab===id?T.red:"transparent"}`,
-              color:tab===id?T.red:T.textLight, transition:"all 0.13s", marginRight:4 }}>
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <div style={{ padding:"16px 16px 0" }}>
-        {/* MENU TAB */}
-        {tab==="menu" && (
-          pizzas.length===0
-            ? <EmptyState icon="🍕" title="No pizzas rated here yet" sub=""/>
-            : <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                {pizzas.map((p,i)=>(
-                  <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <div style={{ fontSize:12, fontWeight:900, width:18, color:T.textLight,
-                      flexShrink:0 }}>#{i+1}</div>
-                    <div style={{ flex:1 }}>
-                      <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
-                    </div>
-                  </div>
-                ))}
-              </div>
-        )}
-
-        {/* VISITS TAB */}
-        {tab==="visits" && (
-          visits.length===0
-            ? <EmptyState icon="📋" title="No visit history yet" sub=""/>
-            : <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                {visits.map((r,i)=>{
-                  const vl = r.price ? valueLabel(r.score, r.price, r.currency) : null;
-                  return (
-                    <div key={r.id||i} style={{ borderRadius:12, padding:"12px 14px",
-                      background:T.bgCard, border:`1px solid ${T.border}` }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
-                        <div style={{ flex:1, minWidth:0 }}>
-                          <div style={{ fontWeight:900, color:T.textDark, fontSize:14 }}>{r.pizzaName}</div>
-                          <div style={{ fontSize:11, color:T.textLight, marginTop:1, display:"flex", gap:8, flexWrap:"wrap" }}>
-                            <span>{r.style}</span>
-                            <span>·</span>
-                            <span style={{ fontWeight:700, color:T.amberMid }}>@{r.user}</span>
-                            <span>·</span>
-                            <span>{r.date}</span>
-                            {r.price && <span>· {r.currency==="PHP"?"₱":r.currency==="USD"?"$":r.currency==="JPY"?"¥":r.currency==="EUR"?"€":r.currency}{r.price}</span>}
-                            {vl && <span style={{ color:vl.color, fontWeight:700 }}>{vl.text}</span>}
-                          </div>
-                          {r.review && (
-                            <p style={{ fontSize:12, color:T.textMid, margin:"6px 0 0",
-                              fontStyle:"italic", borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>
-                              "{r.review}"
-                            </p>
-                          )}
-                        </div>
-                        <ScoreBadge score={r.score}/>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-        )}
-      </div>
+      ))}
     </div>
-  );
+  )}
+
+  {/* Tabs */}
+  <div style={{ display:"flex", borderBottom:`1px solid ${T.border}`,
+    background:T.bgCard, padding:"0 20px" }}>
+    {[["menu","🍕 Menu"],["visits","📋 Visits"]].map(([id,label])=>(
+      <button key={id} onClick={()=>setTab(id)}
+        style={{ padding:"11px 16px", fontSize:13, fontWeight:800, cursor:"pointer",
+          background:"none", border:"none", borderBottom:`2px solid ${tab===id?T.red:"transparent"}`,
+          color:tab===id?T.red:T.textLight, transition:"all 0.13s", marginRight:4 }}>
+        {label}
+      </button>
+    ))}
+  </div>
+
+  <div style={{ padding:"16px 16px 0" }}>
+    {/* MENU TAB */}
+    {tab==="menu" && (
+      pizzas.length===0
+        ? <EmptyState icon="🍕" title="No pizzas rated here yet" sub=""/>
+        : <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {pizzas.map((p,i)=>(
+              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <div style={{ fontSize:12, fontWeight:900, width:18, color:T.textLight,
+                  flexShrink:0 }}>#{i+1}</div>
+                <div style={{ flex:1 }}>
+                  <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+    )}
+
+    {/* VISITS TAB */}
+    {tab==="visits" && (
+      visits.length===0
+        ? <EmptyState icon="📋" title="No visit history yet" sub=""/>
+        : <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+            {visits.map((r,i)=>{
+              const vl = r.price ? valueLabel(r.score, r.price, r.currency) : null;
+              return (
+                <div key={r.id||i} style={{ borderRadius:12, padding:"12px 14px",
+                  background:T.bgCard, border:`1px solid ${T.border}` }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontWeight:900, color:T.textDark, fontSize:14 }}>{r.pizzaName}</div>
+                      <div style={{ fontSize:11, color:T.textLight, marginTop:1, display:"flex", gap:8, flexWrap:"wrap" }}>
+                        <span>{r.style}</span>
+                        <span>·</span>
+                        <span style={{ fontWeight:700, color:T.amberMid }}>@{r.user}</span>
+                        <span>·</span>
+                        <span>{r.date}</span>
+                        {r.price && <span>· {r.currency==="PHP"?"₱":r.currency==="USD"?"$":r.currency==="JPY"?"¥":r.currency==="EUR"?"€":r.currency}{r.price}</span>}
+                        {vl && <span style={{ color:vl.color, fontWeight:700 }}>{vl.text}</span>}
+                      </div>
+                      {r.review && (
+                        <p style={{ fontSize:12, color:T.textMid, margin:"6px 0 0",
+                          fontStyle:"italic", borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>
+                          "{r.review}"
+                        </p>
+                      )}
+                    </div>
+                    <ScoreBadge score={r.score}/>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+    )}
+  </div>
+</div>
+```
+
+);
 }
 
 // ─── PROFILE PAGE ─────────────────────────────────────────────────────────────
 
-function ProfilePage({ username, isMe, myRatings, deleteRating, setPage, setSelectedPizza,
-                       allPizzaMap, setEditingRating }) {
-  const [confirmDelete, setConfirmDelete] = useState(null);
-  const rated = myRatings.length;
-  const level = getLevel(rated);
-  const avg   = rated>0 ? Math.round(myRatings.reduce((a,r)=>a+r.score,0)/rated) : "—";
+function ProfilePage({ username, isMe, myRatings, deleteRating, setPage, goRate, setSelectedPizza,
+allPizzaMap, setEditingRating }) {
+const [confirmDelete, setConfirmDelete] = useState(null);
+const rated = myRatings.length;
+const level = getLevel(rated);
+const avg   = rated>0 ? Math.round(myRatings.reduce((a,r)=>a+r.score,0)/rated) : “—”;
 
-  function handleDelete(id) {
-    if (confirmDelete===id) { deleteRating(id); setConfirmDelete(null); }
-    else setConfirmDelete(id);
-  }
+function handleDelete(id) {
+if (confirmDelete===id) { deleteRating(id); setConfirmDelete(null); }
+else setConfirmDelete(id);
+}
 
-  return (
-    <div style={{ maxWidth:600, margin:"0 auto", padding:"24px 16px 90px",
-      fontFamily:"Georgia,serif" }}>
-      <div style={{ textAlign:"center", marginBottom:20 }}>
-        <div style={{ fontSize:48, marginBottom:6 }}>{level.icon}</div>
-        <h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:2 }}>
-          @{username}
-        </h2>
-        <div style={{ fontSize:12, fontWeight:800, color:T.red, marginBottom:14 }}>
-          {level.label}
+return (
+<div style={{ maxWidth:600, margin:“0 auto”, padding:“24px 16px 90px”,
+fontFamily:“Georgia,serif” }}>
+<div style={{ textAlign:“center”, marginBottom:20 }}>
+<div style={{ fontSize:48, marginBottom:6 }}>{level.icon}</div>
+<h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:2 }}>
+@{username}
+</h2>
+<div style={{ fontSize:12, fontWeight:800, color:T.red, marginBottom:14 }}>
+{level.label}
+</div>
+<div style={{ display:“flex”, justifyContent:“center”, gap:40, marginBottom:16 }}>
+<div>
+<div style={{ fontSize:28, fontWeight:900, color:T.textDark }}>{rated}</div>
+<div style={{ fontSize:10, color:T.textLight }}>Pizzas Rated</div>
+</div>
+<div>
+<div style={{ fontSize:28, fontWeight:900, color:T.textDark }}>{avg}</div>
+<div style={{ fontSize:10, color:T.textLight }}>Avg Score</div>
+</div>
+</div>
+{/* Badges */}
+{(() => {
+const earned = getEarnedBadges(myRatings);
+const locked = BADGE_DEFS.filter(b=>!earned.find(e=>e.id===b.id));
+return rated > 0 ? (
+<div style={{ marginBottom:8 }}>
+{earned.length > 0 && (
+<div style={{ display:“flex”, flexWrap:“wrap”, gap:7, justifyContent:“center”, marginBottom:10 }}>
+{earned.map(b=>(
+<div key={b.id} title={b.desc}
+style={{ display:“flex”, flexDirection:“column”, alignItems:“center”,
+background:“linear-gradient(135deg,rgba(201,59,10,0.09),rgba(184,134,11,0.09))”,
+border:“1.5px solid rgba(201,59,10,0.2)”, borderRadius:12,
+padding:“8px 10px”, minWidth:60, gap:3 }}>
+<span style={{ fontSize:22 }}>{b.icon}</span>
+<span style={{ fontSize:9, fontWeight:800, color:T.textDark,
+textAlign:“center”, lineHeight:1.2, maxWidth:56 }}>{b.name}</span>
+</div>
+))}
+</div>
+)}
+{locked.length > 0 && (
+<div style={{ display:“flex”, flexWrap:“wrap”, gap:4, justifyContent:“center”, opacity:0.38 }}>
+{locked.map(b=>(
+<div key={b.id} title={b.desc}
+style={{ display:“flex”, alignItems:“center”, gap:3, padding:“3px 9px”,
+borderRadius:99, border:“1px dashed rgba(180,120,60,0.4)” }}>
+<span style={{ fontSize:12, filter:“grayscale(1)” }}>{b.icon}</span>
+<span style={{ fontSize:10, fontWeight:700, color:T.textLight }}>{b.name}</span>
+</div>
+))}
+</div>
+)}
+</div>
+) : null;
+})()}
+</div>
+
+```
+  {rated===0
+    ? <EmptyState icon="🍕"
+        title={isMe?"You haven't rated any pizzas yet":`@${username} hasn't rated anything yet`}
+        sub={isMe?"Every pizza you rate shows up here.":""}
+        action={isMe?"Rate Your First Pizza":null}
+        onAction={goRate}/>
+    : <>
+        <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+          textTransform:"uppercase", marginBottom:10 }}>
+          {isMe?"Your Ratings":"Ratings"}
         </div>
-        <div style={{ display:"flex", justifyContent:"center", gap:40, marginBottom:16 }}>
-          <div>
-            <div style={{ fontSize:28, fontWeight:900, color:T.textDark }}>{rated}</div>
-            <div style={{ fontSize:10, color:T.textLight }}>Pizzas Rated</div>
-          </div>
-          <div>
-            <div style={{ fontSize:28, fontWeight:900, color:T.textDark }}>{avg}</div>
-            <div style={{ fontSize:10, color:T.textLight }}>Avg Score</div>
-          </div>
-        </div>
-        {/* Badges */}
-        {(() => {
-          const earned = getEarnedBadges(myRatings);
-          const locked = BADGE_DEFS.filter(b=>!earned.find(e=>e.id===b.id));
-          return rated > 0 ? (
-            <div style={{ marginBottom:8 }}>
-              {earned.length > 0 && (
-                <div style={{ display:"flex", flexWrap:"wrap", gap:7, justifyContent:"center", marginBottom:10 }}>
-                  {earned.map(b=>(
-                    <div key={b.id} title={b.desc}
-                      style={{ display:"flex", flexDirection:"column", alignItems:"center",
-                        background:"linear-gradient(135deg,rgba(201,59,10,0.09),rgba(184,134,11,0.09))",
-                        border:"1.5px solid rgba(201,59,10,0.2)", borderRadius:12,
-                        padding:"8px 10px", minWidth:60, gap:3 }}>
-                      <span style={{ fontSize:22 }}>{b.icon}</span>
-                      <span style={{ fontSize:9, fontWeight:800, color:T.textDark,
-                        textAlign:"center", lineHeight:1.2, maxWidth:56 }}>{b.name}</span>
-                    </div>
-                  ))}
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {[...myRatings].reverse().map((r,i)=>(
+            <div key={r.id||i} style={{ borderRadius:14, overflow:"hidden",
+              background:confirmDelete===r.id?T.deleteBg:"white",
+              border:`1px solid ${confirmDelete===r.id?"rgba(201,59,10,0.3)":T.border}`,
+              transition:"all 0.2s" }}>
+              {/* Letterboxd-style: score block left, content right */}
+              <div style={{ display:"flex", alignItems:"stretch" }}>
+                {/* Score column */}
+                <div onClick={()=>{ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap&&allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");}}}
+                  style={{ width:72, flexShrink:0, cursor:"pointer",
+                    background:"transparent",
+                    display:"flex", flexDirection:"column", alignItems:"center",
+                    justifyContent:"center", padding:"14px 8px", gap:5,
+                    borderRight:`1px solid ${T.border}` }}>
+                  <PizzaFill score={r.score} size={44}/>
+                  <span style={{ fontSize:10, fontWeight:800, color:scoreTier(r.score).color,
+                    textAlign:"center", lineHeight:1.2, maxWidth:60 }}>
+                    {scoreTier(r.score).label}
+                  </span>
                 </div>
-              )}
-              {locked.length > 0 && (
-                <div style={{ display:"flex", flexWrap:"wrap", gap:4, justifyContent:"center", opacity:0.38 }}>
-                  {locked.map(b=>(
-                    <div key={b.id} title={b.desc}
-                      style={{ display:"flex", alignItems:"center", gap:3, padding:"3px 9px",
-                        borderRadius:99, border:"1px dashed rgba(180,120,60,0.4)" }}>
-                      <span style={{ fontSize:12, filter:"grayscale(1)" }}>{b.icon}</span>
-                      <span style={{ fontSize:10, fontWeight:700, color:T.textLight }}>{b.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : null;
-        })()}
-      </div>
-
-      {rated===0
-        ? <EmptyState icon="🍕"
-            title={isMe?"You haven't rated any pizzas yet":`@${username} hasn't rated anything yet`}
-            sub={isMe?"Every pizza you rate shows up here.":""}
-            action={isMe?"Rate Your First Pizza":null}
-            onAction={()=>setPage("rate")}/>
-        : <>
-            <div style={{ fontSize:11, fontWeight:900, color:T.red, letterSpacing:"0.1em",
-              textTransform:"uppercase", marginBottom:10 }}>
-              {isMe?"Your Ratings":"Ratings"}
-            </div>
-            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-              {[...myRatings].reverse().map((r,i)=>(
-                <div key={r.id||i} style={{ borderRadius:14, overflow:"hidden",
-                  background:confirmDelete===r.id?T.deleteBg:"white",
-                  border:`1px solid ${confirmDelete===r.id?"rgba(201,59,10,0.3)":T.border}`,
-                  transition:"all 0.2s" }}>
-                  {/* Letterboxd-style: score block left, content right */}
-                  <div style={{ display:"flex", alignItems:"stretch" }}>
-                    {/* Score column */}
-                    <div onClick={()=>{ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap&&allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");}}}
-                      style={{ width:72, flexShrink:0, cursor:"pointer",
-                        background:"transparent",
-                        display:"flex", flexDirection:"column", alignItems:"center",
-                        justifyContent:"center", padding:"14px 8px", gap:5,
-                        borderRight:`1px solid ${T.border}` }}>
-                      <PizzaFill score={r.score} size={44}/>
-                      <span style={{ fontSize:10, fontWeight:800, color:scoreTier(r.score).color,
-                        textAlign:"center", lineHeight:1.2, maxWidth:60 }}>
-                        {scoreTier(r.score).label}
-                      </span>
-                    </div>
-                    {/* Content column */}
-                    <div style={{ flex:1, padding:"12px 13px", minWidth:0 }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
-                        <div style={{ flex:1, cursor:"pointer", minWidth:0 }}
-                          onClick={()=>{ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap&&allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");}}}>
-                          <div style={{ fontWeight:900, color:T.textDark, fontSize:14, lineHeight:1.3 }}>
-                            {r.restaurant}
-                          </div>
-                          <div style={{ fontSize:12, color:T.amberMid, fontWeight:700, marginBottom:2 }}>
-                            {r.pizzaName}
-                          </div>
-                          <div style={{ fontSize:10, color:T.textLight, marginBottom:6 }}>
-                            {r.style}{r.city||r.country ? ` · 📍 ${[r.city,r.country].filter(Boolean).join(", ")}` : ""} · {r.date}
-                          </div>
-                          {r.review && (
-                            <p style={{ fontSize:12, color:T.textMid, margin:0,
-                              fontStyle:"italic", lineHeight:1.5,
-                              borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>
-                              "{r.review}"
-                            </p>
-                          )}
-                          {(r.tags||[]).length>0 && (
-                            <div style={{ display:"flex", flexWrap:"wrap", gap:3, marginTop:6 }}>
-                              {r.tags.slice(0,3).map(t=>{
-                                const neg = NEGATIVE_TAGS.some(n=>n.label===t);
-                                const tag = ALL_TAGS.find(x=>x.label===t)||{icon:"🍕",label:t};
-                                return (
-                                  <span key={t} style={{ fontSize:10, padding:"2px 7px",
-                                    borderRadius:99, fontWeight:800,
-                                    background:neg?"rgba(201,59,10,0.08)":"rgba(45,138,78,0.08)",
-                                    color:neg?T.red:T.green }}>
-                                    {tag.icon} {t}
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                        {isMe && (
-                          <div style={{ display:"flex", gap:4, flexShrink:0, marginLeft:8 }}>
-                            <button onClick={()=>{ setEditingRating(r); setPage("rate"); }}
-                              style={{ padding:"3px 8px", borderRadius:7, fontSize:10, fontWeight:800,
-                                cursor:"pointer", border:`1px solid ${T.amberMid}`,
-                                background:"transparent", color:T.amberMid }}>
-                              Edit
-                            </button>
-                            <button onClick={()=>handleDelete(r.id)}
-                              style={{ padding:"3px 8px", borderRadius:7, fontSize:10, fontWeight:800,
-                                cursor:"pointer",
-                                border:`1px solid ${confirmDelete===r.id?T.red:T.borderMed}`,
-                                background:confirmDelete===r.id?T.deleteBg:"transparent",
-                                color:confirmDelete===r.id?T.red:T.textLight }}>
-                              {confirmDelete===r.id?"Sure?":"Delete"}
-                            </button>
-                          </div>
-                        )}
+                {/* Content column */}
+                <div style={{ flex:1, padding:"12px 13px", minWidth:0 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                    <div style={{ flex:1, cursor:"pointer", minWidth:0 }}
+                      onClick={()=>{ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap&&allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");}}}>
+                      <div style={{ fontWeight:900, color:T.textDark, fontSize:14, lineHeight:1.3 }}>
+                        {r.restaurant}
                       </div>
+                      <div style={{ fontSize:12, color:T.amberMid, fontWeight:700, marginBottom:2 }}>
+                        {r.pizzaName}
+                      </div>
+                      <div style={{ fontSize:10, color:T.textLight, marginBottom:6 }}>
+                        {r.style}{r.city||r.country ? ` · 📍 ${[r.city,r.country].filter(Boolean).join(", ")}` : ""} · {r.date}
+                      </div>
+                      {r.review && (
+                        <p style={{ fontSize:12, color:T.textMid, margin:0,
+                          fontStyle:"italic", lineHeight:1.5,
+                          borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>
+                          "{r.review}"
+                        </p>
+                      )}
+                      {(r.tags||[]).length>0 && (
+                        <div style={{ display:"flex", flexWrap:"wrap", gap:3, marginTop:6 }}>
+                          {r.tags.slice(0,3).map(t=>{
+                            const neg = NEGATIVE_TAGS.some(n=>n.label===t);
+                            const tag = ALL_TAGS.find(x=>x.label===t)||{icon:"🍕",label:t};
+                            return (
+                              <span key={t} style={{ fontSize:10, padding:"2px 7px",
+                                borderRadius:99, fontWeight:800,
+                                background:neg?"rgba(201,59,10,0.08)":"rgba(45,138,78,0.08)",
+                                color:neg?T.red:T.green }}>
+                                {tag.icon} {t}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
+                    {isMe && (
+                      <div style={{ display:"flex", gap:4, flexShrink:0, marginLeft:8 }}>
+                        <button onClick={()=>{ setEditingRating(r); setPage("rate"); }}
+                          style={{ padding:"3px 8px", borderRadius:7, fontSize:10, fontWeight:800,
+                            cursor:"pointer", border:`1px solid ${T.amberMid}`,
+                            background:"transparent", color:T.amberMid }}>
+                          Edit
+                        </button>
+                        <button onClick={()=>handleDelete(r.id)}
+                          style={{ padding:"3px 8px", borderRadius:7, fontSize:10, fontWeight:800,
+                            cursor:"pointer",
+                            border:`1px solid ${confirmDelete===r.id?T.red:T.borderMed}`,
+                            background:confirmDelete===r.id?T.deleteBg:"transparent",
+                            color:confirmDelete===r.id?T.red:T.textLight }}>
+                          {confirmDelete===r.id?"Sure?":"Delete"}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {confirmDelete===r.id && (
-                    <div style={{ fontSize:11, color:T.red, padding:"8px 14px",
-                      borderTop:`1px solid rgba(201,59,10,0.15)`,
-                      display:"flex", gap:8, alignItems:"center" }}>
-                      <span>Delete this rating?</span>
-                      <button onClick={()=>setConfirmDelete(null)}
-                        style={{ fontSize:11, color:T.textLight, background:"none",
-                          border:"none", cursor:"pointer", padding:0 }}>
-                        Cancel
-                      </button>
-                    </div>
-                  )}
                 </div>
-              ))}
+              </div>
+              {confirmDelete===r.id && (
+                <div style={{ fontSize:11, color:T.red, padding:"8px 14px",
+                  borderTop:`1px solid rgba(201,59,10,0.15)`,
+                  display:"flex", gap:8, alignItems:"center" }}>
+                  <span>Delete this rating?</span>
+                  <button onClick={()=>setConfirmDelete(null)}
+                    style={{ fontSize:11, color:T.textLight, background:"none",
+                      border:"none", cursor:"pointer", padding:0 }}>
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
-          </>
-      }
-    </div>
-  );
+          ))}
+        </div>
+      </>
+  }
+</div>
+```
+
+);
 }
 
 // ─── SUPABASE CLIENT ──────────────────────────────────────────────────────────
 
-const SUPA_URL = "https://mhpnrfarzdnvpzwadypg.supabase.co";
-const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ocG5yZmFyemRudnB6d2FkeXBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMTMzNTIsImV4cCI6MjA4ODY4OTM1Mn0.mt-KMqO35BQiLacgTpJTE_KIEJVe95RVxzxng0ftAXE";
+const SUPA_URL = “https://mhpnrfarzdnvpzwadypg.supabase.co”;
+const SUPA_KEY = “eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ocG5yZmFyemRudnB6d2FkeXBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMTMzNTIsImV4cCI6MjA4ODY4OTM1Mn0.mt-KMqO35BQiLacgTpJTE_KIEJVe95RVxzxng0ftAXE”;
 
 const supa = {
-  async query(table, opts={}) {
-    let url = `${SUPA_URL}/rest/v1/${table}?`;
-    if (opts.select)  url += `select=${opts.select}&`;
-    if (opts.filter)  url += `${opts.filter}&`;
-    if (opts.order)   url += `order=${opts.order}&`;
-    const res = await fetch(url, {
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`,
-        "Content-Type": "application/json", Prefer: "return=representation" }
-    });
-    return res.json();
-  },
-  async insert(table, data) {
-    const res = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
-      method: "POST",
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`,
-        "Content-Type": "application/json", Prefer: "return=representation" },
-      body: JSON.stringify(data)
-    });
-    return res.json();
-  },
-  async update(table, id, data) {
-    const res = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
-      method: "PATCH",
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`,
-        "Content-Type": "application/json", Prefer: "return=representation" },
-      body: JSON.stringify(data)
-    });
-    return res.json();
-  },
-  async delete(table, id) {
-    await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
-      method: "DELETE",
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
-    });
-  }
+async query(table, opts={}) {
+let url = `${SUPA_URL}/rest/v1/${table}?`;
+if (opts.select)  url += `select=${opts.select}&`;
+if (opts.filter)  url += `${opts.filter}&`;
+if (opts.order)   url += `order=${opts.order}&`;
+const res = await fetch(url, {
+headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`,
+“Content-Type”: “application/json”, Prefer: “return=representation” }
+});
+return res.json();
+},
+async insert(table, data) {
+const res = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
+method: “POST”,
+headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`,
+“Content-Type”: “application/json”, Prefer: “return=representation” },
+body: JSON.stringify(data)
+});
+return res.json();
+},
+async update(table, id, data) {
+const res = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+method: “PATCH”,
+headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`,
+“Content-Type”: “application/json”, Prefer: “return=representation” },
+body: JSON.stringify(data)
+});
+return res.json();
+},
+async delete(table, id) {
+await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+method: “DELETE”,
+headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
+});
+}
 };
 
 // ─── AUTH SCREENS ─────────────────────────────────────────────────────────────
 
 function AuthScreen({ onLogin }) {
-  const [mode, setMode]       = useState("login"); // "login" | "signup"
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError]     = useState("");
-  const [loading, setLoading] = useState(false);
-  const [shake, setShake]     = useState(false);
+const [mode, setMode]       = useState(“login”); // “login” | “signup”
+const [username, setUsername] = useState(””);
+const [password, setPassword] = useState(””);
+const [error, setError]     = useState(””);
+const [loading, setLoading] = useState(false);
+const [shake, setShake]     = useState(false);
 
-  const inp = { width:"100%", borderRadius:12, padding:"13px 15px", color:T.textDark,
-    outline:"none", background:"white", border:`1.5px solid rgba(180,120,60,0.3)`,
-    fontSize:15, boxSizing:"border-box", fontFamily:"Georgia,serif" };
+const inp = { width:“100%”, borderRadius:12, padding:“13px 15px”, color:T.textDark,
+outline:“none”, background:“white”, border:`1.5px solid rgba(180,120,60,0.3)`,
+fontSize:15, boxSizing:“border-box”, fontFamily:“Georgia,serif” };
 
-  async function handleSubmit() {
-    const u = username.trim().toLowerCase();
-    const p = password.trim();
-    if (!u || !p) { setError("Fill in both fields."); return; }
-    if (mode==="signup" && u.length < 2) { setError("Username must be at least 2 characters."); return; }
-    if (mode==="signup" && !/^[a-z0-9_]+$/.test(u)) { setError("Username: letters, numbers, underscores only."); return; }
-    if (mode==="signup" && p.length < 4) { setError("Password must be at least 4 characters."); return; }
-    setLoading(true); setError("");
-    try {
-      if (mode==="signup") {
-        // Check username taken
-        const existing = await supa.query("users", { select:"id", filter:`username=eq.${u}` });
-        if (existing.length > 0) { setError("Username taken — try another."); setLoading(false); doShake(); return; }
-        const created = await supa.insert("users", { username:u, password:p });
-        if (created?.error) { setError(created.error.message); setLoading(false); doShake(); return; }
-        onLogin({ id: created[0].id, username: u });
-      } else {
-        const users = await supa.query("users", { select:"id,username,password", filter:`username=eq.${u}` });
-        if (!users.length || users[0].password !== p) {
-          setError("Wrong username or password."); doShake(); setLoading(false); return;
-        }
-        onLogin({ id: users[0].id, username: u });
-      }
-    } catch(e) {
-      setError("Connection error — check your internet."); doShake();
-    }
-    setLoading(false);
-  }
+async function handleSubmit() {
+const u = username.trim().toLowerCase();
+const p = password.trim();
+if (!u || !p) { setError(“Fill in both fields.”); return; }
+if (mode===“signup” && u.length < 2) { setError(“Username must be at least 2 characters.”); return; }
+if (mode===“signup” && !/^[a-z0-9_]+$/.test(u)) { setError(“Username: letters, numbers, underscores only.”); return; }
+if (mode===“signup” && p.length < 4) { setError(“Password must be at least 4 characters.”); return; }
+setLoading(true); setError(””);
+try {
+if (mode===“signup”) {
+// Check username taken
+const existing = await supa.query(“users”, { select:“id”, filter:`username=eq.${u}` });
+if (existing.length > 0) { setError(“Username taken — try another.”); setLoading(false); doShake(); return; }
+const created = await supa.insert(“users”, { username:u, password:p });
+if (created?.error) { setError(created.error.message); setLoading(false); doShake(); return; }
+onLogin({ id: created[0].id, username: u });
+} else {
+const users = await supa.query(“users”, { select:“id,username,password”, filter:`username=eq.${u}` });
+if (!users.length || users[0].password !== p) {
+setError(“Wrong username or password.”); doShake(); setLoading(false); return;
+}
+onLogin({ id: users[0].id, username: u });
+}
+} catch(e) {
+setError(“Connection error — check your internet.”); doShake();
+}
+setLoading(false);
+}
 
-  function doShake() { setShake(true); setTimeout(()=>setShake(false), 600); }
+function doShake() { setShake(true); setTimeout(()=>setShake(false), 600); }
 
-  return (
-    <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#0f0501,#1e0a03,#2a0f04)",
-      display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-      padding:"24px", fontFamily:"Georgia,serif" }}>
-      {/* Logo */}
-      <div style={{ textAlign:"center", marginBottom:36 }}>
-        <div style={{ fontSize:52, marginBottom:10 }}>🍕</div>
-        <h1 style={{ fontFamily:"Georgia,serif", fontWeight:900, letterSpacing:"-2px",
-          fontSize:"clamp(36px,9vw,64px)", color:"#e8390e",
-          textShadow:"0 0 60px rgba(232,57,14,0.4)", lineHeight:0.95, marginBottom:6 }}>
-          In Crust<br/>We Trust
-        </h1>
-        <p style={{ fontSize:13, color:"rgba(245,220,190,0.45)", fontStyle:"italic" }}>
-          Pizza never lies.
-        </p>
-      </div>
+return (
+<div style={{ minHeight:“100vh”, background:“linear-gradient(160deg,#0f0501,#1e0a03,#2a0f04)”,
+display:“flex”, flexDirection:“column”, alignItems:“center”, justifyContent:“center”,
+padding:“24px”, fontFamily:“Georgia,serif” }}>
+{/* Logo */}
+<div style={{ textAlign:“center”, marginBottom:36 }}>
+<div style={{ fontSize:52, marginBottom:10 }}>🍕</div>
+<h1 style={{ fontFamily:“Georgia,serif”, fontWeight:900, letterSpacing:”-2px”,
+fontSize:“clamp(36px,9vw,64px)”, color:”#e8390e”,
+textShadow:“0 0 60px rgba(232,57,14,0.4)”, lineHeight:0.95, marginBottom:6 }}>
+In Crust<br/>We Trust
+</h1>
+<p style={{ fontSize:13, color:“rgba(245,220,190,0.45)”, fontStyle:“italic” }}>
+Pizza never lies.
+</p>
+</div>
 
-      {/* Card */}
-      <div style={{ width:"100%", maxWidth:380,
-        background:"rgba(253,246,236,0.97)", borderRadius:20,
-        padding:"28px 24px", boxShadow:"0 20px 60px rgba(0,0,0,0.4)" }}>
-        {/* Mode toggle */}
-        <div style={{ display:"flex", background:T.bgDeep, borderRadius:12,
-          padding:3, marginBottom:22, gap:3 }}>
-          {[["login","Sign In"],["signup","Create Account"]].map(([m,l])=>(
-            <button key={m} onClick={()=>{ setMode(m); setError(""); }}
-              style={{ flex:1, padding:"9px", borderRadius:9, fontSize:13, fontWeight:800,
-                cursor:"pointer", border:"none", transition:"all 0.15s",
-                background:mode===m?"white":"transparent",
-                color:mode===m?T.red:T.textLight,
-                boxShadow:mode===m?"0 1px 4px rgba(0,0,0,0.1)":"none" }}>
-              {l}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ display:"flex", flexDirection:"column", gap:12,
-          animation: shake ? "shake 0.5s" : "none" }}>
-          <style>{`@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}`}</style>
-          <div>
-            <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-              marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Username</label>
-            <input value={username} onChange={e=>setUsername(e.target.value.toLowerCase())}
-              onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
-              placeholder="e.g. pizzalover99" style={inp} autoCapitalize="none" autoCorrect="off"/>
-          </div>
-          <div>
-            <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
-              marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Password</label>
-            <input type="password" value={password} onChange={e=>setPassword(e.target.value)}
-              onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
-              placeholder="••••••••" style={inp}/>
-          </div>
-          {error && (
-            <div style={{ fontSize:12, color:T.red, fontWeight:700, textAlign:"center",
-              background:T.redLight, borderRadius:8, padding:"8px 12px" }}>
-              {error}
-            </div>
-          )}
-          <button onClick={handleSubmit} disabled={loading}
-            style={{ marginTop:4, padding:"14px", borderRadius:12, fontWeight:900,
-              fontSize:15, background: loading ? T.borderMed : T.red,
-              color:"white", border:"none", cursor: loading ? "default" : "pointer",
-              boxShadow: loading ? "none" : "0 4px 20px rgba(201,59,10,0.4)",
-              transition:"all 0.15s" }}>
-            {loading ? "…" : mode==="login" ? "Sign In 🍕" : "Create Account 🍕"}
-          </button>
-        </div>
-
-        {mode==="signup" && (
-          <p style={{ fontSize:11, color:T.textLight, textAlign:"center", marginTop:14,
-            lineHeight:1.5 }}>
-            🔒 Private beta. Invite only.<br/>Your ratings are saved across devices.
-          </p>
-        )}
-      </div>
+```
+  {/* Card */}
+  <div style={{ width:"100%", maxWidth:380,
+    background:"rgba(253,246,236,0.97)", borderRadius:20,
+    padding:"28px 24px", boxShadow:"0 20px 60px rgba(0,0,0,0.4)" }}>
+    {/* Mode toggle */}
+    <div style={{ display:"flex", background:T.bgDeep, borderRadius:12,
+      padding:3, marginBottom:22, gap:3 }}>
+      {[["login","Sign In"],["signup","Create Account"]].map(([m,l])=>(
+        <button key={m} onClick={()=>{ setMode(m); setError(""); }}
+          style={{ flex:1, padding:"9px", borderRadius:9, fontSize:13, fontWeight:800,
+            cursor:"pointer", border:"none", transition:"all 0.15s",
+            background:mode===m?"white":"transparent",
+            color:mode===m?T.red:T.textLight,
+            boxShadow:mode===m?"0 1px 4px rgba(0,0,0,0.1)":"none" }}>
+          {l}
+        </button>
+      ))}
     </div>
-  );
+
+    <div style={{ display:"flex", flexDirection:"column", gap:12,
+      animation: shake ? "shake 0.5s" : "none" }}>
+      <style>{`@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}`}</style>
+      <div>
+        <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+          marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Username</label>
+        <input value={username} onChange={e=>setUsername(e.target.value.toLowerCase())}
+          onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
+          placeholder="e.g. pizzalover99" style={inp} autoCapitalize="none" autoCorrect="off"/>
+      </div>
+      <div>
+        <label style={{ fontSize:11, fontWeight:800, color:T.amberMid, display:"block",
+          marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Password</label>
+        <input type="password" value={password} onChange={e=>setPassword(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
+          placeholder="••••••••" style={inp}/>
+      </div>
+      {error && (
+        <div style={{ fontSize:12, color:T.red, fontWeight:700, textAlign:"center",
+          background:T.redLight, borderRadius:8, padding:"8px 12px" }}>
+          {error}
+        </div>
+      )}
+      <button onClick={handleSubmit} disabled={loading}
+        style={{ marginTop:4, padding:"14px", borderRadius:12, fontWeight:900,
+          fontSize:15, background: loading ? T.borderMed : T.red,
+          color:"white", border:"none", cursor: loading ? "default" : "pointer",
+          boxShadow: loading ? "none" : "0 4px 20px rgba(201,59,10,0.4)",
+          transition:"all 0.15s" }}>
+        {loading ? "…" : mode==="login" ? "Sign In 🍕" : "Create Account 🍕"}
+      </button>
+    </div>
+
+    {mode==="signup" && (
+      <p style={{ fontSize:11, color:T.textLight, textAlign:"center", marginTop:14,
+        lineHeight:1.5 }}>
+        🔒 Private beta. Invite only.<br/>Your ratings are saved across devices.
+      </p>
+    )}
+  </div>
+</div>
+```
+
+);
 }
 
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
 
 function App() {
-  const [currentUser, setCurrentUser]         = useState(null); // { id, username }
-  const [page, setPage]                       = useState("home");
-  const [selectedPizza, setSelectedPizza]     = useState(null);
-  const [selectedUser, setSelectedUser]       = useState(null);
-  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-  const [allRatings, setAllRatings]           = useState([]);
-  const [editingRating, setEditingRating]     = useState(null);
-  const [loadingRatings, setLoadingRatings]   = useState(false);
+const [currentUser, setCurrentUser]         = useState(null); // { id, username }
+const [page, setPage]                       = useState(“home”);
+const [selectedPizza, setSelectedPizza]     = useState(null);
+const [selectedUser, setSelectedUser]       = useState(null);
+const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+const [allRatings, setAllRatings]           = useState([]);
+const [editingRating, setEditingRating]     = useState(null);
+const [loadingRatings, setLoadingRatings]   = useState(false);
 
-  const username = currentUser?.username || null;
+const username = currentUser?.username || null;
 
-  // Load all ratings from Supabase on login
-  const { useEffect } = React;
-  useEffect(() => {
-    if (!currentUser) return;
-    setLoadingRatings(true);
-    supa.query("ratings", { select:"*", order:"created_at.asc" })
-      .then(rows => {
-        if (!rows || rows.error) return;
-        // Map snake_case DB cols → camelCase app shape
-        setAllRatings(rows.map(r => ({
-          id:         r.id,
-          user:       r.username,
-          restaurant: r.restaurant,
-          pizzaName:  r.pizza_name,
-          style:      r.style,
-          city:       r.city,
-          country:    r.country,
-          score:      r.score,
-          cats:       r.cats || {},
-          review:     r.review,
-          tags:       r.tags || [],
-          price:      r.price,
-          currency:   r.currency || "PHP",
-          date:       r.date,
-        })));
-      })
-      .finally(() => setLoadingRatings(false));
-  }, [currentUser]);
+// Load all ratings from Supabase on login
+const { useEffect } = React;
+useEffect(() => {
+if (!currentUser) return;
+setLoadingRatings(true);
+supa.query(“ratings”, { select:”*”, order:“created_at.asc” })
+.then(rows => {
+if (!rows || rows.error) return;
+// Map snake_case DB cols → camelCase app shape
+setAllRatings(rows.map(r => ({
+id:         r.id,
+user:       r.username,
+restaurant: r.restaurant,
+pizzaName:  r.pizza_name,
+style:      r.style,
+city:       r.city,
+country:    r.country,
+score:      r.score,
+cats:       r.cats || {},
+review:     r.review,
+tags:       r.tags || [],
+price:      r.price,
+currency:   r.currency || “PHP”,
+date:       r.date,
+})));
+})
+.finally(() => setLoadingRatings(false));
+}, [currentUser]);
 
-  if (!currentUser) return <AuthScreen onLogin={setCurrentUser}/>;
+if (!currentUser) return <AuthScreen onLogin={setCurrentUser}/>;
 
-  if (loadingRatings) return (
-    <div style={{ minHeight:"100vh", background:T.bg, display:"flex",
-      alignItems:"center", justifyContent:"center", flexDirection:"column", gap:12,
-      fontFamily:"Georgia,serif" }}>
-      <div style={{ fontSize:40 }}>🍕</div>
-      <div style={{ fontSize:14, color:T.textLight }}>Loading your pizza history…</div>
-    </div>
-  );
+if (loadingRatings) return (
+<div style={{ minHeight:“100vh”, background:T.bg, display:“flex”,
+alignItems:“center”, justifyContent:“center”, flexDirection:“column”, gap:12,
+fontFamily:“Georgia,serif” }}>
+<div style={{ fontSize:40 }}>🍕</div>
+<div style={{ fontSize:14, color:T.textLight }}>Loading your pizza history…</div>
+</div>
+);
 
-  // ── Derive all data from allRatings ──────────────────────────────────────
-  const myRatings = allRatings.filter(r=>r.user===username);
+// ── Derive all data from allRatings ──────────────────────────────────────
+const myRatings = allRatings.filter(r=>r.user===username);
 
-  // Build pizza map
-  const pizzaMap = {};
-  allRatings.forEach(r => {
-    const key = `${r.restaurant}|||${r.pizzaName}`;
-    if (!pizzaMap[key]) {
-      pizzaMap[key] = {
-        id: key, restaurant:r.restaurant, name:r.pizzaName, style:r.style,
-        city: r.city||"", country: r.country||"", ratings:[]
-      };
-    }
-    pizzaMap[key].ratings.push(r);
-  });
+// Build pizza map
+const pizzaMap = {};
+allRatings.forEach(r => {
+const key = `${r.restaurant}|||${r.pizzaName}`;
+if (!pizzaMap[key]) {
+pizzaMap[key] = {
+id: key, restaurant:r.restaurant, name:r.pizzaName, style:r.style,
+city: r.city||””, country: r.country||””, ratings:[]
+};
+}
+pizzaMap[key].ratings.push(r);
+});
 
-  const allPizzas = Object.values(pizzaMap).map(p => {
-    const n = p.ratings.length;
-    const score = Math.round(p.ratings.reduce((a,r)=>a+r.score,0)/n);
-    // Average each category
-    const cats = {};
-    CATEGORIES.forEach(c => {
-      const vals = p.ratings.map(r=>r.cats?.[c.key]).filter(Boolean);
-      cats[c.key] = vals.length ? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*2)/2 : score;
-    });
-    // Aggregate tags
-    const tagCounts = {};
-    p.ratings.forEach(r=>(r.tags||[]).forEach(t=>{ tagCounts[t]=(tagCounts[t]||0)+1; }));
-    const tags = Object.entries(tagCounts)
-      .sort((a,b)=>b[1]-a[1]).slice(0,4)
-      .map(([label])=>ALL_TAGS.find(t=>t.label===label)||{label,icon:"🍕"});
-    const reviews = p.ratings
-      .map(r=>({ user:r.user, score:r.score, text:r.review||"" }))
-      .filter(r=>r.text);
-    return { ...p, score, cats, tags, reviews, ratingCount:n };
-  }).sort((a,b)=>b.score-a.score);
+const allPizzas = Object.values(pizzaMap).map(p => {
+const n = p.ratings.length;
+const score = Math.round(p.ratings.reduce((a,r)=>a+r.score,0)/n);
+// Average each category
+const cats = {};
+CATEGORIES.forEach(c => {
+const vals = p.ratings.map(r=>r.cats?.[c.key]).filter(Boolean);
+cats[c.key] = vals.length ? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*2)/2 : score;
+});
+// Aggregate tags
+const tagCounts = {};
+p.ratings.forEach(r=>(r.tags||[]).forEach(t=>{ tagCounts[t]=(tagCounts[t]||0)+1; }));
+const tags = Object.entries(tagCounts)
+.sort((a,b)=>b[1]-a[1]).slice(0,4)
+.map(([label])=>ALL_TAGS.find(t=>t.label===label)||{label,icon:“🍕”});
+const reviews = p.ratings
+.map(r=>({ user:r.user, score:r.score, text:r.review||”” }))
+.filter(r=>r.text);
+return { …p, score, cats, tags, reviews, ratingCount:n };
+}).sort((a,b)=>b.score-a.score);
 
-  // Build user list
-  const userMap = {};
-  allRatings.forEach(r=>{
-    if (!userMap[r.user]) userMap[r.user]={ username:r.user, ratings:[] };
-    userMap[r.user].ratings.push(r);
-  });
-  const allUsers = Object.values(userMap).map(u=>({
-    username: u.username,
-    rated: u.ratings.length,
-    avg: Math.round(u.ratings.reduce((a,r)=>a+r.score,0)/u.ratings.length),
-  })).sort((a,b)=>b.rated-a.rated);
+// Build user list
+const userMap = {};
+allRatings.forEach(r=>{
+if (!userMap[r.user]) userMap[r.user]={ username:r.user, ratings:[] };
+userMap[r.user].ratings.push(r);
+});
+const allUsers = Object.values(userMap).map(u=>({
+username: u.username,
+rated: u.ratings.length,
+avg: Math.round(u.ratings.reduce((a,r)=>a+r.score,0)/u.ratings.length),
+})).sort((a,b)=>b.rated-a.rated);
 
-  async function addRating(r) {
-    // Optimistic update
-    const tempId = "temp-" + Date.now();
-    const optimistic = { ...r, user:username, id:tempId };
-    setAllRatings(prev => [...prev, optimistic]);
-    try {
-      const rows = await supa.insert("ratings", {
-        user_id:    currentUser.id,
-        username:   username,
-        restaurant: r.restaurant,
-        pizza_name: r.pizzaName,
-        style:      r.style,
-        city:       r.city,
-        country:    r.country,
-        score:      r.score,
-        cats:       r.cats,
-        review:     r.review,
-        tags:       r.tags,
-        price:      r.price,
-        currency:   r.currency,
-        date:       r.date,
-      });
-      if (rows && rows[0]) {
-        // Replace temp with real DB id
-        setAllRatings(prev => prev.map(x =>
-          x.id === tempId ? { ...optimistic, id: rows[0].id } : x
-        ));
-      }
-    } catch(e) {
-      // Rollback on error
-      setAllRatings(prev => prev.filter(x => x.id !== tempId));
-      alert("Failed to save rating — check your connection.");
-    }
-  }
-
-  async function editRating(id, updated) {
-    // Optimistic update
-    setAllRatings(prev => prev.map(r => r.id===id ? { ...r, ...updated, id } : r));
-    try {
-      await supa.update("ratings", id, {
-        restaurant: updated.restaurant,
-        pizza_name: updated.pizzaName,
-        style:      updated.style,
-        city:       updated.city,
-        country:    updated.country,
-        score:      updated.score,
-        cats:       updated.cats,
-        review:     updated.review,
-        tags:       updated.tags,
-        price:      updated.price,
-        currency:   updated.currency,
-      });
-    } catch(e) {
-      alert("Failed to save edit — check your connection.");
-    }
-  }
-
-  async function deleteRating(id) {
-    // Optimistic update
-    setAllRatings(prev => prev.filter(r => r.id !== id));
-    try {
-      await supa.delete("ratings", id);
-    } catch(e) {
-      alert("Failed to delete — check your connection.");
-    }
-  }
-
-  const nav = [
-    { id:"home",    label:"Home",    icon:"🏠" },
-    { id:"rate",    label:"Rate",    icon:"🍕" },
-    { id:"explore", label:"Explore", icon:"🔍" },
-    { id:"profile", label:"Profile", icon:"👤" },
-  ];
-
-  const profileUsername = selectedUser || username;
-  const profileRatings  = allRatings.filter(r=>r.user===profileUsername);
-
-  return (
-    <div style={{ minHeight:"100vh", background:T.bg, fontFamily:"Georgia,serif",
-      color:T.textDark }}>
-
-      {/* Header */}
-      <header style={{ position:"sticky", top:0, zIndex:50,
-        display:"flex", justifyContent:"space-between", alignItems:"center",
-        padding:"11px 17px",
-        background:T.header,
-        borderBottom:`1px solid ${T.border}`,
-        backdropFilter:"blur(12px)" }}>
-        <button onClick={()=>setPage("home")}
-          style={{ display:"flex", alignItems:"center", gap:7,
-            background:"none", border:"none", cursor:"pointer" }}>
-          <span style={{ fontSize:20 }}>🍕</span>
-          <span style={{ fontSize:15, fontWeight:900, color:T.textDark, letterSpacing:"-0.3px" }}>
-            In <span style={{ color:T.red }}>Crust</span> We Trust
-          </span>
-        </button>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <button onClick={()=>{setPage("profile");setSelectedUser(null);}}
-            style={{ fontSize:12, fontWeight:800, color:T.amberMid, background:"none",
-              border:"none", cursor:"pointer" }}>
-            @{username}
-          </button>
-          <button onClick={()=>{ setCurrentUser(null); setAllRatings([]); setPage("home"); }}
-            style={{ fontSize:11, fontWeight:700, color:T.textLight, background:"none",
-              border:`1px solid ${T.border}`, borderRadius:7, padding:"4px 8px", cursor:"pointer" }}>
-            Sign out
-          </button>
-        </div>
-      </header>
-
-      {/* Pages */}
-      <main>
-        {page==="home" &&
-          <HomePage setPage={setPage} setSelectedPizza={setSelectedPizza}
-            allPizzas={allPizzas} allRatings={allRatings}/>}
-        {page==="rate" &&
-          <RatePage setPage={setPage} addRating={addRating} editRating={editRating}
-            editingRating={editingRating} setEditingRating={setEditingRating}
-            allRatings={allRatings}/>}
-        {page==="explore" &&
-          <ExplorePage setPage={setPage} setSelectedPizza={setSelectedPizza}
-            setSelectedRestaurant={setSelectedRestaurant} setSelectedUser={setSelectedUser}
-            allPizzas={allPizzas} allUsers={allUsers} allRatings={allRatings}/>}
-        {page==="pizza" &&
-          <PizzaPage pizza={selectedPizza} setSelectedUser={setSelectedUser} setPage={setPage}/>}
-        {page==="restaurant" &&
-          <RestaurantPage restaurant={selectedRestaurant} allPizzas={allPizzas}
-            allRatings={allRatings} setSelectedPizza={setSelectedPizza} setPage={setPage}/>}
-        {page==="profile" &&
-          <ProfilePage username={profileUsername} isMe={profileUsername===username}
-            myRatings={profileRatings} deleteRating={deleteRating}
-            setPage={setPage} setSelectedPizza={setSelectedPizza} allPizzaMap={pizzaMap}
-            setEditingRating={setEditingRating}/>}
-      </main>
-
-      {/* Bottom nav */}
-      <nav style={{ position:"fixed", bottom:0, left:0, right:0, display:"flex",
-        background:T.header, borderTop:`1px solid ${T.border}`,
-        backdropFilter:"blur(12px)" }}>
-        {nav.map(n=>(
-          <button key={n.id}
-            onClick={()=>{setPage(n.id);setSelectedUser(null);}}
-            style={{ flex:1, padding:"9px 0 7px",
-              display:"flex", flexDirection:"column", alignItems:"center", gap:2,
-              background:"none", border:"none", cursor:"pointer",
-              color:page===n.id?T.red:T.textLight,
-              borderTop:page===n.id?`2px solid ${T.red}`:"2px solid transparent" }}>
-            <span style={{ fontSize:18 }}>{n.icon}</span>
-            <span style={{ fontSize:9, fontWeight:800, letterSpacing:"0.04em",
-              textTransform:"uppercase" }}>{n.label}</span>
-          </button>
-        ))}
-      </nav>
-    </div>
-  );
+async function addRating(r) {
+// Optimistic update
+const tempId = “temp-” + Date.now();
+const optimistic = { …r, user:username, id:tempId };
+setAllRatings(prev => […prev, optimistic]);
+try {
+const rows = await supa.insert(“ratings”, {
+user_id:    currentUser.id,
+username:   username,
+restaurant: r.restaurant,
+pizza_name: r.pizzaName,
+style:      r.style,
+city:       r.city,
+country:    r.country,
+score:      r.score,
+cats:       r.cats,
+review:     r.review,
+tags:       r.tags,
+price:      r.price,
+currency:   r.currency,
+date:       r.date,
+});
+if (rows && rows[0]) {
+// Replace temp with real DB id
+setAllRatings(prev => prev.map(x =>
+x.id === tempId ? { …optimistic, id: rows[0].id } : x
+));
+}
+} catch(e) {
+// Rollback on error
+setAllRatings(prev => prev.filter(x => x.id !== tempId));
+alert(“Failed to save rating — check your connection.”);
+}
 }
 
+async function editRating(id, updated) {
+// Optimistic update
+setAllRatings(prev => prev.map(r => r.id===id ? { …r, …updated, id } : r));
+try {
+await supa.update(“ratings”, id, {
+restaurant: updated.restaurant,
+pizza_name: updated.pizzaName,
+style:      updated.style,
+city:       updated.city,
+country:    updated.country,
+score:      updated.score,
+cats:       updated.cats,
+review:     updated.review,
+tags:       updated.tags,
+price:      updated.price,
+currency:   updated.currency,
+});
+} catch(e) {
+alert(“Failed to save edit — check your connection.”);
+}
+}
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App/>);
+async function deleteRating(id) {
+// Optimistic update
+setAllRatings(prev => prev.filter(r => r.id !== id));
+try {
+await supa.delete(“ratings”, id);
+} catch(e) {
+alert(“Failed to delete — check your connection.”);
+}
+}
+
+// Always clear editingRating when going to Rate fresh
+function goRate() { setEditingRating(null); setPage(“rate”); }
+
+const nav = [
+{ id:“home”,    label:“Home”,    icon:“🏠”, onClick:()=>{setPage(“home”);setSelectedUser(null);} },
+{ id:“rate”,    label:“Rate”,    icon:“🍕”, onClick:()=>{goRate();setSelectedUser(null);} },
+{ id:“explore”, label:“Explore”, icon:“🔍”, onClick:()=>{setPage(“explore”);setSelectedUser(null);} },
+{ id:“profile”, label:“Profile”, icon:“👤”, onClick:()=>{setPage(“profile”);setSelectedUser(null);} },
+];
+
+const profileUsername = selectedUser || username;
+const profileRatings  = allRatings.filter(r=>r.user===profileUsername);
+
+return (
+<div style={{ minHeight:“100vh”, background:T.bg, fontFamily:“Georgia,serif”,
+color:T.textDark }}>
+
+```
+  {/* Header */}
+  <header style={{ position:"sticky", top:0, zIndex:50,
+    display:"flex", justifyContent:"space-between", alignItems:"center",
+    padding:"11px 17px",
+    background:T.header,
+    borderBottom:`1px solid ${T.border}`,
+    backdropFilter:"blur(12px)" }}>
+    <button onClick={()=>setPage("home")}
+      style={{ display:"flex", alignItems:"center", gap:7,
+        background:"none", border:"none", cursor:"pointer" }}>
+      <span style={{ fontSize:20 }}>🍕</span>
+      <span style={{ fontSize:15, fontWeight:900, color:T.textDark, letterSpacing:"-0.3px" }}>
+        In <span style={{ color:T.red }}>Crust</span> We Trust
+      </span>
+    </button>
+    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+      <button onClick={()=>{setPage("profile");setSelectedUser(null);}}
+        style={{ fontSize:12, fontWeight:800, color:T.amberMid, background:"none",
+          border:"none", cursor:"pointer" }}>
+        @{username}
+      </button>
+      <button onClick={()=>{ setCurrentUser(null); setAllRatings([]); setPage("home"); }}
+        style={{ fontSize:11, fontWeight:700, color:T.textLight, background:"none",
+          border:`1px solid ${T.border}`, borderRadius:7, padding:"4px 8px", cursor:"pointer" }}>
+        Sign out
+      </button>
+    </div>
+  </header>
+
+  {/* Pages */}
+  <main>
+    {page==="home" &&
+      <HomePage setPage={setPage} goRate={goRate} setSelectedPizza={setSelectedPizza}
+        allPizzas={allPizzas} allRatings={allRatings}/>}
+    {page==="rate" &&
+      <RatePage setPage={setPage} addRating={addRating} editRating={editRating}
+        editingRating={editingRating} setEditingRating={setEditingRating}
+        allRatings={allRatings}/>}
+    {page==="explore" &&
+      <ExplorePage setPage={setPage} goRate={goRate} setSelectedPizza={setSelectedPizza}
+        setSelectedRestaurant={setSelectedRestaurant} setSelectedUser={setSelectedUser}
+        allPizzas={allPizzas} allUsers={allUsers} allRatings={allRatings}/>}
+    {page==="pizza" &&
+      <PizzaPage pizza={selectedPizza} setSelectedUser={setSelectedUser} setPage={setPage}/>}
+    {page==="restaurant" &&
+      <RestaurantPage restaurant={selectedRestaurant} allPizzas={allPizzas}
+        allRatings={allRatings} setSelectedPizza={setSelectedPizza} setPage={setPage}/>}
+    {page==="profile" &&
+      <ProfilePage username={profileUsername} isMe={profileUsername===username}
+        myRatings={profileRatings} deleteRating={deleteRating}
+        setPage={setPage} goRate={goRate} setSelectedPizza={setSelectedPizza} allPizzaMap={pizzaMap}
+        setEditingRating={setEditingRating}/>}
+  </main>
+
+  {/* Bottom nav */}
+  <nav style={{ position:"fixed", bottom:0, left:0, right:0, display:"flex",
+    background:T.header, borderTop:`1px solid ${T.border}`,
+    backdropFilter:"blur(12px)" }}>
+    {nav.map(n=>(
+      <button key={n.id}
+        onClick={n.onClick}
+        style={{ flex:1, padding:"9px 0 7px",
+          display:"flex", flexDirection:"column", alignItems:"center", gap:2,
+          background:"none", border:"none", cursor:"pointer",
+          color:page===n.id?T.red:T.textLight,
+          borderTop:page===n.id?`2px solid ${T.red}`:"2px solid transparent" }}>
+        <span style={{ fontSize:18 }}>{n.icon}</span>
+        <span style={{ fontSize:9, fontWeight:800, letterSpacing:"0.04em",
+          textTransform:"uppercase" }}>{n.label}</span>
+      </button>
+    ))}
+  </nav>
+</div>
+```
+
+);
+}
+
+```
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+```
+
   </script>
 </body>
 </html>
