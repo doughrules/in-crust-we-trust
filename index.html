@@ -144,9 +144,9 @@ const T = {
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
 function calcOverall(cats) {
-  const vals = Object.values(cats).filter(v=>v>0);
+  const parsed = typeof cats === "string" ? JSON.parse(cats) : (cats||{});
+  const vals = Object.values(parsed).filter(v=>typeof v === "number" && v > 0);
   if (!vals.length) return 0;
-  // Always divide by 30 (max possible) so partial ratings aren't inflated
   return Math.round(vals.reduce((a,b)=>a+b,0) / 30 * 100);
 }
 
@@ -677,16 +677,24 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
                 marginBottom:6, letterSpacing:"0.06em", textTransform:"uppercase" }}>Country</label>
               {/* Quick-tap popular countries */}
               <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:8 }}>
-                {["🇵🇭 Philippines","🇺🇸 USA","🇯🇵 Japan","🇸🇬 Singapore","🇹🇭 Thailand","🇭🇰 Hong Kong","🇮🇹 Italy","🇬🇧 UK","🇦🇺 Australia","🇫🇷 France","🇩🇪 Germany","🇪🇸 Spain"].map(opt => {
-                  const label = opt.split(" ").slice(1).join(" ");
-                  const active = country === label;
+                {[
+                  {flag:"🇵🇭",name:"Philippines"},{flag:"🇺🇸",name:"USA"},
+                  {flag:"🇯🇵",name:"Japan"},{flag:"🇸🇬",name:"Singapore"},
+                  {flag:"🇹🇭",name:"Thailand"},{flag:"🇭🇰",name:"Hong Kong"},
+                  {flag:"🇮🇹",name:"Italy"},{flag:"🇬🇧",name:"UK"},
+                  {flag:"🇦🇺",name:"Australia"},{flag:"🇫🇷",name:"France"},
+                  {flag:"🇩🇪",name:"Germany"},{flag:"🇪🇸",name:"Spain"},
+                ].map(({flag,name}) => {
+                  const active = country === name;
                   return (
-                    <button key={label} onClick={() => setCountry(active ? "" : label)}
+                    <button key={name} onClick={() => setCountry(active ? "" : name)}
                       style={{ padding:"5px 10px", borderRadius:9, fontSize:12, fontWeight:700,
                         cursor:"pointer", border:`1.5px solid ${active ? T.red : T.borderMed}`,
                         background: active ? T.redLight : "white",
-                        color: active ? T.red : T.textMid, transition:"all 0.12s" }}>
-                      {opt}
+                        color: active ? T.red : T.textMid, transition:"all 0.12s",
+                        display:"flex", alignItems:"center", gap:4 }}>
+                      <span style={{ fontSize:16 }}>{flag}</span>
+                      <span>{name}</span>
                     </button>
                   );
                 })}
@@ -1001,7 +1009,10 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
 
                 const catAvgs = {};
                 CATEGORIES.forEach(c=>{
-                  const vals = restRatings.map(x=>x.cats?.[c.key]).filter(Boolean);
+                  const vals = restRatings.map(x=>{
+                    const cats2 = typeof x.cats === "string" ? JSON.parse(x.cats) : (x.cats||{});
+                    return cats2[c.key];
+                  }).filter(v=>typeof v === "number" && v > 0);
                   catAvgs[c.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
                 });
                 return (
@@ -1302,7 +1313,10 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
 
   const catAvgs = {};
   CATEGORIES.forEach(c=>{
-    const vals = visits.map(r=>r.cats?.[c.key]).filter(Boolean);
+    const vals = visits.map(r=>{
+      const cats2 = typeof r.cats === "string" ? JSON.parse(r.cats) : (r.cats||{});
+      return cats2[c.key];
+    }).filter(v=>typeof v === "number" && v > 0);
     catAvgs[c.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
   });
 
@@ -1840,7 +1854,7 @@ function App() {
   );
 
   // ── Derive all data from allRatings ──────────────────────────────────────
-  const myRatings = allRatings.filter(r=>r.user===username);
+  const myRatings = allRatings.filter(r=>(r.user||"").toLowerCase()===(username||"").toLowerCase());
 
   // Build pizza map
   const pizzaMap = {};
@@ -1858,11 +1872,14 @@ function App() {
   const allPizzas = Object.values(pizzaMap).map(p => {
     const n = p.ratings.length;
     const score = Math.round(p.ratings.reduce((a,r)=>a+r.score,0)/n);
-    // Average each category
+    // Average each category — safely parse cats (Supabase returns JSON objects)
     const cats = {};
     CATEGORIES.forEach(c => {
-      const vals = p.ratings.map(r=>r.cats?.[c.key]).filter(Boolean);
-      cats[c.key] = vals.length ? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*2)/2 : score;
+      const vals = p.ratings.map(r=>{
+        const c2 = typeof r.cats === "string" ? JSON.parse(r.cats) : (r.cats||{});
+        return c2[c.key];
+      }).filter(v=>typeof v === "number" && v > 0);
+      cats[c.key] = vals.length ? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*2)/2 : 0;
     });
     // Aggregate tags
     const tagCounts = {};
@@ -1966,7 +1983,7 @@ function App() {
   ];
 
   const profileUsername = selectedUser || username;
-  const profileRatings  = allRatings.filter(r=>r.user===profileUsername);
+  const profileRatings  = allRatings.filter(r=>(r.user||"").toLowerCase()===(profileUsername||"").toLowerCase());
 
   return (
     <div style={{ minHeight:"100vh", background:T.bg, fontFamily:"Georgia,serif",
