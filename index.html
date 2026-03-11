@@ -1,23 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>In Crust We Trust</title>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Georgia,serif;background:#fdf6ec;color:#2a1a08;font-size:18px}
-input,textarea,select{font-family:Georgia,serif}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:#f5e8d4}
-::-webkit-scrollbar-thumb{background:#c17b3a;border-radius:3px}
-</style>
-</head>
-<body>
-<div id="root"></div>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#fdf6ec;color:#2a1a08;font-size:18px}input,textarea,select{font-family:Georgia,serif}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f5e8d4}::-webkit-scrollbar-thumb{background:#c17b3a;border-radius:3px}</style>
+</head><body><div id="root"></div>
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
@@ -364,8 +351,10 @@ function Tag({ label, icon, selected, onClick, negative }) {
   );
 }
 
-function PizzaCard({ pizza, onClick }) {
+function PizzaCard({ pizza, onClick, highlightCat }) {
   const [hov, setHov] = useState(false);
+  const catObj = highlightCat ? CATEGORIES.find(c=>c.key===highlightCat) : null;
+  const catVal = catObj ? (pizza.cats[catObj.key] || 0) : null;
   return (
     <div onClick={()=>onClick(pizza)}
       onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
@@ -386,9 +375,21 @@ function PizzaCard({ pizza, onClick }) {
             </div>
           )}
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <ScoreBadge score={pizza.score} large/>
-          <div style={{ fontSize:14, color:T.textLight, marginTop:2 }}>{pizza.ratingCount} rating{pizza.ratingCount!==1?"s":""}</div>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:3 }}>
+          {catObj && catVal > 0 ? (
+            <>
+              <div style={{ display:"flex", alignItems:"center", gap:5,
+                background:"rgba(201,59,10,0.07)", borderRadius:10, padding:"5px 10px" }}>
+                <span style={{ fontSize:18 }}>{catObj.icon}</span>
+                <span style={{ fontSize:22, fontWeight:900, color:T.red, lineHeight:1 }}>{catVal.toFixed(1)}</span>
+                <span style={{ fontSize:13, color:T.textLight, lineHeight:1 }}>/5</span>
+              </div>
+              <div style={{ fontSize:13, color:T.textLight }}>overall {pizza.score}</div>
+            </>
+          ) : (
+            <ScoreBadge score={pizza.score} large/>
+          )}
+          <div style={{ fontSize:14, color:T.textLight }}>{pizza.ratingCount} rating{pizza.ratingCount!==1?"s":""}</div>
         </div>
       </div>
       <div style={{ display:"flex", flexWrap:"wrap", gap:4, marginTop:8 }}>
@@ -1333,7 +1334,8 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                     <div style={{ fontSize:18, fontWeight:900, width:18, textAlign:"right",
                       color:T.textLight }}>#{i+1}</div>
                     <div style={{ flex:1 }}>
-                      <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
+                      <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}
+                        highlightCat={sort.startsWith("cat_") ? sort.replace("cat_","") : null}/>
                     </div>
                   </div>
                 ))}
@@ -1896,7 +1898,7 @@ function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, dra
           border:`1.5px solid ${T.border}`, textAlign:"left" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:hasPrefs?10:0 }}>
             <span style={{ fontSize:13, fontWeight:900, color:T.textLight,
-              letterSpacing:"0.1em", textTransform:"uppercase" }}>Pizza Identity</span>
+              letterSpacing:"0.1em", textTransform:"uppercase" }}>🧩 Pizza Me</span>
             {isMe && (
               <button onClick={()=>{ setDraftPrefs({...prefs}); setEditingPrefs(true); }}
                 style={{ background:"none", border:`1px solid ${T.border}`, borderRadius:8,
@@ -1912,7 +1914,7 @@ function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, dra
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <span style={{ fontSize:20 }}>{prefs.pizza_type==="red" ? "🍅" : "🧄"}</span>
                   <span style={{ fontSize:15, fontWeight:700, color:accentColor }}>
-                    {prefs.pizza_type==="red" ? "Red pizza person" : "White pizza person"}
+                    {prefs.pizza_type==="red" ? "Red Queen" : "Pretty Fly For A White Pie"}
                   </span>
                 </div>
               )}
@@ -1920,7 +1922,7 @@ function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, dra
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <span style={{ fontSize:20 }}>🍕</span>
                   <span style={{ fontSize:15, color:T.textMid }}>
-                    <span style={{ fontWeight:700, color:T.textDark }}>Fav style:</span> {prefs.fav_style}
+                    <span style={{ fontWeight:700, color:T.textDark }}>Fave style:</span> {prefs.fav_style}
                   </span>
                 </div>
               )}
@@ -1946,12 +1948,12 @@ function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, dra
           border:`1.5px solid ${T.border}` }}>
           <div style={{ fontSize:13, fontWeight:900, color:T.textLight,
             letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:14 }}>
-            Pizza Identity
+            🧩 Pizza Me
           </div>
           <div style={{ marginBottom:14 }}>
             <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Red or white pizza?</div>
             <div style={{ display:"flex", gap:10 }}>
-              {[{v:"red",emoji:"🍅",label:"Red"},{v:"white",emoji:"🧄",label:"White"}].map(({v,emoji,label}) => {
+              {[{v:"red",emoji:"🍅",label:"Red Queen"},{v:"white",emoji:"🧄",label:"White Pie"}].map(({v,emoji,label}) => {
                 const active = draft.pizza_type === v;
                 return (
                   <button key={v} onClick={()=>setDraftPrefs(d=>({...d,pizza_type:v}))}
@@ -1967,7 +1969,7 @@ function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, dra
             </div>
           </div>
           <div style={{ marginBottom:14 }}>
-            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite style</div>
+            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Fave style</div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
               {STYLES.map(s => {
                 const active = draft.fav_style === s;
@@ -2703,6 +2705,4 @@ function App() {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
-</script>
-</body>
-</html>
+</script></body></html>
