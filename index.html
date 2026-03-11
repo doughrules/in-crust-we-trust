@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><!-- v1773249662340 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
+<html lang="en"><head><meta charset="UTF-8"/><!-- v1773250493415 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍕</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -2061,189 +2061,153 @@ function mercatorY(lat, h) {
 }
 
 function PizzaPassport({ myRatings }) {
-  const [page, setPage] = useState(0); // 0=cover, 1=map, 2=stamps
-
   const countries = [...new Set(myRatings.map(r=>r.country).filter(Boolean))];
   const cities    = [...new Set(myRatings.map(r=>r.city).filter(Boolean))];
 
   const countryStats = {};
   myRatings.forEach(r=>{
     if(!r.country) return;
-    if(!countryStats[r.country]) countryStats[r.country]={count:0,cities:new Set(),topScore:0};
+    if(!countryStats[r.country]) countryStats[r.country]={count:0,cities:new Set(),topScore:0,dates:[]};
     countryStats[r.country].count++;
     if(r.city) countryStats[r.country].cities.add(r.city);
     if(r.score>countryStats[r.country].topScore) countryStats[r.country].topScore=r.score;
+    if(r.date) countryStats[r.country].dates.push(r.date);
   });
 
-  const W=340, H=180;
-  const mapPins = Object.entries(countryStats).map(([country, stats])=>{
-    const coords = COUNTRY_COORDS[country];
-    if(!coords) return null;
-    return { country, stats, x: mercatorX(coords[0], W), y: mercatorY(coords[1], H) };
-  }).filter(Boolean);
+  useEffect(()=>{
+    const id = "passport-stamp-styles";
+    if(document.getElementById(id)) return;
+    const s = document.createElement("style");
+    s.id = id;
+    s.textContent = `
+      @keyframes stampDrop { 0%{transform:var(--rot) scale(2.5);opacity:0} 65%{transform:var(--rot) scale(0.9);opacity:1} 100%{transform:var(--rot) scale(1);opacity:1} }
+      .passport-stamp { animation: stampDrop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; opacity:0; }
+    `;
+    document.head.appendChild(s);
+  }, []);
 
-  const pages = ["cover","map","stamps"];
+  const inkColors = [
+    { ink:"#c93b0a", bg:"rgba(201,59,10,0.06)", border:"rgba(201,59,10,0.45)" },
+    { ink:"#1a5c8a", bg:"rgba(26,92,138,0.06)",  border:"rgba(26,92,138,0.45)" },
+    { ink:"#2d7a3e", bg:"rgba(45,122,62,0.06)",  border:"rgba(45,122,62,0.45)" },
+    { ink:"#7a3a8a", bg:"rgba(122,58,138,0.06)", border:"rgba(122,58,138,0.45)" },
+    { ink:"#8a5c1a", bg:"rgba(138,92,26,0.06)",  border:"rgba(138,92,26,0.45)" },
+    { ink:"#1a6a6a", bg:"rgba(26,106,106,0.06)", border:"rgba(26,106,106,0.45)" },
+    { ink:"#6a1a1a", bg:"rgba(106,26,26,0.06)",  border:"rgba(106,26,26,0.45)" },
+  ];
+
+  // Slight random-ish rotations per stamp (deterministic by index)
+  const rotations = [-3, 2.5, -1.5, 3.5, -2, 1, -4, 2, -1, 3, -2.5, 1.5];
+
+  if(myRatings.length===0) return (
+    <div style={{textAlign:"center",padding:"40px 20px",color:T.textLight,fontStyle:"italic"}}>
+      Rate pizzas with a country to unlock your Passport 🍕
+    </div>
+  );
+
+  const sorted = Object.entries(countryStats).sort((a,b)=>b[1].count-a[1].count);
 
   return (
-    <div style={{ marginBottom:24 }}>
-      {/* Passport label */}
-      <div style={{ fontSize:13, fontWeight:900, color:T.textLight, letterSpacing:"0.12em",
-        textTransform:"uppercase", marginBottom:10, textAlign:"center" }}>
-        🛂 Pizza Passport
-      </div>
-
-      {/* Passport booklet */}
-      <div style={{ background:"#1a3a2a", borderRadius:16, overflow:"hidden",
-        boxShadow:"0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07)",
-        maxWidth:380, margin:"0 auto" }}>
-
-        {/* Page tabs */}
-        <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
-          {[["cover","Cover"],["map","🗺 Map"],["stamps","🏷 Stamps"]].map(([id,label],i)=>(
-            <button key={id} onClick={()=>setPage(i)}
-              style={{ flex:1, padding:"9px 4px", fontSize:13, fontWeight:800,
-                cursor:"pointer", border:"none", fontFamily:"Georgia,serif",
-                background:page===i?"rgba(255,255,255,0.08)":"transparent",
-                color:page===i?"#f5dca8":"rgba(245,220,168,0.45)",
-                borderBottom:page===i?"2px solid #c8a050":"2px solid transparent",
-                transition:"all 0.15s" }}>
-              {label}
-            </button>
+    <div style={{fontFamily:"Georgia,serif"}}>
+      {/* Passport cover stats */}
+      <div style={{ background:"linear-gradient(135deg,#2d1208,#1a0a02)", borderRadius:16,
+        padding:"20px 20px 18px", marginBottom:16, position:"relative", overflow:"hidden",
+        boxShadow:"0 4px 20px rgba(0,0,0,0.18)" }}>
+        <div style={{ position:"absolute", right:-12, bottom:-12, fontSize:100,
+          opacity:0.05, transform:"rotate(-15deg)", pointerEvents:"none" }}>🍕</div>
+        <div style={{ position:"absolute", top:0, left:0, right:0, height:3,
+          background:"linear-gradient(90deg,transparent,#c9a24a,#e8c96a,#c9a24a,transparent)" }}/>
+        <div style={{ fontSize:10, letterSpacing:"0.28em", color:"rgba(201,162,74,0.65)",
+          textTransform:"uppercase", marginBottom:3 }}>Pizza Passport</div>
+        <div style={{ fontSize:17, fontWeight:900, color:"#e8c96a", letterSpacing:"0.05em",
+          marginBottom:14 }}>IN CRUST WE TRUST 🍕</div>
+        <div style={{ display:"flex", gap:0, borderRadius:10, overflow:"hidden",
+          border:"1px solid rgba(201,162,74,0.2)" }}>
+          {[
+            {val:myRatings.length, label:"Pizzas"},
+            {val:countries.length, label:countries.length===1?"Country":"Countries"},
+            {val:cities.length,    label:cities.length===1?"City":"Cities"},
+          ].map((s,i)=>(
+            <div key={i} style={{ flex:1, textAlign:"center", padding:"9px 4px",
+              background:i%2===0?"rgba(201,162,74,0.07)":"rgba(201,162,74,0.03)",
+              borderRight:i<2?"1px solid rgba(201,162,74,0.15)":"none" }}>
+              <div style={{fontSize:24,fontWeight:900,color:"#c93b0a"}}>{s.val}</div>
+              <div style={{fontSize:11,color:"rgba(245,220,168,0.5)",textTransform:"uppercase",
+                letterSpacing:"0.08em"}}>{s.label}</div>
+            </div>
           ))}
         </div>
+      </div>
 
-        {/* COVER PAGE */}
-        {page===0 && (
-          <div style={{ padding:"28px 24px 24px", textAlign:"center",
-            background:"linear-gradient(160deg,#1a3a2a,#0f2418)" }}>
-            <div style={{ fontSize:44, marginBottom:8 }}>🍕</div>
-            <div style={{ fontSize:11, letterSpacing:"0.25em", color:"rgba(200,160,80,0.7)",
-              textTransform:"uppercase", marginBottom:4, fontFamily:"Georgia,serif" }}>
-              In Crust We Trust
-            </div>
-            <div style={{ fontSize:20, fontWeight:900, color:"#f5dca8", letterSpacing:"0.06em",
-              marginBottom:18, fontFamily:"Georgia,serif" }}>
-              PIZZA PASSPORT
-            </div>
-            <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:12,
-              padding:"14px 20px", display:"inline-block", minWidth:200 }}>
-              <div style={{ display:"flex", justifyContent:"center", gap:32, marginBottom:8 }}>
-                <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:28, fontWeight:900, color:"#c8a050" }}>{countries.length}</div>
-                  <div style={{ fontSize:12, color:"rgba(245,220,168,0.55)", textTransform:"uppercase",
-                    letterSpacing:"0.08em" }}>Countries</div>
-                </div>
-                <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:28, fontWeight:900, color:"#c8a050" }}>{cities.length}</div>
-                  <div style={{ fontSize:12, color:"rgba(245,220,168,0.55)", textTransform:"uppercase",
-                    letterSpacing:"0.08em" }}>Cities</div>
-                </div>
-                <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:28, fontWeight:900, color:"#c8a050" }}>{myRatings.length}</div>
-                  <div style={{ fontSize:12, color:"rgba(245,220,168,0.55)", textTransform:"uppercase",
-                    letterSpacing:"0.08em" }}>Pizzas</div>
-                </div>
-              </div>
-            </div>
-            {countries.length>0 && (
-              <div style={{ marginTop:14, display:"flex", flexWrap:"wrap", gap:5, justifyContent:"center" }}>
-                {countries.map(c=>(
-                  <span key={c} style={{ fontSize:22 }}>{COUNTRY_FLAGS[c]||"🏳️"}</span>
-                ))}
-              </div>
-            )}
+      {/* Stamps grid */}
+      {sorted.length===0
+        ? <div style={{textAlign:"center",color:T.textLight,fontSize:15,padding:"32px 0",fontStyle:"italic"}}>
+            No stamps yet — add a country when rating!
           </div>
-        )}
-
-        {/* MAP PAGE */}
-        {page===1 && (
-          <div style={{ padding:"16px", background:"linear-gradient(160deg,#0f2418,#1a3a2a)" }}>
-            <div style={{ position:"relative", width:"100%", paddingBottom:`${(H/W)*100}%`,
-              background:"rgba(255,255,255,0.04)", borderRadius:10, overflow:"hidden",
-              border:"1px solid rgba(255,255,255,0.08)" }}>
-              <svg viewBox={`0 0 ${W} ${H}`} style={{ position:"absolute", inset:0, width:"100%", height:"100%" }}>
-                {/* Grid lines */}
-                {[-60,-30,0,30,60].map(lat=>(
-                  <line key={`lat${lat}`}
-                    x1={0} y1={mercatorY(lat,H)} x2={W} y2={mercatorY(lat,H)}
-                    stroke="rgba(255,255,255,0.06)" strokeWidth={0.5}/>
-                ))}
-                {[-120,-60,0,60,120].map(lng=>(
-                  <line key={`lng${lng}`}
-                    x1={mercatorX(lng,W)} y1={0} x2={mercatorX(lng,W)} y2={H}
-                    stroke="rgba(255,255,255,0.06)" strokeWidth={0.5}/>
-                ))}
-                {/* Equator */}
-                <line x1={0} y1={mercatorY(0,H)} x2={W} y2={mercatorY(0,H)}
-                  stroke="rgba(200,160,80,0.15)" strokeWidth={1}/>
-                {/* Pins */}
-                {mapPins.map(({country,stats,x,y})=>(
-                  <g key={country} transform={`translate(${x},${y})`}>
-                    <circle r={Math.min(3+stats.count*1.5, 9)} fill="#c8a050" opacity={0.85}/>
-                    <circle r={Math.min(3+stats.count*1.5, 9)+3} fill="#c8a050" opacity={0.18}/>
-                    <text x={0} y={-8} textAnchor="middle" fontSize={9}
-                      fill="rgba(245,220,168,0.9)" fontFamily="Georgia,serif">
-                      {COUNTRY_FLAGS[country]||""}
-                    </text>
-                  </g>
-                ))}
-              </svg>
-            </div>
-            {mapPins.length===0 && (
-              <div style={{ textAlign:"center", color:"rgba(245,220,168,0.4)",
-                fontSize:14, padding:"20px 0", fontStyle:"italic" }}>
-                Rate pizzas with a country to see your map
-              </div>
-            )}
-            <div style={{ marginTop:10, fontSize:12, color:"rgba(245,220,168,0.4)",
-              textAlign:"center", fontStyle:"italic" }}>
-              Bigger dot = more pizzas rated there
-            </div>
-          </div>
-        )}
-
-        {/* STAMPS PAGE */}
-        {page===2 && (
-          <div style={{ padding:"16px", background:"linear-gradient(160deg,#0f2418,#1a3a2a)",
-            maxHeight:320, overflowY:"auto" }}>
-            {Object.entries(countryStats).length===0 ? (
-              <div style={{ textAlign:"center", color:"rgba(245,220,168,0.4)",
-                fontSize:14, padding:"20px 0", fontStyle:"italic" }}>
-                No country stamps yet — add a country when rating!
-              </div>
-            ) : (
-              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                {Object.entries(countryStats)
-                  .sort((a,b)=>b[1].count-a[1].count)
-                  .map(([country, stats])=>(
-                  <div key={country} style={{ display:"flex", alignItems:"center", gap:12,
-                    background:"rgba(255,255,255,0.05)", borderRadius:10,
-                    padding:"10px 12px", border:"1px solid rgba(200,160,80,0.15)" }}>
-                    <div style={{ fontSize:28, lineHeight:1 }}>{COUNTRY_FLAGS[country]||"🏳️"}</div>
-                    <div style={{ flex:1 }}>
-                      <div style={{ fontWeight:900, color:"#f5dca8", fontSize:16 }}>{country}</div>
-                      {stats.cities.size>0 && (
-                        <div style={{ fontSize:12, color:"rgba(245,220,168,0.5)", marginTop:1 }}>
-                          📍 {[...stats.cities].join(", ")}
+        : <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            {sorted.map(([country, stats], i) => {
+              const col = inkColors[i % inkColors.length];
+              const rot = rotations[i % rotations.length];
+              const flag = COUNTRY_FLAGS[country] || "🏳️";
+              const latestDate = stats.dates.length ? stats.dates[stats.dates.length-1] : null;
+              const cities3 = [...stats.cities].slice(0,2);
+              return (
+                <div key={country}
+                  className="passport-stamp"
+                  style={{ "--rot": `rotate(${rot}deg)`, animationDelay:`${i*0.07}s`,
+                    transform:`rotate(${rot}deg)` }}>
+                  {/* Stamp outer - serrated edge via repeating gradient */}
+                  <div style={{
+                    position:"relative",
+                    background:col.bg,
+                    border:`2.5px dashed ${col.border}`,
+                    borderRadius:8,
+                    padding:"12px 10px 10px",
+                    boxShadow:`inset 0 0 0 1px ${col.bg}, 0 2px 8px rgba(0,0,0,0.08)`,
+                  }}>
+                    {/* Corner registry marks */}
+                    {[[0,0],[0,1],[1,0],[1,1]].map(([r,c],ci)=>(
+                      <div key={ci} style={{
+                        position:"absolute",
+                        top:r===0?5:"auto", bottom:r===1?5:"auto",
+                        left:c===0?5:"auto", right:c===1?5:"auto",
+                        width:7, height:7,
+                        borderTop:r===0?`1.5px solid ${col.ink}`:"none",
+                        borderBottom:r===1?`1.5px solid ${col.ink}`:"none",
+                        borderLeft:c===0?`1.5px solid ${col.ink}`:"none",
+                        borderRight:c===1?`1.5px solid ${col.ink}`:"none",
+                        opacity:0.5,
+                      }}/>
+                    ))}
+                    {/* Stamp content */}
+                    <div style={{textAlign:"center"}}>
+                      <div style={{fontSize:32, lineHeight:1, marginBottom:4}}>{flag}</div>
+                      <div style={{ fontSize:12, fontWeight:900, color:col.ink,
+                        letterSpacing:"0.1em", textTransform:"uppercase",
+                        lineHeight:1.2, marginBottom:3 }}>
+                        {country}
+                      </div>
+                      {cities3.length>0 && (
+                        <div style={{ fontSize:10, color:col.ink, opacity:0.7,
+                          letterSpacing:"0.05em", marginBottom:4, lineHeight:1.3 }}>
+                          {cities3.join(" · ")}{stats.cities.size>2?` +${stats.cities.size-2}`:""}
                         </div>
                       )}
-                    </div>
-                    <div style={{ textAlign:"right" }}>
-                      <div style={{ fontSize:20, fontWeight:900, color:"#c8a050" }}>{stats.count}</div>
-                      <div style={{ fontSize:11, color:"rgba(245,220,168,0.4)", textTransform:"uppercase",
-                        letterSpacing:"0.06em" }}>pizza{stats.count!==1?"s":""}</div>
+
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              );
+            })}
           </div>
-        )}
+      }
+      <div style={{ textAlign:"center", marginTop:16, fontSize:12,
+        color:T.textLight, fontStyle:"italic", letterSpacing:"0.1em" }}>
+        Eat pizza. See the world. 🍕
       </div>
     </div>
   );
 }
-
 // ─── PROFILE PAGE ─────────────────────────────────────────────────────────────
 
 function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, draftPrefs, setDraftPrefs, savingPrefs, setSavingPrefs, saveUserPrefs }) {
@@ -2391,6 +2355,7 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
   const [draftPrefs, setDraftPrefs]       = useState(null);
   const [savingPrefs, setSavingPrefs]     = useState(false);
   const [viewedPrefs, setViewedPrefs]     = useState(null);
+  const [profileTab, setProfileTab]       = useState("ratings");
 
   // Always fetch the viewed user's prefs fresh (not just the logged-in user's)
   useEffect(() => {
@@ -2453,11 +2418,6 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
           <BadgesDisplay myRatings={myRatings} allRatings={allRatings} username={username}/>
         )}
 
-        {/* Pizza Passport */}
-        {rated>0 && (
-          <PizzaPassport myRatings={myRatings}/>
-        )}
-
         {/* Pizza Identity */}
         <PizzaIdentityCard
           isMe={isMe}
@@ -2474,7 +2434,26 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
 
       </div>
 
-      {rated===0
+      {/* Tab switcher */}
+      {rated>0 && (
+        <div style={{ display:"flex", marginBottom:16, borderRadius:12, overflow:"hidden",
+          border:`1px solid ${T.borderMed}`, background:T.bgDeep }}>
+          {[["ratings", "🍕 Ratings"], ["passport", "🛂 Passport"]].map(([id, label]) => (
+            <button key={id} onClick={()=>setProfileTab(id)}
+              style={{ flex:1, padding:"10px 4px", fontSize:15, fontWeight:900, cursor:"pointer",
+                border:"none", background:profileTab===id?"white":"transparent",
+                color:profileTab===id?T.red:T.textLight,
+                borderBottom:profileTab===id?`2px solid ${T.red}`:"2px solid transparent",
+                transition:"all 0.13s", fontFamily:"Georgia,serif" }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {profileTab==="passport" && <PizzaPassport myRatings={myRatings}/>}
+
+      {profileTab==="ratings" && (rated===0
         ? <EmptyState icon="🍕"
             title={isMe?"You haven't rated any pizzas yet":`@${username} hasn't rated anything yet`}
             sub={isMe?"Every pizza you rate shows up here.":""}
@@ -2592,7 +2571,7 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
               ))}
             </div>
           </>
-      }
+      )}
     </div>
   );
 }
