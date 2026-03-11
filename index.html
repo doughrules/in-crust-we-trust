@@ -1745,7 +1745,7 @@ function BadgesDisplay({ myRatings, allRatings, username }) {
 // ─── PROFILE PAGE ─────────────────────────────────────────────────────────────
 
 function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setPage, goRate, setSelectedPizza,
-                       allPizzaMap, setEditingRating, setPrefillSession }) {
+                       allPizzaMap, setEditingRating, setPrefillSession, setSelectedRestaurant }) {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const rated = myRatings.length;
   const level = getLevel(rated);
@@ -1804,40 +1804,45 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
                   <div style={{ display:"flex", alignItems:"stretch" }}>
                     {/* Score column */}
                     <div onClick={()=>{ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap&&allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");}}}
-                      style={{ width:72, flexShrink:0, cursor:"pointer",
-                        background:"transparent",
+                      style={{ width:68, flexShrink:0, cursor:"pointer",
                         display:"flex", flexDirection:"column", alignItems:"center",
-                        justifyContent:"center", padding:"14px 8px", gap:5,
+                        justifyContent:"center", padding:"12px 6px", gap:4,
                         borderRight:`1px solid ${T.border}` }}>
-                      <PizzaFill score={r.score} size={44}/>
-                      <span style={{ fontSize:10, fontWeight:800, color:scoreTier(r.score).color,
-                        textAlign:"center", lineHeight:1.2, maxWidth:60 }}>
+                      <PizzaFill score={r.score} size={42}/>
+                      <span style={{ fontSize:9, fontWeight:800, color:scoreTier(r.score).color,
+                        textAlign:"center", lineHeight:1.2, maxWidth:58 }}>
                         {scoreTier(r.score).label}
                       </span>
                     </div>
                     {/* Content column */}
-                    <div style={{ flex:1, padding:"12px 13px", minWidth:0 }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
-                        <div style={{ flex:1, cursor:"pointer", minWidth:0 }}
+                    <div style={{ flex:1, padding:"11px 12px", minWidth:0, width:0 }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:6 }}>
+                        <div style={{ flex:1, cursor:"pointer", minWidth:0, overflow:"hidden" }}
                           onClick={()=>{ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap&&allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");}}}>
-                          <div style={{ fontWeight:900, color:T.textDark, fontSize:15, lineHeight:1.3 }}>
+                          <div style={{ fontWeight:900, color:T.textDark, fontSize:14, lineHeight:1.3,
+                            whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis",
+                            cursor:"pointer" }}
+                            onClick={e=>{ e.stopPropagation(); setSelectedRestaurant(r.restaurant); setPage("restaurant"); }}>
                             {r.restaurant}
                           </div>
-                          <div style={{ fontSize:13, color:T.amberMid, fontWeight:700, marginBottom:2 }}>
+                          <div style={{ fontSize:12, color:T.amberMid, fontWeight:700, marginBottom:1,
+                            whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                             {r.pizzaName}
                           </div>
-                          <div style={{ fontSize:11, color:T.textLight, marginBottom:6 }}>
+                          <div style={{ fontSize:10, color:T.textLight, marginBottom:r.review?6:0,
+                            whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                             {r.style}{r.city||r.country ? ` · 📍 ${[r.city,r.country].filter(Boolean).join(", ")}` : ""} · {r.date}
                           </div>
                           {r.review && (
-                            <p style={{ fontSize:13, color:T.textMid, margin:0,
-                              fontStyle:"italic", lineHeight:1.5,
-                              borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>
+                            <p style={{ fontSize:12, color:T.textMid, margin:"0 0 4px",
+                              fontStyle:"italic", lineHeight:1.45,
+                              borderLeft:`2px solid ${T.border}`, paddingLeft:7,
+                              display:"block", wordBreak:"break-word" }}>
                               "{r.review}"
                             </p>
                           )}
                           {(r.tags||[]).length>0 && (
-                            <div style={{ display:"flex", flexWrap:"wrap", gap:3, marginTop:6 }}>
+                            <div style={{ display:"flex", flexWrap:"wrap", gap:3, marginTop:4 }}>
                               {r.tags.slice(0,3).map(t=>{
                                 const neg = NEGATIVE_TAGS.some(n=>n.label===t);
                                 const tag = ALL_TAGS.find(x=>x.label===t)||{icon:"🍕",label:t};
@@ -2352,7 +2357,8 @@ function App() {
           <ProfilePage username={profileUsername} isMe={profileUsername===username}
             myRatings={profileRatings} allRatings={allRatings} deleteRating={deleteRating}
             setPage={navigateTo} goRate={goRate} setSelectedPizza={setSelectedPizza} allPizzaMap={pizzaMap}
-            setEditingRating={setEditingRating} setPrefillSession={setPrefillSession}/>}
+            setEditingRating={setEditingRating} setPrefillSession={setPrefillSession}
+            setSelectedRestaurant={setSelectedRestaurant}/>}
       </main>
 
       {/* Bottom nav */}
