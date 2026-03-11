@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><!-- v1773248039242 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
+<html lang="en"><head><meta charset="UTF-8"/><!-- v1773249662340 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍕</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -2013,6 +2013,237 @@ function BadgesDisplay({ myRatings, allRatings, username }) {
   );
 }
 
+
+// ─── PIZZA PASSPORT ────────────────────────────────────────────────────────────
+
+const COUNTRY_FLAGS = {
+  "Philippines":"🇵🇭","Italy":"🇮🇹","USA":"🇺🇸","United States":"🇺🇸",
+  "Japan":"🇯🇵","France":"🇫🇷","Spain":"🇪🇸","Mexico":"🇲🇽","Thailand":"🇹🇭",
+  "Singapore":"🇸🇬","Australia":"🇦🇺","UK":"🇬🇧","United Kingdom":"🇬🇧",
+  "Germany":"🇩🇪","Portugal":"🇵🇹","Argentina":"🇦🇷","Brazil":"🇧🇷",
+  "South Korea":"🇰🇷","China":"🇨🇳","Taiwan":"🇹🇼","Hong Kong":"🇭🇰",
+  "Vietnam":"🇻🇳","Indonesia":"🇮🇩","Malaysia":"🇲🇾","India":"🇮🇳",
+  "Canada":"🇨🇦","Netherlands":"🇳🇱","Belgium":"🇧🇪","Switzerland":"🇨🇭",
+  "Greece":"🇬🇷","Turkey":"🇹🇷","Morocco":"🇲🇦","Egypt":"🇪🇬",
+  "New Zealand":"🇳🇿","Peru":"🇵🇪","Colombia":"🇨🇴","Chile":"🇨🇱",
+  "Denmark":"🇩🇰","Sweden":"🇸🇪","Norway":"🇳🇴","Finland":"🇫🇮",
+  "Poland":"🇵🇱","Austria":"🇦🇹","Czech Republic":"🇨🇿","Hungary":"🇭🇺",
+  "UAE":"🇦🇪","Israel":"🇮🇱","South Africa":"🇿🇦",
+};
+
+const COUNTRY_COORDS = {
+  "Philippines":   [122.0, 12.0],  "Japan":        [138.0, 37.0],
+  "USA":           [-98.0, 38.0],  "United States": [-98.0, 38.0],
+  "Italy":         [12.5,  41.9],  "France":        [2.3,   46.2],
+  "Spain":         [-3.7,  40.4],  "Germany":       [10.5,  51.2],
+  "UK":            [-1.5,  52.4],  "Australia":     [133.0,-25.0],
+  "Thailand":      [100.5, 13.7],  "Singapore":     [103.8,  1.4],
+  "Hong Kong":     [114.1, 22.3],  "South Korea":   [127.8, 36.5],
+  "China":         [104.0, 35.0],  "Taiwan":        [121.0, 23.7],
+  "Vietnam":       [108.0, 14.0],  "Indonesia":     [106.8, -6.2],
+  "Malaysia":      [109.7,  4.2],  "Mexico":        [-102.0, 23.6],
+  "Brazil":        [-51.9,-14.2],  "Argentina":     [-65.2,-34.6],
+  "Canada":        [-96.8, 56.1],  "Netherlands":   [5.3,  52.1],
+  "Belgium":       [4.5,  50.5],   "Switzerland":   [8.2,  46.8],
+  "Portugal":      [-8.2, 39.4],   "Greece":        [21.8, 39.0],
+  "Turkey":        [35.2, 39.0],   "India":         [78.9, 20.6],
+  "UAE":           [53.8, 23.4],   "New Zealand":   [172.0,-41.0],
+  "Denmark":       [9.5,  56.3],   "Sweden":        [18.6, 59.3],
+  "Norway":        [10.7, 59.9],   "Poland":        [19.1, 51.9],
+  "Austria":       [14.5, 47.5],   "Czech Republic":[15.5, 49.8],
+};
+
+function mercatorX(lng, w) { return ((lng + 180) / 360) * w; }
+function mercatorY(lat, h) {
+  const rad = lat * Math.PI / 180;
+  const merc = Math.log(Math.tan(Math.PI/4 + rad/2));
+  return (1 - (merc + Math.PI) / (2 * Math.PI)) * h;
+}
+
+function PizzaPassport({ myRatings }) {
+  const [page, setPage] = useState(0); // 0=cover, 1=map, 2=stamps
+
+  const countries = [...new Set(myRatings.map(r=>r.country).filter(Boolean))];
+  const cities    = [...new Set(myRatings.map(r=>r.city).filter(Boolean))];
+
+  const countryStats = {};
+  myRatings.forEach(r=>{
+    if(!r.country) return;
+    if(!countryStats[r.country]) countryStats[r.country]={count:0,cities:new Set(),topScore:0};
+    countryStats[r.country].count++;
+    if(r.city) countryStats[r.country].cities.add(r.city);
+    if(r.score>countryStats[r.country].topScore) countryStats[r.country].topScore=r.score;
+  });
+
+  const W=340, H=180;
+  const mapPins = Object.entries(countryStats).map(([country, stats])=>{
+    const coords = COUNTRY_COORDS[country];
+    if(!coords) return null;
+    return { country, stats, x: mercatorX(coords[0], W), y: mercatorY(coords[1], H) };
+  }).filter(Boolean);
+
+  const pages = ["cover","map","stamps"];
+
+  return (
+    <div style={{ marginBottom:24 }}>
+      {/* Passport label */}
+      <div style={{ fontSize:13, fontWeight:900, color:T.textLight, letterSpacing:"0.12em",
+        textTransform:"uppercase", marginBottom:10, textAlign:"center" }}>
+        🛂 Pizza Passport
+      </div>
+
+      {/* Passport booklet */}
+      <div style={{ background:"#1a3a2a", borderRadius:16, overflow:"hidden",
+        boxShadow:"0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07)",
+        maxWidth:380, margin:"0 auto" }}>
+
+        {/* Page tabs */}
+        <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
+          {[["cover","Cover"],["map","🗺 Map"],["stamps","🏷 Stamps"]].map(([id,label],i)=>(
+            <button key={id} onClick={()=>setPage(i)}
+              style={{ flex:1, padding:"9px 4px", fontSize:13, fontWeight:800,
+                cursor:"pointer", border:"none", fontFamily:"Georgia,serif",
+                background:page===i?"rgba(255,255,255,0.08)":"transparent",
+                color:page===i?"#f5dca8":"rgba(245,220,168,0.45)",
+                borderBottom:page===i?"2px solid #c8a050":"2px solid transparent",
+                transition:"all 0.15s" }}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* COVER PAGE */}
+        {page===0 && (
+          <div style={{ padding:"28px 24px 24px", textAlign:"center",
+            background:"linear-gradient(160deg,#1a3a2a,#0f2418)" }}>
+            <div style={{ fontSize:44, marginBottom:8 }}>🍕</div>
+            <div style={{ fontSize:11, letterSpacing:"0.25em", color:"rgba(200,160,80,0.7)",
+              textTransform:"uppercase", marginBottom:4, fontFamily:"Georgia,serif" }}>
+              In Crust We Trust
+            </div>
+            <div style={{ fontSize:20, fontWeight:900, color:"#f5dca8", letterSpacing:"0.06em",
+              marginBottom:18, fontFamily:"Georgia,serif" }}>
+              PIZZA PASSPORT
+            </div>
+            <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:12,
+              padding:"14px 20px", display:"inline-block", minWidth:200 }}>
+              <div style={{ display:"flex", justifyContent:"center", gap:32, marginBottom:8 }}>
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ fontSize:28, fontWeight:900, color:"#c8a050" }}>{countries.length}</div>
+                  <div style={{ fontSize:12, color:"rgba(245,220,168,0.55)", textTransform:"uppercase",
+                    letterSpacing:"0.08em" }}>Countries</div>
+                </div>
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ fontSize:28, fontWeight:900, color:"#c8a050" }}>{cities.length}</div>
+                  <div style={{ fontSize:12, color:"rgba(245,220,168,0.55)", textTransform:"uppercase",
+                    letterSpacing:"0.08em" }}>Cities</div>
+                </div>
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ fontSize:28, fontWeight:900, color:"#c8a050" }}>{myRatings.length}</div>
+                  <div style={{ fontSize:12, color:"rgba(245,220,168,0.55)", textTransform:"uppercase",
+                    letterSpacing:"0.08em" }}>Pizzas</div>
+                </div>
+              </div>
+            </div>
+            {countries.length>0 && (
+              <div style={{ marginTop:14, display:"flex", flexWrap:"wrap", gap:5, justifyContent:"center" }}>
+                {countries.map(c=>(
+                  <span key={c} style={{ fontSize:22 }}>{COUNTRY_FLAGS[c]||"🏳️"}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* MAP PAGE */}
+        {page===1 && (
+          <div style={{ padding:"16px", background:"linear-gradient(160deg,#0f2418,#1a3a2a)" }}>
+            <div style={{ position:"relative", width:"100%", paddingBottom:`${(H/W)*100}%`,
+              background:"rgba(255,255,255,0.04)", borderRadius:10, overflow:"hidden",
+              border:"1px solid rgba(255,255,255,0.08)" }}>
+              <svg viewBox={`0 0 ${W} ${H}`} style={{ position:"absolute", inset:0, width:"100%", height:"100%" }}>
+                {/* Grid lines */}
+                {[-60,-30,0,30,60].map(lat=>(
+                  <line key={`lat${lat}`}
+                    x1={0} y1={mercatorY(lat,H)} x2={W} y2={mercatorY(lat,H)}
+                    stroke="rgba(255,255,255,0.06)" strokeWidth={0.5}/>
+                ))}
+                {[-120,-60,0,60,120].map(lng=>(
+                  <line key={`lng${lng}`}
+                    x1={mercatorX(lng,W)} y1={0} x2={mercatorX(lng,W)} y2={H}
+                    stroke="rgba(255,255,255,0.06)" strokeWidth={0.5}/>
+                ))}
+                {/* Equator */}
+                <line x1={0} y1={mercatorY(0,H)} x2={W} y2={mercatorY(0,H)}
+                  stroke="rgba(200,160,80,0.15)" strokeWidth={1}/>
+                {/* Pins */}
+                {mapPins.map(({country,stats,x,y})=>(
+                  <g key={country} transform={`translate(${x},${y})`}>
+                    <circle r={Math.min(3+stats.count*1.5, 9)} fill="#c8a050" opacity={0.85}/>
+                    <circle r={Math.min(3+stats.count*1.5, 9)+3} fill="#c8a050" opacity={0.18}/>
+                    <text x={0} y={-8} textAnchor="middle" fontSize={9}
+                      fill="rgba(245,220,168,0.9)" fontFamily="Georgia,serif">
+                      {COUNTRY_FLAGS[country]||""}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+            {mapPins.length===0 && (
+              <div style={{ textAlign:"center", color:"rgba(245,220,168,0.4)",
+                fontSize:14, padding:"20px 0", fontStyle:"italic" }}>
+                Rate pizzas with a country to see your map
+              </div>
+            )}
+            <div style={{ marginTop:10, fontSize:12, color:"rgba(245,220,168,0.4)",
+              textAlign:"center", fontStyle:"italic" }}>
+              Bigger dot = more pizzas rated there
+            </div>
+          </div>
+        )}
+
+        {/* STAMPS PAGE */}
+        {page===2 && (
+          <div style={{ padding:"16px", background:"linear-gradient(160deg,#0f2418,#1a3a2a)",
+            maxHeight:320, overflowY:"auto" }}>
+            {Object.entries(countryStats).length===0 ? (
+              <div style={{ textAlign:"center", color:"rgba(245,220,168,0.4)",
+                fontSize:14, padding:"20px 0", fontStyle:"italic" }}>
+                No country stamps yet — add a country when rating!
+              </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                {Object.entries(countryStats)
+                  .sort((a,b)=>b[1].count-a[1].count)
+                  .map(([country, stats])=>(
+                  <div key={country} style={{ display:"flex", alignItems:"center", gap:12,
+                    background:"rgba(255,255,255,0.05)", borderRadius:10,
+                    padding:"10px 12px", border:"1px solid rgba(200,160,80,0.15)" }}>
+                    <div style={{ fontSize:28, lineHeight:1 }}>{COUNTRY_FLAGS[country]||"🏳️"}</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontWeight:900, color:"#f5dca8", fontSize:16 }}>{country}</div>
+                      {stats.cities.size>0 && (
+                        <div style={{ fontSize:12, color:"rgba(245,220,168,0.5)", marginTop:1 }}>
+                          📍 {[...stats.cities].join(", ")}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ textAlign:"right" }}>
+                      <div style={{ fontSize:20, fontWeight:900, color:"#c8a050" }}>{stats.count}</div>
+                      <div style={{ fontSize:11, color:"rgba(245,220,168,0.4)", textTransform:"uppercase",
+                        letterSpacing:"0.06em" }}>pizza{stats.count!==1?"s":""}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── PROFILE PAGE ─────────────────────────────────────────────────────────────
 
 function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, draftPrefs, setDraftPrefs, savingPrefs, setSavingPrefs, saveUserPrefs }) {
@@ -2222,6 +2453,11 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
           <BadgesDisplay myRatings={myRatings} allRatings={allRatings} username={username}/>
         )}
 
+        {/* Pizza Passport */}
+        {rated>0 && (
+          <PizzaPassport myRatings={myRatings}/>
+        )}
+
         {/* Pizza Identity */}
         <PizzaIdentityCard
           isMe={isMe}
@@ -2234,6 +2470,8 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
           setSavingPrefs={setSavingPrefs}
           saveUserPrefs={saveUserPrefs}
         />
+
+
       </div>
 
       {rated===0
