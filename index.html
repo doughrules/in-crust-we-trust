@@ -71,8 +71,8 @@ const POSITIVE_TAGS = [
   { label:"Crispy Crust",        icon:"🥖" },
   { label:"Say Cheese!",         icon:"🧀" },
   { label:"Balanced",            icon:"⚖️" },
-  { label:"Great Dough",         icon:"💪" },
-  { label:"Flavor Town",         icon:"💥" },
+  { label:"Dough Rules",          icon:"💪" },
+  { label:"Flavor Town",         icon:"🏘️" },
   { label:"Topping Harmony",     icon:"🎯" },
   { label:"Quality Ingredients", icon:"✨" },
   { label:"Worth the Trip",      icon:"🗺️" },
@@ -1160,6 +1160,88 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
   );
 }
 
+// ─── EXPLORE BACKGROUND ───────────────────────────────────────────────────────
+
+function ExploreBackground() {
+  useEffect(() => {
+    const id = "explore-bg-styles";
+    if (document.getElementById(id)) return;
+    const style = document.createElement("style");
+    style.id = id;
+    style.textContent = `
+      @keyframes floatA { 0%{transform:translateY(0px) rotate(0deg) scale(1)} 50%{transform:translateY(-28px) rotate(12deg) scale(1.08)} 100%{transform:translateY(0px) rotate(0deg) scale(1)} }
+      @keyframes floatB { 0%{transform:translateY(0px) rotate(0deg) scale(1)} 50%{transform:translateY(-18px) rotate(-9deg) scale(0.94)} 100%{transform:translateY(0px) rotate(0deg) scale(1)} }
+      @keyframes floatC { 0%{transform:translateY(0px) rotate(5deg) scale(1)} 50%{transform:translateY(-22px) rotate(-6deg) scale(1.06)} 100%{transform:translateY(0px) rotate(5deg) scale(1)} }
+      @keyframes meshShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+      @keyframes pulseGlow { 0%,100%{opacity:0.18} 50%{opacity:0.32} }
+      .explore-float-a { animation: floatA ease-in-out infinite; }
+      .explore-float-b { animation: floatB ease-in-out infinite; }
+      .explore-float-c { animation: floatC ease-in-out infinite; }
+    `;
+    document.head.appendChild(style);
+    return () => { const el = document.getElementById(id); if(el) el.remove(); };
+  }, []);
+
+  const emojis = [
+    { e:"🍕", top:"4%",  left:"3%",  sz:52, cls:"explore-float-a", dur:"6.2s", del:"0s",   op:0.18 },
+    { e:"🍕", top:"12%", left:"88%", sz:38, cls:"explore-float-b", dur:"8.1s", del:"1.3s",  op:0.13 },
+    { e:"🧀", top:"28%", left:"92%", sz:30, cls:"explore-float-c", dur:"7.4s", del:"0.6s",  op:0.12 },
+    { e:"🍕", top:"42%", left:"1%",  sz:44, cls:"explore-float-b", dur:"9.0s", del:"2.1s",  op:0.14 },
+    { e:"🔥", top:"55%", left:"85%", sz:28, cls:"explore-float-a", dur:"5.8s", del:"0.9s",  op:0.15 },
+    { e:"🍕", top:"68%", left:"5%",  sz:34, cls:"explore-float-c", dur:"7.7s", del:"3.2s",  op:0.11 },
+    { e:"🧀", top:"78%", left:"91%", sz:26, cls:"explore-float-b", dur:"8.5s", del:"1.8s",  op:0.10 },
+    { e:"🍕", top:"88%", left:"10%", sz:42, cls:"explore-float-a", dur:"6.9s", del:"0.4s",  op:0.13 },
+    { e:"🔥", top:"20%", left:"48%", sz:22, cls:"explore-float-c", dur:"10s",  del:"4.0s",  op:0.08 },
+    { e:"🍕", top:"60%", left:"50%", sz:58, cls:"explore-float-b", dur:"11s",  del:"2.5s",  op:0.07 },
+  ];
+
+  return (
+    <div style={{ position:"fixed", inset:0, pointerEvents:"none", zIndex:0, overflow:"hidden" }}>
+      {/* Animated mesh gradient */}
+      <div style={{
+        position:"absolute", inset:0,
+        background:"linear-gradient(135deg, #fdf6ec 0%, #fce8d0 25%, #fdf0e0 50%, #f9e4c8 75%, #fdf6ec 100%)",
+        backgroundSize:"400% 400%",
+        animation:"meshShift 14s ease infinite",
+      }}/>
+      {/* Warm radial glows */}
+      <div style={{
+        position:"absolute", top:"-10%", left:"-5%",
+        width:"55%", height:"55%", borderRadius:"50%",
+        background:"radial-gradient(circle, rgba(232,90,14,0.12) 0%, transparent 70%)",
+        animation:"pulseGlow 8s ease-in-out infinite",
+      }}/>
+      <div style={{
+        position:"absolute", bottom:"-8%", right:"-5%",
+        width:"50%", height:"50%", borderRadius:"50%",
+        background:"radial-gradient(circle, rgba(193,123,58,0.14) 0%, transparent 70%)",
+        animation:"pulseGlow 10s ease-in-out infinite 2s",
+      }}/>
+      <div style={{
+        position:"absolute", top:"40%", right:"20%",
+        width:"35%", height:"35%", borderRadius:"50%",
+        background:"radial-gradient(circle, rgba(232,57,14,0.07) 0%, transparent 70%)",
+        animation:"pulseGlow 12s ease-in-out infinite 4s",
+      }}/>
+      {/* Floating emojis */}
+      {emojis.map((item, i) => (
+        <div key={i} className={item.cls}
+          style={{ position:"absolute", top:item.top, left:item.left,
+            fontSize:item.sz, opacity:item.op,
+            animationDuration:item.dur, animationDelay:item.del,
+            userSelect:"none", filter:"blur(0.3px)" }}>
+          {item.e}
+        </div>
+      ))}
+      {/* Subtle diagonal stripe texture */}
+      <div style={{
+        position:"absolute", inset:0,
+        backgroundImage:"repeating-linear-gradient(45deg, rgba(193,123,58,0.025) 0px, rgba(193,123,58,0.025) 1px, transparent 1px, transparent 18px)",
+      }}/>
+    </div>
+  );
+}
+
 // ─── EXPLORE PAGE ─────────────────────────────────────────────────────────────
 
 function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant, setSelectedUser,
@@ -1247,9 +1329,12 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
   const tabs = [["pizzas","Pizzas"],["restaurants","Spots"],["users","Inspectors"],["leaderboard","🏆 Board"]];
 
   return (
-    <div style={{ maxWidth:640, margin:"0 auto", padding:"24px 16px 90px",
-      fontFamily:"Georgia,serif" }}>
-      <h2 style={{ fontSize:24, fontWeight:900, color:T.textDark, marginBottom:14 }}>Explore</h2>
+    <div style={{ position:"relative", minHeight:"100vh" }}>
+      <ExploreBackground/>
+      <div style={{ position:"relative", zIndex:1, maxWidth:640, margin:"0 auto",
+        padding:"24px 16px 90px", fontFamily:"Georgia,serif" }}>
+      <h2 style={{ fontSize:28, fontWeight:900, color:T.textDark, marginBottom:14,
+        textShadow:"0 1px 0 rgba(255,255,255,0.8)" }}>🔍 Explore</h2>
 
       {/* Tab bar */}
       <div style={{ display:"flex", marginBottom:16, borderRadius:12, overflow:"hidden",
@@ -1612,6 +1697,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
               </>}
             </>
       )}
+      </div>
     </div>
   );
 }
