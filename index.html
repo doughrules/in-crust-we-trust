@@ -107,11 +107,60 @@ const BADGE_DEFS = [
   { id:"style_master",     icon:"👑", name:"Style Master",      desc:"Rated all 8 pizza styles",           check:r=>STYLES.every(s=>r.some(x=>x.style===s)) },
   { id:"globe_trotter",    icon:"🌍", name:"Globe Trotter",     desc:"Rated pizzas in 5+ countries",       check:r=>new Set(r.map(x=>x.country).filter(Boolean)).size>=5 },
   { id:"harsh_critic",     icon:"💀", name:"Harsh Critic",      desc:"Avg score under 60 (min 5 ratings)", check:r=>r.length>=5&&r.reduce((a,x)=>a+x.score,0)/r.length<60 },
-  { id:"creature_of_habit",icon:"🔁", name:"Creature of Habit", desc:"Visited the same spot 3+ times",     check:r=>{ const c={}; r.forEach(x=>c[x.restaurant]=(c[x.restaurant]||0)+1); return Object.values(c).some(v=>v>=3); }},
+  { id:"creature_of_habit",icon:"🔁", name:"Creature of Habit", desc:"Visited the same spot 3+ times",     check:r=>Object.values(visitsByRestaurant(r)).some(v=>v>=3) },
   { id:"value_hunter",     icon:"🎯", name:"Value Hunter",      desc:"Score ≥90 for under $10 USD",         check:r=>r.some(x=>{ const p=parseFloat(x.price); if(!p||p<=0) return false; const usd=p*(CURRENCY_TO_USD[x.currency]||1); return x.score>=90&&usd<10; })},
   { id:"high_roller",      icon:"💎", name:"High Roller",       desc:"Paid over $50 USD for a pizza",       check:r=>r.some(x=>{ const p=parseFloat(x.price); const usd=p*(CURRENCY_TO_USD[x.currency]||1); return p>0&&usd>=50; })},
+  { id:"marco_polo",       icon:"🧭", name:"Marco Polo",        desc:"First to rate 25 different pizzerias",check:(r,all,u)=>firstToNSpots(all,u,25) },
+  { id:"columbus",         icon:"🧭", name:"Columbus",          desc:"First to rate 50 different pizzerias",check:(r,all,u)=>firstToNSpots(all,u,50) },
+  { id:"magellan",         icon:"🧭", name:"Magellan",          desc:"First to rate 75 different pizzerias",check:(r,all,u)=>firstToNSpots(all,u,75) },
+  { id:"mama_mia",         icon:"🤌", name:"Mama Mia!",         desc:"Had pizza in Italy",                  check:r=>r.some(x=>(x.country||"").toLowerCase().includes("italy")) },
+  { id:"gotham_knight",    icon:"🗽", name:"Gotham Knight",     desc:"Had New York pizza in New York, USA", check:r=>r.some(x=>(x.style||"")==="New York"&&(x.city||"").toLowerCase().includes("new york")&&(x.country||"").toLowerCase().includes("usa")) },
+  { id:"full_spectrum",    icon:"🎭", name:"Full Spectrum",     desc:"Rated a pizza below 20 AND above 90", check:r=>r.some(x=>x.score<20)&&r.some(x=>x.score>90) },
+  { id:"bikini_bottom",    icon:"🍍", name:"Bikini Bottom",     desc:"Had pineapple on pizza",              check:r=>r.some(x=>(x.tags||[]).some(t=>t.toLowerCase().includes("pineapple"))||(x.pizzaName||"").toLowerCase().includes("pineapple")||(x.review||"").toLowerCase().includes("pineapple")) },
+  { id:"arigathanks",      icon:"🎎", name:"Arigathanks Gozaimuch", desc:"Had Tokyo pizza in Japan",        check:r=>r.some(x=>(x.style||"")==="Tokyo"&&(x.country||"").toLowerCase().includes("japan")) },
 ];
-function getEarnedBadges(ratings) { return BADGE_DEFS.filter(b=>b.check(ratings)); }
+// Count unique visits: same restaurant + same date = 1 visit
+function uniqueVisits(ratings) {
+  const seen = new Set();
+  ratings.forEach(r => seen.add(`${r.restaurant}||${r.date||""}`));
+  return seen.size;
+}
+// Count unique visits per restaurant
+function visitsByRestaurant(ratings) {
+  const c = {};
+  ratings.forEach(r => {
+    const key = `${r.restaurant}||${r.date||""}`;
+    if (!c[r.restaurant]) c[r.restaurant] = new Set();
+    c[r.restaurant].add(key);
+  });
+  const out = {};
+  Object.entries(c).forEach(([k,v]) => out[k] = v.size);
+  return out;
+}
+// Returns the date string when a user first reached `n` unique restaurants
+function dateReachedNSpots(userRatings, n) {
+  const sorted = [...userRatings].sort((a,b)=>(a.date||"") < (b.date||"") ? -1 : 1);
+  const seen = new Set();
+  for (const r of sorted) {
+    if (r.restaurant) seen.add(r.restaurant);
+    if (seen.size >= n) return r.date || "9999-99-99";
+  }
+  return null;
+}
+// Returns true if `username` was the FIRST user across allRatings to reach n unique spots
+function firstToNSpots(allRatings, username, n) {
+  const byUser = {};
+  allRatings.forEach(r => { if (!byUser[r.user]) byUser[r.user] = []; byUser[r.user].push(r); });
+  let best = null, bestUser = null;
+  Object.entries(byUser).forEach(([u, rs]) => {
+    const d = dateReachedNSpots(rs, n);
+    if (d && (!best || d < best)) { best = d; bestUser = u; }
+  });
+  return bestUser && bestUser.toLowerCase() === (username||"").toLowerCase();
+}
+function getEarnedBadges(ratings, allRatings, username) {
+  return BADGE_DEFS.filter(b=>b.check(ratings, allRatings||ratings, username||""));
+}
 
 const LEVEL_THRESHOLDS = [
   { min:200, label:"Cheesus Crust Superstar", icon:"🌍" },
@@ -176,10 +225,8 @@ function isWorthIt(score, price, currency) {
 }
 function valueLabel(score, price, currency) {
   const w = isWorthIt(score, price, currency);
-  if (w === null) return null;
-  return w
-    ? { text:"✅ Worth It",     color:"#2d8a4e" }
-    : { text:"❌ Not Worth It", color:"#c93b0a" };
+  if (!w) return null;
+  return { text:"✅ Worth It", color:"#2d8a4e" };
 }
 // Keep a ratio for sort purposes only
 function valueRatio(score, price, currency) {
@@ -646,9 +693,8 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
 
   const inp = { width:"100%", borderRadius:12, padding:"11px 13px", color:T.textDark,
     outline:"none", background:"white", border:`1.5px solid ${T.borderMed}`,
-    fontSize:15, boxSizing:"border-box", fontFamily:"Georgia,serif" };
+    fontSize:16, boxSizing:"border-box", fontFamily:"Georgia,serif" };
 
-  // ── SUBMITTED SCREEN ──
   if (submitted) {
     const savedList = isEdit
       ? [{ pizzaName, style, score:overall }]
@@ -1059,8 +1105,9 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
 // ─── EXPLORE PAGE ─────────────────────────────────────────────────────────────
 
 function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant, setSelectedUser,
-                       allPizzas, allUsers, allRatings }) {
-  const [tab, setTab]           = useState("pizzas");
+                       allPizzas, allUsers, allRatings, initialTab, setExploreTab }) {
+  const [tab, setTab]           = useState(initialTab || "pizzas");
+  function switchTab(t) { setTab(t); if(setExploreTab) setExploreTab(t); }
   const [filter, setFilter]     = useState("All");
   const [search, setSearch]     = useState("");
   const [locFilter, setLocFilter] = useState("");
@@ -1134,7 +1181,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
       <div style={{ display:"flex", marginBottom:16, borderRadius:12, overflow:"hidden",
         border:`1px solid ${T.borderMed}`, background:T.bgDeep }}>
         {tabs.map(([id,label])=>(
-          <button key={id} onClick={()=>setTab(id)}
+          <button key={id} onClick={()=>switchTab(id)}
             style={{ flex:1, padding:"10px 4px", fontSize:11, fontWeight:900, cursor:"pointer",
               border:"none", background:tab===id?"white":"transparent",
               color:tab===id?T.red:T.textLight,
@@ -1530,6 +1577,7 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
   const [tab, setTab] = useState("menu");
   const pizzas = allPizzas.filter(p=>p.restaurant===restaurant).sort((a,b)=>b.score-a.score);
   const visits = (allRatings||[]).filter(r=>r.restaurant===restaurant).sort((a,b)=>0);
+  const visitCount = uniqueVisits(visits);
   const avg = pizzas.length ? Math.round(pizzas.reduce((a,p)=>a+p.score,0)/pizzas.length) : 0;
   const loc = visits.length ? [visits[0].city, visits[0].country].filter(Boolean).join(", ") : "";
 
@@ -1566,8 +1614,8 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
               <div style={{ fontSize:10, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>pizza{pizzas.length!==1?"s":""}</div>
             </div>
             <div>
-              <div style={{ fontSize:22, fontWeight:900, color:"rgba(245,220,190,0.9)" }}>{visits.length}</div>
-              <div style={{ fontSize:10, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>visit{visits.length!==1?"s":""}</div>
+              <div style={{ fontSize:22, fontWeight:900, color:"rgba(245,220,190,0.9)" }}>{visitCount}</div>
+              <div style={{ fontSize:10, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>visit{visitCount!==1?"s":""}</div>
             </div>
           </div>
         </div>
@@ -1666,13 +1714,17 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
 }
 
 
-function BadgesDisplay({ myRatings }) {
-  const earned = getEarnedBadges(myRatings);
-  const locked = BADGE_DEFS.filter(b=>!earned.find(e=>e.id===b.id));
+function BadgesDisplay({ myRatings, allRatings, username }) {
+  const earned = getEarnedBadges(myRatings, allRatings, username);
   return (
     <div style={{ marginBottom:8 }}>
+      {earned.length === 0 && (
+        <div style={{ textAlign:"center", fontSize:13, color:T.textLight, padding:"8px 0", fontStyle:"italic" }}>
+          Rate more pizzas to unlock badges 🍕
+        </div>
+      )}
       {earned.length > 0 && (
-        <div style={{ display:"flex", flexWrap:"wrap", gap:7, justifyContent:"center", marginBottom:10 }}>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:7, justifyContent:"center" }}>
           {earned.map(b=>(
             <div key={b.id} title={b.desc}
               style={{ display:"flex", flexDirection:"column", alignItems:"center",
@@ -1686,25 +1738,13 @@ function BadgesDisplay({ myRatings }) {
           ))}
         </div>
       )}
-      {locked.length > 0 && (
-        <div style={{ display:"flex", flexWrap:"wrap", gap:4, justifyContent:"center", opacity:0.38 }}>
-          {locked.map(b=>(
-            <div key={b.id} title={b.desc}
-              style={{ display:"flex", alignItems:"center", gap:3, padding:"3px 9px",
-                borderRadius:99, border:"1px dashed rgba(180,120,60,0.4)" }}>
-              <span style={{ fontSize:12, filter:"grayscale(1)" }}>{b.icon}</span>
-              <span style={{ fontSize:10, fontWeight:700, color:T.textLight }}>{b.name}</span>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
 
 // ─── PROFILE PAGE ─────────────────────────────────────────────────────────────
 
-function ProfilePage({ username, isMe, myRatings, deleteRating, setPage, goRate, setSelectedPizza,
+function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setPage, goRate, setSelectedPizza,
                        allPizzaMap, setEditingRating, setPrefillSession }) {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const rated = myRatings.length;
@@ -1739,7 +1779,7 @@ function ProfilePage({ username, isMe, myRatings, deleteRating, setPage, goRate,
         </div>
         {/* Badges */}
         {rated > 0 && (
-          <BadgesDisplay myRatings={myRatings}/>
+          <BadgesDisplay myRatings={myRatings} allRatings={allRatings} username={username}/>
         )}
       </div>
 
@@ -1780,17 +1820,17 @@ function ProfilePage({ username, isMe, myRatings, deleteRating, setPage, goRate,
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
                         <div style={{ flex:1, cursor:"pointer", minWidth:0 }}
                           onClick={()=>{ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap&&allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");}}}>
-                          <div style={{ fontWeight:900, color:T.textDark, fontSize:14, lineHeight:1.3 }}>
+                          <div style={{ fontWeight:900, color:T.textDark, fontSize:15, lineHeight:1.3 }}>
                             {r.restaurant}
                           </div>
-                          <div style={{ fontSize:12, color:T.amberMid, fontWeight:700, marginBottom:2 }}>
+                          <div style={{ fontSize:13, color:T.amberMid, fontWeight:700, marginBottom:2 }}>
                             {r.pizzaName}
                           </div>
-                          <div style={{ fontSize:10, color:T.textLight, marginBottom:6 }}>
+                          <div style={{ fontSize:11, color:T.textLight, marginBottom:6 }}>
                             {r.style}{r.city||r.country ? ` · 📍 ${[r.city,r.country].filter(Boolean).join(", ")}` : ""} · {r.date}
                           </div>
                           {r.review && (
-                            <p style={{ fontSize:12, color:T.textMid, margin:0,
+                            <p style={{ fontSize:13, color:T.textMid, margin:0,
                               fontStyle:"italic", lineHeight:1.5,
                               borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>
                               "{r.review}"
@@ -2034,6 +2074,7 @@ function AuthScreen({ onLogin }) {
 function App() {
   const [currentUser, setCurrentUser]         = useState(null); // { id, username }
   const [page, setPage]                       = useState("home");
+  const [pageHistory, setPageHistory]         = useState([]);
   const [selectedPizza, setSelectedPizza]     = useState(null);
   const [selectedUser, setSelectedUser]       = useState(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
@@ -2072,6 +2113,22 @@ function App() {
       })
       .finally(() => setLoadingRatings(false));
   }, [currentUser]);
+
+  // Intercept browser back button to navigate within app instead of leaving
+  useEffect(() => {
+    window.history.pushState({ spa: true }, "");
+    const handlePop = (e) => {
+      window.history.pushState({ spa: true }, "");
+      setPageHistory(h => {
+        if (!h.length) return h;
+        const prev = h[h.length - 1];
+        setPage(prev);
+        return h.slice(0, -1);
+      });
+    };
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
 
   if (!currentUser) return <AuthScreen onLogin={setCurrentUser}/>;
 
@@ -2204,13 +2261,26 @@ function App() {
   }
 
   // Always clear editingRating when going to Rate fresh
-  function goRate() { setEditingRating(null); setPrefillSession(null); setPage("rate"); }
+  function navigateTo(newPage) {
+    setPageHistory(h => [...h, page]);
+    setPage(newPage);
+  }
+  function goBack() {
+    setPageHistory(h => {
+      if (!h.length) return h;
+      const prev = h[h.length - 1];
+      setPage(prev);
+      return h.slice(0, -1);
+    });
+  }
+  function goRate() { setEditingRating(null); setPrefillSession(null); setPageHistory(h=>[...h,page]); setPage("rate"); }
 
+  const [exploreTab, setExploreTab] = useState("pizzas");
   const nav = [
-    { id:"home",    label:"Home",    icon:"🏠", onClick:()=>{setPage("home");setSelectedUser(null);} },
+    { id:"home",    label:"Home",    icon:"🏠", onClick:()=>{setPage("home");setSelectedUser(null);setPageHistory([]);} },
     { id:"rate",    label:"Rate",    icon:"🍕", onClick:()=>{goRate();setSelectedUser(null);} },
-    { id:"explore", label:"Explore", icon:"🔍", onClick:()=>{setPage("explore");setSelectedUser(null);} },
-    { id:"profile", label:"Profile", icon:"👤", onClick:()=>{setPage("profile");setSelectedUser(null);} },
+    { id:"spots",   label:"Spots",   icon:"📍", onClick:()=>{setExploreTab("restaurants");setPage("explore");setSelectedUser(null);setPageHistory([]);} },
+    { id:"profile", label:"Profile", icon:"👤", onClick:()=>{setPage("profile");setSelectedUser(null);setPageHistory([]);} },
   ];
 
   const profileUsername = selectedUser || username;
@@ -2218,7 +2288,7 @@ function App() {
 
   return (
     <div style={{ minHeight:"100vh", background:T.bg, fontFamily:"Georgia,serif",
-      color:T.textDark }}>
+      color:T.textDark, fontSize:16 }}>
 
       {/* Header */}
       <header style={{ position:"sticky", top:0, zIndex:50,
@@ -2227,16 +2297,25 @@ function App() {
         background:T.header,
         borderBottom:`1px solid ${T.border}`,
         backdropFilter:"blur(12px)" }}>
-        <button onClick={()=>setPage("home")}
-          style={{ display:"flex", alignItems:"center", gap:7,
-            background:"none", border:"none", cursor:"pointer" }}>
-          <span style={{ fontSize:20 }}>🍕</span>
-          <span style={{ fontSize:15, fontWeight:900, color:T.textDark, letterSpacing:"-0.3px" }}>
-            In <span style={{ color:T.red }}>Crust</span> We Trust
-          </span>
-        </button>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          {pageHistory.length > 0 && (
+            <button onClick={goBack}
+              style={{ fontSize:18, background:"none", border:"none", cursor:"pointer",
+                color:T.textMid, padding:"0 4px 0 0", lineHeight:1 }}>
+              ←
+            </button>
+          )}
+          <button onClick={()=>{setPage("home");setPageHistory([]);}}
+            style={{ display:"flex", alignItems:"center", gap:7,
+              background:"none", border:"none", cursor:"pointer" }}>
+            <span style={{ fontSize:20 }}>🍕</span>
+            <span style={{ fontSize:15, fontWeight:900, color:T.textDark, letterSpacing:"-0.3px" }}>
+              In <span style={{ color:T.red }}>Crust</span> We Trust
+            </span>
+          </button>
+        </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <button onClick={()=>{setPage("profile");setSelectedUser(null);}}
+          <button onClick={()=>{setPage("profile");setSelectedUser(null);setPageHistory([]);}}
             style={{ fontSize:12, fontWeight:800, color:T.amberMid, background:"none",
               border:"none", cursor:"pointer" }}>
             @{username}
@@ -2252,7 +2331,7 @@ function App() {
       {/* Pages */}
       <main>
         {page==="home" &&
-          <HomePage setPage={setPage} goRate={goRate} setSelectedPizza={setSelectedPizza}
+          <HomePage setPage={navigateTo} goRate={goRate} setSelectedPizza={setSelectedPizza}
             allPizzas={allPizzas} allRatings={allRatings}/>}
         {page==="rate" &&
           <RatePage setPage={setPage} addRating={addRating} editRating={editRating}
@@ -2260,18 +2339,19 @@ function App() {
             prefillSession={prefillSession} setPrefillSession={setPrefillSession}
             allRatings={allRatings}/>}
         {page==="explore" &&
-          <ExplorePage setPage={setPage} goRate={goRate} setSelectedPizza={setSelectedPizza}
+          <ExplorePage setPage={navigateTo} goRate={goRate} setSelectedPizza={setSelectedPizza}
             setSelectedRestaurant={setSelectedRestaurant} setSelectedUser={setSelectedUser}
-            allPizzas={allPizzas} allUsers={allUsers} allRatings={allRatings}/>}
+            allPizzas={allPizzas} allUsers={allUsers} allRatings={allRatings}
+            initialTab={exploreTab} setExploreTab={setExploreTab}/>}
         {page==="pizza" &&
-          <PizzaPage pizza={selectedPizza} setSelectedUser={setSelectedUser} setPage={setPage}/>}
+          <PizzaPage pizza={selectedPizza} setSelectedUser={setSelectedUser} setPage={navigateTo}/>}
         {page==="restaurant" &&
           <RestaurantPage restaurant={selectedRestaurant} allPizzas={allPizzas}
-            allRatings={allRatings} setSelectedPizza={setSelectedPizza} setPage={setPage}/>}
+            allRatings={allRatings} setSelectedPizza={setSelectedPizza} setPage={navigateTo}/>}
         {page==="profile" &&
           <ProfilePage username={profileUsername} isMe={profileUsername===username}
-            myRatings={profileRatings} deleteRating={deleteRating}
-            setPage={setPage} goRate={goRate} setSelectedPizza={setSelectedPizza} allPizzaMap={pizzaMap}
+            myRatings={profileRatings} allRatings={allRatings} deleteRating={deleteRating}
+            setPage={navigateTo} goRate={goRate} setSelectedPizza={setSelectedPizza} allPizzaMap={pizzaMap}
             setEditingRating={setEditingRating} setPrefillSession={setPrefillSession}/>}
       </main>
 
@@ -2279,19 +2359,24 @@ function App() {
       <nav style={{ position:"fixed", bottom:0, left:0, right:0, display:"flex",
         background:T.header, borderTop:`1px solid ${T.border}`,
         backdropFilter:"blur(12px)" }}>
-        {nav.map(n=>(
-          <button key={n.id}
-            onClick={n.onClick}
-            style={{ flex:1, padding:"9px 0 7px",
-              display:"flex", flexDirection:"column", alignItems:"center", gap:2,
-              background:"none", border:"none", cursor:"pointer",
-              color:page===n.id?T.red:T.textLight,
-              borderTop:page===n.id?`2px solid ${T.red}`:"2px solid transparent" }}>
-            <span style={{ fontSize:18 }}>{n.icon}</span>
-            <span style={{ fontSize:9, fontWeight:800, letterSpacing:"0.04em",
-              textTransform:"uppercase" }}>{n.label}</span>
-          </button>
-        ))}
+        {nav.map(n=>{
+          const isActive =
+            n.id==="spots" ? page==="explore" :
+            page===n.id;
+          return (
+            <button key={n.id}
+              onClick={n.onClick}
+              style={{ flex:1, padding:"9px 0 7px",
+                display:"flex", flexDirection:"column", alignItems:"center", gap:2,
+                background:"none", border:"none", cursor:"pointer",
+                color:isActive?T.red:T.textLight,
+                borderTop:isActive?`2px solid ${T.red}`:"2px solid transparent" }}>
+              <span style={{ fontSize:18 }}>{n.icon}</span>
+              <span style={{ fontSize:9, fontWeight:800, letterSpacing:"0.04em",
+                textTransform:"uppercase" }}>{n.label}</span>
+            </button>
+          );
+        })}
       </nav>
     </div>
   );
