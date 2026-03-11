@@ -1881,6 +1881,143 @@ function BadgesDisplay({ myRatings, allRatings, username }) {
 
 // ─── PROFILE PAGE ─────────────────────────────────────────────────────────────
 
+function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, draftPrefs, setDraftPrefs, savingPrefs, setSavingPrefs, saveUserPrefs }) {
+  const prefs = userPrefs || {};
+  const hasPrefs = prefs.pizza_type || prefs.fav_topping || prefs.fav_style;
+  const draft = draftPrefs || prefs;
+  const accentColor = (editingPrefs ? draft.pizza_type : prefs.pizza_type) === "white" ? "#8a6a2a" : T.red;
+
+  if (!isMe && !hasPrefs) return null;
+
+  return (
+    <div style={{ marginTop:18, marginBottom:4 }}>
+      {!editingPrefs && (
+        <div style={{ background:"white", borderRadius:16, padding:"14px 18px",
+          border:`1.5px solid ${T.border}`, textAlign:"left" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:hasPrefs?10:0 }}>
+            <span style={{ fontSize:13, fontWeight:900, color:T.textLight,
+              letterSpacing:"0.1em", textTransform:"uppercase" }}>Pizza Identity</span>
+            {isMe && (
+              <button onClick={()=>{ setDraftPrefs({...prefs}); setEditingPrefs(true); }}
+                style={{ background:"none", border:`1px solid ${T.border}`, borderRadius:8,
+                  padding:"3px 10px", fontSize:13, color:T.textMid, cursor:"pointer",
+                  fontFamily:"Georgia,serif" }}>
+                {hasPrefs ? "Edit" : "Set up ✨"}
+              </button>
+            )}
+          </div>
+          {hasPrefs ? (
+            <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+              {prefs.pizza_type && (
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:20 }}>{prefs.pizza_type==="red" ? "🍅" : "🧄"}</span>
+                  <span style={{ fontSize:15, fontWeight:700, color:accentColor }}>
+                    {prefs.pizza_type==="red" ? "Red pizza person" : "White pizza person"}
+                  </span>
+                </div>
+              )}
+              {prefs.fav_style && (
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:20 }}>🍕</span>
+                  <span style={{ fontSize:15, color:T.textMid }}>
+                    <span style={{ fontWeight:700, color:T.textDark }}>Fav style:</span> {prefs.fav_style}
+                  </span>
+                </div>
+              )}
+              {prefs.fav_topping && (
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:20 }}>❤️</span>
+                  <span style={{ fontSize:15, color:T.textMid }}>
+                    <span style={{ fontWeight:700, color:T.textDark }}>Fav topping:</span> {prefs.fav_topping}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : isMe ? (
+            <div style={{ fontSize:14, color:T.textLight, fontStyle:"italic" }}>
+              Tell the world your pizza identity…
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      {isMe && editingPrefs && (
+        <div style={{ background:"white", borderRadius:16, padding:"16px 18px",
+          border:`1.5px solid ${T.border}` }}>
+          <div style={{ fontSize:13, fontWeight:900, color:T.textLight,
+            letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:14 }}>
+            Pizza Identity
+          </div>
+          <div style={{ marginBottom:14 }}>
+            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Red or white pizza?</div>
+            <div style={{ display:"flex", gap:10 }}>
+              {[{v:"red",emoji:"🍅",label:"Red"},{v:"white",emoji:"🧄",label:"White"}].map(({v,emoji,label}) => {
+                const active = draft.pizza_type === v;
+                return (
+                  <button key={v} onClick={()=>setDraftPrefs(d=>({...d,pizza_type:v}))}
+                    style={{ flex:1, padding:"10px 0", borderRadius:12, cursor:"pointer",
+                      fontFamily:"Georgia,serif", fontSize:15, fontWeight:active?900:600,
+                      border:`2px solid ${active?(v==="red"?T.red:"#8a6a2a"):T.border}`,
+                      background:active?(v==="red"?"rgba(201,59,10,0.08)":"rgba(138,106,42,0.08)"):"white",
+                      color:active?(v==="red"?T.red:"#8a6a2a"):T.textMid, transition:"all 0.15s" }}>
+                    {emoji} {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div style={{ marginBottom:14 }}>
+            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite style</div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
+              {STYLES.map(s => {
+                const active = draft.fav_style === s;
+                return (
+                  <button key={s} onClick={()=>setDraftPrefs(d=>({...d,fav_style:active?"":s}))}
+                    style={{ padding:"7px 13px", borderRadius:20, cursor:"pointer",
+                      fontFamily:"Georgia,serif", fontSize:14, fontWeight:active?800:500,
+                      border:`1.5px solid ${active?T.red:T.border}`,
+                      background:active?"rgba(201,59,10,0.08)":"white",
+                      color:active?T.red:T.textMid, transition:"all 0.15s" }}>
+                    {s}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div style={{ marginBottom:16 }}>
+            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite topping</div>
+            <input value={draft.fav_topping||""} onChange={e=>setDraftPrefs(d=>({...d,fav_topping:e.target.value}))}
+              placeholder="e.g. nduja, burrata, hot honey…"
+              style={{ width:"100%", borderRadius:10, padding:"10px 13px",
+                border:`1.5px solid ${T.border}`, fontSize:15, fontFamily:"Georgia,serif",
+                color:T.textDark, outline:"none", background:T.bg, boxSizing:"border-box" }}/>
+          </div>
+          <div style={{ display:"flex", gap:10 }}>
+            <button onClick={()=>{ setEditingPrefs(false); setDraftPrefs(null); }}
+              style={{ flex:1, padding:"10px 0", borderRadius:12, cursor:"pointer",
+                background:"none", border:`1.5px solid ${T.border}`,
+                fontSize:15, color:T.textMid, fontFamily:"Georgia,serif" }}>
+              Cancel
+            </button>
+            <button onClick={async()=>{
+                setSavingPrefs(true);
+                await saveUserPrefs(draft);
+                setSavingPrefs(false);
+                setEditingPrefs(false);
+                setDraftPrefs(null);
+              }}
+              style={{ flex:2, padding:"10px 0", borderRadius:12, cursor:"pointer",
+                background:T.red, border:"none",
+                fontSize:15, fontWeight:800, color:"white", fontFamily:"Georgia,serif" }}>
+              {savingPrefs ? "Saving…" : "Save"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setPage, goRate, setSelectedPizza,
                        allPizzaMap, setEditingRating, setPrefillSession, setSelectedRestaurant,
                        userPrefs, saveUserPrefs }) {
@@ -1925,155 +2062,17 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
         )}
 
         {/* Pizza Identity */}
-        {(() => {
-          const prefs = isMe ? userPrefs : null;
-          const hasPrefs = prefs && (prefs.pizza_type || prefs.fav_topping || prefs.fav_style);
-          const isEditing = editingPrefs;
-          const draft = draftPrefs || userPrefs || {};
-
-          const baseStyle = "white" === (isEditing ? draft.pizza_type : prefs?.pizza_type);
-          const accentColor = baseStyle ? "#8a6a2a" : T.red;
-
-          if (!isMe && !hasPrefs) return null;
-
-          return (
-            <div style={{ marginTop:18, marginBottom:4 }}>
-              {/* Display card (non-editing) */}
-              {!isEditing && (
-                <div style={{ background:"white", borderRadius:16, padding:"14px 18px",
-                  border:`1.5px solid ${T.border}`, textAlign:"left" }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom: hasPrefs ? 10 : 0 }}>
-                    <span style={{ fontSize:13, fontWeight:900, color:T.textLight,
-                      letterSpacing:"0.1em", textTransform:"uppercase" }}>Pizza Identity</span>
-                    {isMe && (
-                      <button onClick={()=>{ setDraftPrefs({...userPrefs}); setEditingPrefs(true); }}
-                        style={{ background:"none", border:`1px solid ${T.border}`, borderRadius:8,
-                          padding:"3px 10px", fontSize:13, color:T.textMid, cursor:"pointer",
-                          fontFamily:"Georgia,serif" }}>
-                        {hasPrefs ? "Edit" : "Set up ✨"}
-                      </button>
-                    )}
-                  </div>
-                  {hasPrefs ? (
-                    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                      {prefs.pizza_type && (
-                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <span style={{ fontSize:20 }}>{prefs.pizza_type === "red" ? "🍅" : "🧄"}</span>
-                          <span style={{ fontSize:15, fontWeight:700, color:accentColor }}>
-                            {prefs.pizza_type === "red" ? "Red pizza person" : "White pizza person"}
-                          </span>
-                        </div>
-                      )}
-                      {prefs.fav_style && (
-                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <span style={{ fontSize:20 }}>🍕</span>
-                          <span style={{ fontSize:15, color:T.textMid }}>
-                            <span style={{ fontWeight:700, color:T.textDark }}>Fav style:</span> {prefs.fav_style}
-                          </span>
-                        </div>
-                      )}
-                      {prefs.fav_topping && (
-                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <span style={{ fontSize:20 }}>❤️</span>
-                          <span style={{ fontSize:15, color:T.textMid }}>
-                            <span style={{ fontWeight:700, color:T.textDark }}>Fav topping:</span> {prefs.fav_topping}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ) : isMe ? (
-                    <div style={{ fontSize:14, color:T.textLight, fontStyle:"italic" }}>
-                      Tell the world your pizza identity…
-                    </div>
-                  ) : null}
-                </div>
-              )}
-
-              {/* Edit form */}
-              {isMe && isEditing && (
-                <div style={{ background:"white", borderRadius:16, padding:"16px 18px",
-                  border:`1.5px solid ${T.border}` }}>
-                  <div style={{ fontSize:13, fontWeight:900, color:T.textLight,
-                    letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:14 }}>
-                    Pizza Identity
-                  </div>
-
-                  {/* Red vs White toggle */}
-                  <div style={{ marginBottom:14 }}>
-                    <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Are you a red or white pizza person?</div>
-                    <div style={{ display:"flex", gap:10 }}>
-                      {[{v:"red",emoji:"🍅",label:"Red"},{v:"white",emoji:"🧄",label:"White"}].map(({v,emoji,label})=>{
-                        const active = draft.pizza_type === v;
-                        return (
-                          <button key={v} onClick={()=>setDraftPrefs(d=>({...d,pizza_type:v}))}
-                            style={{ flex:1, padding:"10px 0", borderRadius:12, cursor:"pointer",
-                              fontFamily:"Georgia,serif", fontSize:15, fontWeight:active?900:600,
-                              border:`2px solid ${active?(v==="red"?T.red:"#8a6a2a"):T.border}`,
-                              background: active?(v==="red"?"rgba(201,59,10,0.08)":"rgba(138,106,42,0.08)"):"white",
-                              color: active?(v==="red"?T.red:"#8a6a2a"):T.textMid,
-                              transition:"all 0.15s" }}>
-                            {emoji} {label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Fav style */}
-                  <div style={{ marginBottom:14 }}>
-                    <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite style</div>
-                    <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
-                      {STYLES.map(s=>{
-                        const active = draft.fav_style === s;
-                        return (
-                          <button key={s} onClick={()=>setDraftPrefs(d=>({...d,fav_style:active?"":s}))}
-                            style={{ padding:"7px 13px", borderRadius:20, cursor:"pointer",
-                              fontFamily:"Georgia,serif", fontSize:14, fontWeight:active?800:500,
-                              border:`1.5px solid ${active?T.red:T.border}`,
-                              background: active?"rgba(201,59,10,0.08)":"white",
-                              color: active?T.red:T.textMid, transition:"all 0.15s" }}>
-                            {s}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Fav topping */}
-                  <div style={{ marginBottom:16 }}>
-                    <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite topping</div>
-                    <input value={draft.fav_topping||""} onChange={e=>setDraftPrefs(d=>({...d,fav_topping:e.target.value}))}
-                      placeholder="e.g. nduja, burrata, hot honey…"
-                      style={{ width:"100%", borderRadius:10, padding:"10px 13px",
-                        border:`1.5px solid ${T.border}`, fontSize:15, fontFamily:"Georgia,serif",
-                        color:T.textDark, outline:"none", background:T.bg, boxSizing:"border-box" }}/>
-                  </div>
-
-                  <div style={{ display:"flex", gap:10 }}>
-                    <button onClick={()=>{ setEditingPrefs(false); setDraftPrefs(null); }}
-                      style={{ flex:1, padding:"10px 0", borderRadius:12, cursor:"pointer",
-                        background:"none", border:`1.5px solid ${T.border}`,
-                        fontSize:15, color:T.textMid, fontFamily:"Georgia,serif" }}>
-                      Cancel
-                    </button>
-                    <button onClick={async()=>{
-                        setSavingPrefs(true);
-                        await saveUserPrefs(draft);
-                        setSavingPrefs(false);
-                        setEditingPrefs(false);
-                        setDraftPrefs(null);
-                      }}
-                      style={{ flex:2, padding:"10px 0", borderRadius:12, cursor:"pointer",
-                        background:T.red, border:"none",
-                        fontSize:15, fontWeight:800, color:"white", fontFamily:"Georgia,serif" }}>
-                      {savingPrefs ? "Saving…" : "Save"}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })()}
+        <PizzaIdentityCard
+          isMe={isMe}
+          userPrefs={userPrefs}
+          editingPrefs={editingPrefs}
+          setEditingPrefs={setEditingPrefs}
+          draftPrefs={draftPrefs}
+          setDraftPrefs={setDraftPrefs}
+          savingPrefs={savingPrefs}
+          setSavingPrefs={setSavingPrefs}
+          saveUserPrefs={saveUserPrefs}
+        />
       </div>
 
       {rated===0
@@ -2406,7 +2405,6 @@ function App() {
   }
 
   // Load all ratings from Supabase on login
-  const { useEffect } = React;
   useEffect(() => {
     if (!currentUser) return;
     setLoadingRatings(true);
