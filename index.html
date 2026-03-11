@@ -2082,6 +2082,7 @@ function App() {
   const [editingRating, setEditingRating]     = useState(null);
   const [prefillSession, setPrefillSession]   = useState(null);
   const [loadingRatings, setLoadingRatings]   = useState(false);
+  const [exploreTab, setExploreTab]           = useState("pizzas");
 
   const username = currentUser?.username || null;
 
@@ -2275,7 +2276,6 @@ function App() {
   }
   function goRate() { setEditingRating(null); setPrefillSession(null); setPageHistory(h=>[...h,page]); setPage("rate"); }
 
-  const [exploreTab, setExploreTab] = useState("pizzas");
   const nav = [
     { id:"home",    label:"Home",    icon:"🏠", onClick:()=>{setPage("home");setSelectedUser(null);setPageHistory([]);} },
     { id:"rate",    label:"Rate",    icon:"🍕", onClick:()=>{goRate();setSelectedUser(null);} },
