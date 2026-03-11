@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>In Crust We Trust</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Georgia, serif; background: #fdf6ec; -webkit-font-smoothing: antialiased; font-size: 16px; }
-    input, button, textarea, select { font-family: Georgia, serif; }
-    button { cursor: pointer; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>In Crust We Trust</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,serif;background:#fdf6ec;color:#2a1a08;font-size:18px}
+input,textarea,select{font-family:Georgia,serif}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#f5e8d4}
+::-webkit-scrollbar-thumb{background:#c17b3a;border-radius:3px}
+</style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -166,13 +168,12 @@ function getEarnedBadges(ratings, allRatings, username) {
 }
 
 const LEVEL_THRESHOLDS = [
-  { min:200, label:"Cheesus Crust Superstar", icon:"🌍" },
-  { min:100, label:"Pizza Overlord",          icon:"👑" },
-  { min:50,  label:"Pizza Inspector",         icon:"⭐" },
-  { min:25,  label:"Dough Scholar",           icon:"🏅" },
-  { min:15,  label:"Crust Apprentice",        icon:"🧎" },
-  { min:5,   label:"Pie Curious",             icon:"😜" },
-  { min:0,   label:"Rookie",                  icon:"🍕" },
+  { min:150, label:"Cheesus Crust Superstar", icon:"⭐⭐⭐" },
+  { min:100, label:"Pizza Overlord",          icon:"⚔️" },
+  { min:50,  label:"Slice Inspector",         icon:"🕵" },
+  { min:30,  label:"Dough Scholar",           icon:"🎓" },
+  { min:10,  label:"Pie Curious",             icon:"😜" },
+  { min:0,   label:"Pizza Baby",              icon:"👶" },
 ];
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
@@ -293,8 +294,8 @@ function PizzaMeter({ score, label, showLabel=true }) {
     <div style={{ width:"100%" }}>
       {showLabel && (
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-          <span style={{ fontSize:13, fontWeight:800, color:T.textMid }}>{label}</span>
-          <span style={{ fontSize:13, fontWeight:900, color:T.red }}>{pct}%</span>
+          <span style={{ fontSize:15, fontWeight:800, color:T.textMid }}>{label}</span>
+          <span style={{ fontSize:15, fontWeight:900, color:T.red }}>{pct}%</span>
         </div>
       )}
       <div style={{ height:7, borderRadius:99, background:T.bgDeep, overflow:"hidden" }}>
@@ -316,11 +317,11 @@ function CategoryRater({ cat, value, onChange }) {
   return (
     <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 0",
       borderBottom:`1px solid ${T.border}` }}>
-      <div style={{ width:26, textAlign:"center", fontSize:17 }}>{cat.icon}</div>
+      <div style={{ width:26, textAlign:"center", fontSize:19 }}>{cat.icon}</div>
       <div style={{ flex:1 }}>
-        <div style={{ fontSize:13, fontWeight:900, color:T.amberMid, letterSpacing:"0.07em",
+        <div style={{ fontSize:15, fontWeight:900, color:T.amberMid, letterSpacing:"0.07em",
           textTransform:"uppercase" }}>{cat.label}</div>
-        <div style={{ fontSize:12, color:T.textLight, marginTop:1 }}>{cat.desc}</div>
+        <div style={{ fontSize:14, color:T.textLight, marginTop:1 }}>{cat.desc}</div>
       </div>
       <div style={{ display:"flex", gap:3, cursor:"pointer" }} onMouseLeave={()=>setHover(null)}>
         {[1,2,3,4,5].map(i=>(
@@ -337,7 +338,7 @@ function CategoryRater({ cat, value, onChange }) {
           >🍕</span>
         ))}
       </div>
-      <div style={{ width:28, textAlign:"right", fontSize:15, fontWeight:900,
+      <div style={{ width:28, textAlign:"right", fontSize:17, fontWeight:900,
         color:display?T.red:T.textLight }}>
         {display||"—"}
       </div>
@@ -353,7 +354,7 @@ function Tag({ label, icon, selected, onClick, negative }) {
     : negative ? "2px solid rgba(201,59,10,0.25)" : "2px solid rgba(45,138,78,0.25)";
   const bg = selected ? abg : negative ? "rgba(201,59,10,0.04)" : "rgba(45,138,78,0.04)";
   return (
-    <button onClick={onClick} style={{ padding:"5px 11px", borderRadius:99, fontSize:14,
+    <button onClick={onClick} style={{ padding:"5px 11px", borderRadius:99, fontSize:16,
       fontWeight:800, border, background:bg, color:ac,
       display:"flex", alignItems:"center", gap:4, cursor:"pointer",
       opacity: selected ? 1 : 0.6,
@@ -375,19 +376,19 @@ function PizzaCard({ pizza, onClick }) {
         transition:"all 0.14s" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:7 }}>
         <div>
-          <div style={{ fontWeight:900, fontSize:17, color:T.textDark }}>{pizza.restaurant}</div>
-          <div style={{ fontSize:14, color:T.textMid }}>{pizza.name}
+          <div style={{ fontWeight:900, fontSize:19, color:T.textDark }}>{pizza.restaurant}</div>
+          <div style={{ fontSize:16, color:T.textMid }}>{pizza.name}
             <span style={{ color:T.textLight }}> · {pizza.style}</span>
           </div>
           {(pizza.city||pizza.country) && (
-            <div style={{ fontSize:13, color:T.textLight, marginTop:1 }}>
+            <div style={{ fontSize:15, color:T.textLight, marginTop:1 }}>
               📍 {[pizza.city,pizza.country].filter(Boolean).join(", ")}
             </div>
           )}
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <ScoreBadge score={pizza.score} large/>
-          <div style={{ fontSize:12, color:T.textLight, marginTop:2 }}>{pizza.ratingCount} rating{pizza.ratingCount!==1?"s":""}</div>
+          <div style={{ fontSize:14, color:T.textLight, marginTop:2 }}>{pizza.ratingCount} rating{pizza.ratingCount!==1?"s":""}</div>
         </div>
       </div>
       <div style={{ display:"flex", flexWrap:"wrap", gap:4, marginTop:8 }}>
@@ -396,7 +397,7 @@ function PizzaCard({ pizza, onClick }) {
           const tagColor = isNeg ? "#c93b0a" : "#2d8a4e";
           const tagBg    = isNeg ? "rgba(201,59,10,0.09)" : "rgba(45,138,78,0.09)";
           return (
-            <span key={t.label} style={{ fontSize:13, padding:"2px 8px", borderRadius:99,
+            <span key={t.label} style={{ fontSize:15, padding:"2px 8px", borderRadius:99,
               background:tagBg, color:tagColor,
               display:"inline-flex", alignItems:"center", gap:3, fontWeight:700 }}>
               {t.icon} {t.label}
@@ -434,7 +435,7 @@ function AutocompleteInput({ value, onChange, suggestions, placeholder, style: e
           {filtered.map(s => (
             <div key={s}
               onMouseDown={() => { onChange(s); setOpen(false); }}
-              style={{ padding:"10px 14px", cursor:"pointer", fontSize:16,
+              style={{ padding:"10px 14px", cursor:"pointer", fontSize:18,
                 color:T.textDark, fontFamily:"Georgia,serif",
                 borderBottom:`1px solid ${T.border}`,
                 transition:"background 0.1s" }}
@@ -452,13 +453,13 @@ function AutocompleteInput({ value, onChange, suggestions, placeholder, style: e
 function EmptyState({ icon, title, sub, action, onAction }) {
   return (
     <div style={{ textAlign:"center", padding:"50px 20px" }}>
-      <div style={{ fontSize:48, marginBottom:10, opacity:0.35 }}>{icon}</div>
-      <div style={{ fontSize:16, fontWeight:900, color:T.textDark, marginBottom:6 }}>{title}</div>
-      <div style={{ fontSize:15, color:T.textLight, maxWidth:240, margin:"0 auto",
+      <div style={{ fontSize:50, marginBottom:10, opacity:0.35 }}>{icon}</div>
+      <div style={{ fontSize:18, fontWeight:900, color:T.textDark, marginBottom:6 }}>{title}</div>
+      <div style={{ fontSize:17, color:T.textLight, maxWidth:240, margin:"0 auto",
         lineHeight:1.5, marginBottom:action?20:0 }}>{sub}</div>
       {action && (
         <button onClick={onAction} style={{ marginTop:18, padding:"10px 22px", borderRadius:12,
-          fontWeight:900, fontSize:15, background:T.red, color:"white", border:"none", cursor:"pointer" }}>
+          fontWeight:900, fontSize:17, background:T.red, color:"white", border:"none", cursor:"pointer" }}>
           {action}
         </button>
       )}
@@ -497,7 +498,7 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings }) 
             <span style={{ display:"inline-flex", alignItems:"center", gap:6,
               background:"rgba(201,59,10,0.18)", border:"1px solid rgba(201,59,10,0.35)",
               borderRadius:99, padding:"5px 14px",
-              fontSize:13, fontWeight:800, color:"#f08060",
+              fontSize:15, fontWeight:800, color:"#f08060",
               letterSpacing:"0.12em", textTransform:"uppercase" }}>
               🍕 Private Beta
             </span>
@@ -523,11 +524,11 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings }) 
             background:"linear-gradient(90deg,#e8390e,#c93b0a)",
             borderRadius:99, marginBottom:18 }}/>
           {/* Bylines */}
-          <p style={{ fontSize:18, color:"rgba(245,220,190,0.85)", marginBottom:4,
+          <p style={{ fontSize:20, color:"rgba(245,220,190,0.85)", marginBottom:4,
             fontFamily:"Georgia,serif", fontWeight:400, letterSpacing:"0.01em" }}>
             Rate every pie.
           </p>
-          <p style={{ fontSize:16, color:"rgba(245,220,190,0.45)", marginBottom:36,
+          <p style={{ fontSize:18, color:"rgba(245,220,190,0.45)", marginBottom:36,
             fontStyle:"italic", fontFamily:"Georgia,serif" }}>
             Pizza never lies.
           </p>
@@ -535,13 +536,13 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings }) 
           <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
             <button onClick={goRate}
               style={{ padding:"15px 32px", borderRadius:12, fontWeight:900, color:"white",
-                fontSize:17, background:"#e8390e", border:"none", cursor:"pointer",
+                fontSize:19, background:"#e8390e", border:"none", cursor:"pointer",
                 boxShadow:"0 6px 28px rgba(232,57,14,0.55)", letterSpacing:"0.01em",
                 fontFamily:"Georgia,serif" }}>
               Rate a Pizza 🍕
             </button>
             <button onClick={()=>setPage("explore")}
-              style={{ padding:"15px 32px", borderRadius:12, fontWeight:900, fontSize:17,
+              style={{ padding:"15px 32px", borderRadius:12, fontWeight:900, fontSize:19,
                 background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.18)",
                 color:"rgba(245,220,190,0.8)", cursor:"pointer", fontFamily:"Georgia,serif",
                 backdropFilter:"blur(8px)" }}>
@@ -558,7 +559,7 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings }) 
             action="Rate a Pizza" onAction={goRate}/>
         ) : (
           <>
-            <h2 style={{ fontSize:18, fontWeight:900, color:T.textDark, margin:"8px 0 12px" }}>
+            <h2 style={{ fontSize:20, fontWeight:900, color:T.textDark, margin:"8px 0 12px" }}>
               🔥 Top Rated
             </h2>
             <div style={{ display:"grid", gap:9 }}>
@@ -571,7 +572,7 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings }) 
         )}
         {recent.length>0 && (
           <>
-            <h2 style={{ fontSize:18, fontWeight:900, color:T.textDark, margin:"28px 0 12px" }}>
+            <h2 style={{ fontSize:20, fontWeight:900, color:T.textDark, margin:"28px 0 12px" }}>
               🕐 Recent Activity
             </h2>
             <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
@@ -579,7 +580,7 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings }) 
                 <div key={i} style={{ borderRadius:12, padding:"11px 14px",
                   background:T.bgCard, border:`1px solid ${T.border}`,
                   display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                  <div style={{ fontSize:15 }}>
+                  <div style={{ fontSize:17 }}>
                     <span style={{ fontWeight:900, color:T.amberMid }}>@{r.user}</span>
                     <span style={{ color:T.textLight }}> rated </span>
                     <span style={{ fontWeight:700, color:T.textDark }}>
@@ -696,7 +697,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
 
   const inp = { width:"100%", borderRadius:12, padding:"11px 13px", color:T.textDark,
     outline:"none", background:"white", border:`1.5px solid ${T.borderMed}`,
-    fontSize:16, boxSizing:"border-box", fontFamily:"Georgia,serif" };
+    fontSize:18, boxSizing:"border-box", fontFamily:"Georgia,serif" };
 
   if (submitted) {
     const savedList = isEdit
@@ -705,11 +706,11 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
     return (
       <div style={{ maxWidth:420, margin:"0 auto", padding:"48px 20px 90px", textAlign:"center",
         fontFamily:"Georgia,serif" }}>
-        <div style={{ fontSize:48, marginBottom:8 }}>🍕</div>
-        <h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:4 }}>
+        <div style={{ fontSize:50, marginBottom:8 }}>🍕</div>
+        <h2 style={{ fontSize:24, fontWeight:900, color:T.textDark, marginBottom:4 }}>
           {isEdit ? "Rating updated!" : savedList.length > 1 ? `${savedList.length} pizzas saved!` : "Rating saved!"}
         </h2>
-        <div style={{ fontSize:15, color:T.textLight, marginBottom:20 }}>
+        <div style={{ fontSize:17, color:T.textLight, marginBottom:20 }}>
           {restaurant}{(city||country) ? ` · 📍 ${[city,country].filter(Boolean).join(", ")}` : ""}
         </div>
         {/* Summary cards */}
@@ -719,8 +720,8 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
               borderRadius:12, padding:"11px 14px",
               display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div style={{ textAlign:"left" }}>
-                <div style={{ fontWeight:900, color:T.textDark, fontSize:16 }}>{p.pizzaName}</div>
-                <div style={{ fontSize:13, color:T.textLight }}>{p.style}</div>
+                <div style={{ fontWeight:900, color:T.textDark, fontSize:18 }}>{p.pizzaName}</div>
+                <div style={{ fontSize:15, color:T.textLight }}>{p.style}</div>
               </div>
               <ScoreBadge score={p.score} large/>
             </div>
@@ -728,12 +729,12 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
         </div>
         <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
           <button onClick={reset}
-            style={{ padding:"11px 20px", borderRadius:12, fontWeight:900, fontSize:15,
+            style={{ padding:"11px 20px", borderRadius:12, fontWeight:900, fontSize:17,
               background:T.red, color:"white", border:"none", cursor:"pointer" }}>
             New session
           </button>
           <button onClick={()=>{ reset(); setPage("profile"); }}
-            style={{ padding:"11px 20px", borderRadius:12, fontWeight:900, fontSize:15,
+            style={{ padding:"11px 20px", borderRadius:12, fontWeight:900, fontSize:17,
               background:"white", border:`2px solid ${T.amberMid}`, color:T.amberMid, cursor:"pointer" }}>
             My Profile
           </button>
@@ -764,12 +765,12 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
         <div style={{ background:T.bgDeep, borderRadius:10, padding:"8px 12px",
           marginBottom:16, display:"flex", alignItems:"center", gap:8,
           border:`1px solid ${T.border}` }}>
-          <span style={{ fontSize:14, color:T.textMid, fontWeight:700 }}>
+          <span style={{ fontSize:16, color:T.textMid, fontWeight:700 }}>
             🍕 {queue.length} pizza{queue.length>1?"s":""} queued
           </span>
           <div style={{ display:"flex", gap:5, flex:1, flexWrap:"wrap" }}>
             {queue.map((p,i)=>(
-              <span key={i} style={{ fontSize:13, color:T.amberMid, fontWeight:800,
+              <span key={i} style={{ fontSize:15, color:T.amberMid, fontWeight:800,
                 background:"white", borderRadius:6, padding:"2px 7px",
                 border:`1px solid ${T.border}` }}>
                 {p.pizzaName} <span style={{ color:T.textLight }}>·{p.score}</span>
@@ -777,7 +778,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
             ))}
           </div>
           <button onClick={()=>setStep(5)}
-            style={{ fontSize:13, fontWeight:800, color:T.green, background:"none",
+            style={{ fontSize:15, fontWeight:800, color:T.green, background:"none",
               border:"none", cursor:"pointer", flexShrink:0 }}>
             Review →
           </button>
@@ -803,13 +804,13 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
                 <div style={{ display:"inline-flex", alignItems:"center", gap:6,
                   background:"rgba(201,59,10,0.85)", borderRadius:6,
                   padding:"3px 9px", marginBottom:10 }}>
-                  <span style={{ fontSize:12, fontWeight:900, color:"white",
+                  <span style={{ fontSize:14, fontWeight:900, color:"white",
                     letterSpacing:"0.12em", textTransform:"uppercase" }}>
                     Step 1 · Spot Info
                   </span>
                 </div>
                 {/* Main title */}
-                <div style={{ fontSize:40, fontWeight:900, color:"white", lineHeight:1,
+                <div style={{ fontSize:42, fontWeight:900, color:"white", lineHeight:1,
                   letterSpacing:"-1.5px", marginBottom:8,
                   textShadow:"0 2px 0 rgba(0,0,0,0.9), 0 4px 20px rgba(0,0,0,0.8)" }}>
                   Pizza ID
@@ -825,8 +826,8 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
                       background:"rgba(255,255,255,0.12)", backdropFilter:"blur(4px)",
                       border:"1px solid rgba(255,255,255,0.18)",
                       borderRadius:20, padding:"4px 10px" }}>
-                      <span style={{ fontSize:14 }}>{icon}</span>
-                      <span style={{ fontSize:13, fontWeight:700, color:"rgba(255,230,190,0.95)",
+                      <span style={{ fontSize:16 }}>{icon}</span>
+                      <span style={{ fontSize:15, fontWeight:700, color:"rgba(255,230,190,0.95)",
                         letterSpacing:"0.02em" }}>{text}</span>
                     </div>
                   ))}
@@ -835,25 +836,25 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
             </div>
           )}
           {isEdit && (
-            <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:20 }}>
+            <h2 style={{ fontSize:28, fontWeight:900, color:T.textDark, marginBottom:20 }}>
               Edit pizza
             </h2>
           )}
           <div style={{ display:"flex", flexDirection:"column", gap:13 }}>
             <div>
-              <label style={{ fontSize:13, fontWeight:800, color:T.amberMid, display:"block",
+              <label style={{ fontSize:15, fontWeight:800, color:T.amberMid, display:"block",
                 marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Restaurant</label>
               <AutocompleteInput value={restaurant} onChange={setRestaurant}
                 suggestions={pastRestaurants} placeholder="e.g. Crosta" style={inp}/>
             </div>
             <div>
-              <label style={{ fontSize:13, fontWeight:800, color:T.amberMid, display:"block",
+              <label style={{ fontSize:15, fontWeight:800, color:T.amberMid, display:"block",
                 marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>City</label>
               <AutocompleteInput value={city} onChange={setCity}
                 suggestions={pastCities} placeholder="e.g. New York" style={inp}/>
             </div>
             <div>
-              <label style={{ fontSize:13, fontWeight:800, color:T.amberMid, display:"block",
+              <label style={{ fontSize:15, fontWeight:800, color:T.amberMid, display:"block",
                 marginBottom:6, letterSpacing:"0.06em", textTransform:"uppercase" }}>Country</label>
               <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:8 }}>
                 {[
@@ -862,45 +863,39 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
                   {flag:"🇹🇭",name:"Thailand"},{flag:"🇭🇰",name:"Hong Kong"},
                   {flag:"🇮🇹",name:"Italy"},{flag:"🇬🇧",name:"UK"},
                   {flag:"🇦🇺",name:"Australia"},{flag:"🇫🇷",name:"France"},
-                  {flag:"🇩🇪",name:"Germany"},{flag:"🇪🇸",name:"Spain"},
+                  {flag:"🇪🇸",name:"Spain"},
                 ].map(({flag,name}) => {
                   const active = country === name;
                   return (
                     <button key={name} onClick={() => setCountry(active ? "" : name)}
-                      style={{ padding:"5px 10px", borderRadius:9, fontSize:14, fontWeight:700,
+                      style={{ padding:"5px 10px", borderRadius:9, fontSize:16, fontWeight:700,
                         cursor:"pointer", border:`1.5px solid ${active ? T.red : T.borderMed}`,
                         background: active ? T.redLight : "white",
                         color: active ? T.red : T.textMid, transition:"all 0.12s",
                         display:"flex", alignItems:"center", gap:4 }}>
-                      <span style={{ fontSize:16 }}>{flag}</span>
+                      <span style={{ fontSize:18 }}>{flag}</span>
                       <span>{name}</span>
                     </button>
                   );
                 })}
               </div>
               <AutocompleteInput value={country} onChange={setCountry}
-                suggestions={[...new Set([...pastCountries,"Italy","USA","Japan","UK","France","Australia","Germany","Spain","Singapore","Thailand","Hong Kong","Philippines"])].filter(c=>!["Italy","USA","Japan","UK","France","Australia","Germany","Spain","Singapore","Thailand","Hong Kong","Philippines"].includes(c)||pastCountries.includes(c))}
-                placeholder="Or type another country…" style={{ ...inp, fontSize:15 }}/>
+                suggestions={[...new Set([...pastCountries,"Italy","USA","Japan","UK","France","Australia","Spain","Singapore","Thailand","Hong Kong","Philippines"])].filter(c=>!["Italy","USA","Japan","UK","France","Australia","Spain","Singapore","Thailand","Hong Kong","Philippines"].includes(c)||pastCountries.includes(c))}
+                placeholder="Or type another country…" style={{ ...inp, fontSize:17 }}/>
             </div>
             {/* Vibes: rated once per place */}
             <div style={{ background:"white", borderRadius:16, padding:"4px 14px 8px",
               border:`1px solid ${T.border}`, boxShadow:"0 1px 8px rgba(180,100,30,0.08)" }}>
-              <div style={{ fontSize:13, fontWeight:800, color:T.amberMid, letterSpacing:"0.06em",
-                textTransform:"uppercase", padding:"10px 0 2px" }}>
-                ✨ Vibes <span style={{ fontSize:12, fontWeight:400, color:T.textLight,
-                  textTransform:"none", letterSpacing:0 }}>— rate the place, not the pizza</span>
+              <div style={{ fontSize:15, fontWeight:600, color:T.textLight, padding:"10px 0 2px",
+                fontStyle:"italic" }}>
+                ✨ Rate the place, not the pizza — atmosphere, service &amp; experience
               </div>
               <CategoryRater cat={VIBES_CAT} value={sessionVibes}
                 onChange={v=>setSessionVibes(v)}/>
-              {sessionVibes === 0 && (
-                <div style={{ fontSize:13, color:T.textLight, paddingBottom:8 }}>
-                  Atmosphere, service &amp; experience — shared across all pizzas here
-                </div>
-              )}
             </div>
             <button onClick={()=>setStep(2)}
               disabled={!restaurant || (!isEdit && sessionVibes === 0)}
-              style={{ marginTop:6, padding:"13px", borderRadius:12, fontWeight:900, fontSize:17,
+              style={{ marginTop:6, padding:"13px", borderRadius:12, fontWeight:900, fontSize:19,
                 background:T.red, color:"white", border:"none", cursor:"pointer",
                 opacity:(!restaurant || (!isEdit && sessionVibes === 0))?0.3:1 }}>
               {isEdit ? "Next →" : "Start Rating →"}
@@ -912,26 +907,44 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
       {/* STEP 2: Pizza ID — name, style, price (new session + edit) */}
       {step===2 && (
         <div>
-          <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:4 }}>
-            Pizza ID
-          </h2>
-          <div style={{ fontSize:14, color:T.textLight, marginBottom:18 }}>
-            📍 {restaurant}{(city||country)?` · ${[city,country].filter(Boolean).join(", ")}`:""}
+          <div style={{ borderRadius:18, overflow:"hidden", marginBottom:24, position:"relative", height:140,
+            background:"linear-gradient(150deg, #0f0501 0%, #1e0a03 45%, #2a0f04 100%)" }}>
+            <div style={{ position:"absolute", inset:0,
+              background:"radial-gradient(circle at 80% 50%, rgba(201,59,10,0.18) 0%, transparent 65%)" }}/>
+            <div style={{ position:"relative", zIndex:1, padding:"18px 18px 16px", height:"100%",
+              display:"flex", flexDirection:"column", justifyContent:"flex-end" }}>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:6,
+                background:"rgba(201,59,10,0.85)", borderRadius:6,
+                padding:"3px 9px", marginBottom:8, alignSelf:"flex-start" }}>
+                <span style={{ fontSize:14, fontWeight:900, color:"white",
+                  letterSpacing:"0.12em", textTransform:"uppercase" }}>
+                  Step 2 · Pizza ID
+                </span>
+              </div>
+              <div style={{ fontSize:30, fontWeight:900, color:"white", lineHeight:1,
+                letterSpacing:"-1px", marginBottom:4,
+                textShadow:"0 2px 0 rgba(0,0,0,0.9)" }}>
+                {restaurant}
+              </div>
+              <div style={{ fontSize:15, color:"rgba(245,220,190,0.6)" }}>
+                {[city,country].filter(Boolean).join(", ")}
+              </div>
+            </div>
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:13 }}>
             <div>
-              <label style={{ fontSize:13, fontWeight:800, color:T.amberMid, display:"block",
+              <label style={{ fontSize:15, fontWeight:800, color:T.amberMid, display:"block",
                 marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Pizza Name</label>
               <AutocompleteInput value={pizzaName} onChange={setPizzaName}
                 suggestions={pastPizzaNames} placeholder="e.g. Margherita" style={inp}/>
             </div>
             <div>
-              <label style={{ fontSize:13, fontWeight:800, color:T.amberMid, display:"block",
+              <label style={{ fontSize:15, fontWeight:800, color:T.amberMid, display:"block",
                 marginBottom:7, letterSpacing:"0.06em", textTransform:"uppercase" }}>Style</label>
               <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                 {STYLES.map(s=>(
                   <button key={s} onClick={()=>setStyle(s)}
-                    style={{ padding:"7px 12px", borderRadius:10, fontSize:14, fontWeight:800,
+                    style={{ padding:"7px 12px", borderRadius:10, fontSize:16, fontWeight:800,
                       cursor:"pointer", transition:"all 0.13s",
                       border:`1.5px solid ${style===s?T.red:T.borderMed}`,
                       background:style===s?T.red:"white",
@@ -942,13 +955,13 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
               </div>
             </div>
             <div>
-              <label style={{ fontSize:13, fontWeight:800, color:T.amberMid, display:"block",
+              <label style={{ fontSize:15, fontWeight:800, color:T.amberMid, display:"block",
                 marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>
                 Price paid <span style={{fontWeight:400,color:T.textLight}}>(optional)</span>
               </label>
               <div style={{ display:"flex", gap:8 }}>
                 <select value={currency} onChange={e=>setCurrency(e.target.value)}
-                  style={{ ...inp, width:"auto", padding:"11px 10px", flexShrink:0, fontSize:15 }}>
+                  style={{ ...inp, width:"auto", padding:"11px 10px", flexShrink:0, fontSize:17 }}>
                   {[["PHP","₱ PHP"],["USD","$ USD"],["JPY","¥ JPY"],["SGD","S$ SGD"],
                     ["THB","฿ THB"],["HKD","HK$ HKD"],["EUR","€ EUR"],["GBP","£ GBP"],
                     ["AUD","A$ AUD"]].map(([c,l])=>(
@@ -962,7 +975,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
               </div>
             </div>
             <button onClick={()=>setStep(3)} disabled={!pizzaName||!style}
-              style={{ marginTop:6, padding:"13px", borderRadius:12, fontWeight:900, fontSize:17,
+              style={{ marginTop:6, padding:"13px", borderRadius:12, fontWeight:900, fontSize:19,
                 background:T.red, color:"white", border:"none", cursor:"pointer",
                 opacity:(!pizzaName||!style)?0.3:1 }}>
               Score It →
@@ -974,11 +987,29 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
       {/* STEP 3: Score categories */}
       {step===3 && (
         <div>
-          <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:3 }}>
-            Score each category
-          </h2>
-          <div style={{ fontSize:14, color:T.textLight, marginBottom:16 }}>
-            {restaurant} · {pizzaName} · {style}
+          <div style={{ borderRadius:18, overflow:"hidden", marginBottom:24, position:"relative", height:140,
+            background:"linear-gradient(150deg, #0f0501 0%, #1e0a03 45%, #2a0f04 100%)" }}>
+            <div style={{ position:"absolute", inset:0,
+              background:"radial-gradient(circle at 80% 50%, rgba(201,59,10,0.18) 0%, transparent 65%)" }}/>
+            <div style={{ position:"relative", zIndex:1, padding:"18px 18px 16px", height:"100%",
+              display:"flex", flexDirection:"column", justifyContent:"flex-end" }}>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:6,
+                background:"rgba(201,59,10,0.85)", borderRadius:6,
+                padding:"3px 9px", marginBottom:8, alignSelf:"flex-start" }}>
+                <span style={{ fontSize:14, fontWeight:900, color:"white",
+                  letterSpacing:"0.12em", textTransform:"uppercase" }}>
+                  Step 3 · Score It
+                </span>
+              </div>
+              <div style={{ fontSize:30, fontWeight:900, color:"white", lineHeight:1,
+                letterSpacing:"-1px", marginBottom:4,
+                textShadow:"0 2px 0 rgba(0,0,0,0.9)" }}>
+                {pizzaName}
+              </div>
+              <div style={{ fontSize:15, color:"rgba(245,220,190,0.6)" }}>
+                {restaurant}{style ? ` · ${style}` : ""}
+              </div>
+            </div>
           </div>
           <div style={{ background:"white", borderRadius:16, padding:"2px 14px 6px",
             marginBottom:16, border:`1px solid ${T.border}`,
@@ -991,7 +1022,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
           {overall>0 && (
             <div style={{ background:T.redLight, borderRadius:14, padding:"14px 16px",
               marginBottom:14, border:`1px solid rgba(201,59,10,0.2)`, textAlign:"center" }}>
-              <div style={{ fontSize:12, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+              <div style={{ fontSize:14, fontWeight:900, color:T.red, letterSpacing:"0.1em",
                 textTransform:"uppercase", marginBottom:8 }}>Overall</div>
               <PizzaFill score={overall} size={60}/>
               <div style={{ marginTop:8 }}>
@@ -1000,7 +1031,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
             </div>
           )}
           <button onClick={()=>setStep(4)} disabled={!allCatsRated}
-            style={{ width:"100%", padding:"13px", borderRadius:12, fontWeight:900, fontSize:17,
+            style={{ width:"100%", padding:"13px", borderRadius:12, fontWeight:900, fontSize:19,
               background:T.red, color:"white", border:"none", cursor:"pointer",
               opacity:allCatsRated?1:0.3 }}>
             Write Your Verdict →
@@ -1011,15 +1042,35 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
       {/* STEP 4: Notes + tags */}
       {step===4 && (
         <div>
-          <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:3 }}>Pizza Bytes</h2>
-          <div style={{ fontSize:14, color:T.textLight, marginBottom:14 }}>
-            {restaurant} · {pizzaName} · {overall} overall
+          <div style={{ borderRadius:18, overflow:"hidden", marginBottom:24, position:"relative", height:140,
+            background:"linear-gradient(150deg, #0f0501 0%, #1e0a03 45%, #2a0f04 100%)" }}>
+            <div style={{ position:"absolute", inset:0,
+              background:"radial-gradient(circle at 80% 50%, rgba(201,59,10,0.18) 0%, transparent 65%)" }}/>
+            <div style={{ position:"relative", zIndex:1, padding:"18px 18px 16px", height:"100%",
+              display:"flex", flexDirection:"column", justifyContent:"flex-end" }}>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:6,
+                background:"rgba(201,59,10,0.85)", borderRadius:6,
+                padding:"3px 9px", marginBottom:8, alignSelf:"flex-start" }}>
+                <span style={{ fontSize:14, fontWeight:900, color:"white",
+                  letterSpacing:"0.12em", textTransform:"uppercase" }}>
+                  Step 4 · Pizza Bytes
+                </span>
+              </div>
+              <div style={{ fontSize:30, fontWeight:900, color:"white", lineHeight:1,
+                letterSpacing:"-1px", marginBottom:4,
+                textShadow:"0 2px 0 rgba(0,0,0,0.9)" }}>
+                {pizzaName}
+              </div>
+              <div style={{ fontSize:15, color:"rgba(245,220,190,0.6)" }}>
+                {restaurant} · {overall} overall
+              </div>
+            </div>
           </div>
           <textarea value={review} onChange={e=>setReview(e.target.value)}
             placeholder='"Perfect char, great crust chew."'
             style={{ ...inp, resize:"none", height:84, marginBottom:14 }}/>
           <div style={{ marginBottom:12 }}>
-            <div style={{ fontSize:13, fontWeight:900, color:T.green, letterSpacing:"0.1em",
+            <div style={{ fontSize:15, fontWeight:900, color:T.green, letterSpacing:"0.1em",
               textTransform:"uppercase", marginBottom:7 }}>🍕 The Good</div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
               {POSITIVE_TAGS.map(t=>(
@@ -1030,7 +1081,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
             </div>
           </div>
           <div style={{ marginBottom:22 }}>
-            <div style={{ fontSize:13, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+            <div style={{ fontSize:15, fontWeight:900, color:T.red, letterSpacing:"0.1em",
               textTransform:"uppercase", marginBottom:7 }}>🚫 The Bad</div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
               {NEGATIVE_TAGS.map(t=>(
@@ -1043,7 +1094,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
           {isEdit ? (
             <button onClick={handleEditSave}
               style={{ width:"100%", padding:"14px", borderRadius:12, fontWeight:900,
-                fontSize:17, background:T.red, color:"white", border:"none", cursor:"pointer",
+                fontSize:19, background:T.red, color:"white", border:"none", cursor:"pointer",
                 boxShadow:"0 4px 18px rgba(201,59,10,0.35)" }}>
               Save Changes ✓
             </button>
@@ -1051,13 +1102,13 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
             <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
               <button onClick={addToQueue}
                 style={{ width:"100%", padding:"13px", borderRadius:12, fontWeight:900,
-                  fontSize:16, background:T.red, color:"white", border:"none", cursor:"pointer",
+                  fontSize:18, background:T.red, color:"white", border:"none", cursor:"pointer",
                   boxShadow:"0 4px 18px rgba(201,59,10,0.3)" }}>
                 ➕ Add &amp; rate another pizza here
               </button>
               <button onClick={handleSubmitAll}
                 style={{ width:"100%", padding:"13px", borderRadius:12, fontWeight:900,
-                  fontSize:16, background:"white", border:`2px solid ${T.amberMid}`,
+                  fontSize:18, background:"white", border:`2px solid ${T.amberMid}`,
                   color:T.amberMid, cursor:"pointer" }}>
                 ✓ Done — save {queue.length > 0 ? `all ${queue.length+1} pizzas` : "rating"}
               </button>
@@ -1069,10 +1120,10 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
       {/* STEP 5 (non-edit): Queue review before final save — reached via "Review →" in mini-bar */}
       {!isEdit && step===5 && (
         <div>
-          <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginBottom:4 }}>
+          <h2 style={{ fontSize:28, fontWeight:900, color:T.textDark, marginBottom:4 }}>
             Review your order
           </h2>
-          <div style={{ fontSize:14, color:T.textLight, marginBottom:18 }}>
+          <div style={{ fontSize:16, color:T.textLight, marginBottom:18 }}>
             📍 {restaurant} · {queue.length} pizza{queue.length!==1?"s":""}
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:22 }}>
@@ -1081,13 +1132,13 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
                 borderRadius:12, padding:"11px 14px",
                 display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                 <div>
-                  <div style={{ fontWeight:900, color:T.textDark, fontSize:16 }}>{p.pizzaName}</div>
-                  <div style={{ fontSize:13, color:T.textLight }}>{p.style}</div>
+                  <div style={{ fontWeight:900, color:T.textDark, fontSize:18 }}>{p.pizzaName}</div>
+                  <div style={{ fontSize:15, color:T.textLight }}>{p.style}</div>
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <ScoreBadge score={p.score}/>
                   <button onClick={()=>removeFromQueue(i)}
-                    style={{ fontSize:13, color:T.textLight, background:"none", border:"none",
+                    style={{ fontSize:15, color:T.textLight, background:"none", border:"none",
                       cursor:"pointer", padding:0 }}>✕</button>
                 </div>
               </div>
@@ -1095,7 +1146,7 @@ function RatePage({ setPage, addRating, editRating, editingRating, setEditingRat
           </div>
           <button onClick={handleSubmitAll}
             style={{ width:"100%", padding:"14px", borderRadius:12, fontWeight:900,
-              fontSize:17, background:T.red, color:"white", border:"none", cursor:"pointer",
+              fontSize:19, background:T.red, color:"white", border:"none", cursor:"pointer",
               boxShadow:"0 4px 18px rgba(201,59,10,0.35)" }}>
             Save all {queue.length} pizza{queue.length!==1?"s":""}  🍕
           </button>
@@ -1194,14 +1245,14 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
   return (
     <div style={{ maxWidth:640, margin:"0 auto", padding:"24px 16px 90px",
       fontFamily:"Georgia,serif" }}>
-      <h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:14 }}>Explore</h2>
+      <h2 style={{ fontSize:24, fontWeight:900, color:T.textDark, marginBottom:14 }}>Explore</h2>
 
       {/* Tab bar */}
       <div style={{ display:"flex", marginBottom:16, borderRadius:12, overflow:"hidden",
         border:`1px solid ${T.borderMed}`, background:T.bgDeep }}>
         {tabs.map(([id,label])=>(
           <button key={id} onClick={()=>switchTab(id)}
-            style={{ flex:1, padding:"10px 4px", fontSize:13, fontWeight:900, cursor:"pointer",
+            style={{ flex:1, padding:"10px 4px", fontSize:15, fontWeight:900, cursor:"pointer",
               border:"none", background:tab===id?"white":"transparent",
               color:tab===id?T.red:T.textLight,
               borderBottom:tab===id?`2px solid ${T.red}`:"2px solid transparent",
@@ -1222,7 +1273,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
           <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:8 }}>
             {["All",...STYLES].map(s=>(
               <button key={s} onClick={()=>setFilter(s)}
-                style={{ padding:"5px 10px", borderRadius:9, fontSize:13, fontWeight:800,
+                style={{ padding:"5px 10px", borderRadius:9, fontSize:15, fontWeight:800,
                   cursor:"pointer",
                   border:`1px solid ${filter===s?T.red:T.borderMed}`,
                   background:filter===s?T.red:"white",
@@ -1240,7 +1291,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
               ...CATEGORIES.map(c=>([`cat_${c.key}`, `${c.icon} ${c.label}`]))
             ].map(([v,l])=>(
               <button key={v} onClick={()=>setSort(v)}
-                style={{ padding:"5px 11px", borderRadius:9, fontSize:13, fontWeight:800,
+                style={{ padding:"5px 11px", borderRadius:9, fontSize:15, fontWeight:800,
                   cursor:"pointer", border:`1px solid ${sort===v?T.amberMid:"transparent"}`,
                   background:T.bgDeep, color:sort===v?T.amberMid:T.textLight }}>
                 {l}
@@ -1249,11 +1300,11 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
           </div>
           {allLocations.length>0 && (
             <div style={{ marginBottom:12 }}>
-              <div style={{ fontSize:12, fontWeight:800, color:T.textLight, letterSpacing:"0.07em",
+              <div style={{ fontSize:14, fontWeight:800, color:T.textLight, letterSpacing:"0.07em",
                 textTransform:"uppercase", marginBottom:6 }}>📍 Filter by Location</div>
               <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
                 <button onClick={()=>setLocFilter("")}
-                  style={{ padding:"4px 10px", borderRadius:9, fontSize:13, fontWeight:800,
+                  style={{ padding:"4px 10px", borderRadius:9, fontSize:15, fontWeight:800,
                     cursor:"pointer", border:`1px solid ${locFilter===""?T.amberMid:T.borderMed}`,
                     background:locFilter===""?T.amberMid:"white",
                     color:locFilter===""?"white":T.textMid }}>
@@ -1261,7 +1312,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                 </button>
                 {allLocations.map(loc=>(
                   <button key={loc} onClick={()=>setLocFilter(locFilter===loc?"":loc)}
-                    style={{ padding:"4px 10px", borderRadius:9, fontSize:13, fontWeight:800,
+                    style={{ padding:"4px 10px", borderRadius:9, fontSize:15, fontWeight:800,
                       cursor:"pointer",
                       border:`1px solid ${locFilter===loc?T.amberMid:T.borderMed}`,
                       background:locFilter===loc?T.amberMid:"white",
@@ -1279,7 +1330,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
             : <div style={{ display:"grid", gap:9 }}>
                 {filtered.map((p,i)=>(
                   <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <div style={{ fontSize:16, fontWeight:900, width:18, textAlign:"right",
+                    <div style={{ fontSize:18, fontWeight:900, width:18, textAlign:"right",
                       color:T.textLight }}>#{i+1}</div>
                     <div style={{ flex:1 }}>
                       <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
@@ -1321,13 +1372,13 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                     <div style={{ display:"flex", justifyContent:"space-between",
                       alignItems:"flex-start", padding:"13px 15px 10px" }}>
                       <div>
-                        <div style={{ fontWeight:900, color:T.textDark, fontSize:17 }}>{r.name}</div>
+                        <div style={{ fontWeight:900, color:T.textDark, fontSize:19 }}>{r.name}</div>
                         {(r.city||r.country) && (
-                          <div style={{ fontSize:13, color:T.textLight, marginTop:1 }}>
+                          <div style={{ fontSize:15, color:T.textLight, marginTop:1 }}>
                             📍 {[r.city,r.country].filter(Boolean).join(", ")}
                           </div>
                         )}
-                        <div style={{ fontSize:13, color:T.textLight, marginTop:4, display:"flex", flexWrap:"wrap", gap:6 }}>
+                        <div style={{ fontSize:15, color:T.textLight, marginTop:4, display:"flex", flexWrap:"wrap", gap:6 }}>
                           <span>{restRatings.length} visit{restRatings.length!==1?"s":""}</span>
                           <span>·</span>
                           <span>{r.pizzaCount} pizza{r.pizzaCount!==1?"s":""}</span>
@@ -1337,7 +1388,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                       {avgScore>0 && (
                         <div style={{ textAlign:"right", flexShrink:0 }}>
                           <ScoreBadge score={avgScore} large/>
-                          <div style={{ fontSize:9, color:T.textLight, marginTop:3 }}>avg score</div>
+                          <div style={{ fontSize:11, color:T.textLight, marginTop:3 }}>avg score</div>
                         </div>
                       )}
                     </div>
@@ -1348,13 +1399,13 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                         display:"grid", gridTemplateColumns:"1fr 1fr", gap:"5px 14px" }}>
                         {CATEGORIES.map(c=>(
                           <div key={c.key} style={{ display:"flex", alignItems:"center", gap:5 }}>
-                            <span style={{ fontSize:13 }}>{c.icon}</span>
+                            <span style={{ fontSize:15 }}>{c.icon}</span>
                             <div style={{ flex:1, height:4, borderRadius:99, background:T.bgDeep }}>
                               <div style={{ width:`${(catAvgs[c.key]/5)*100}%`, height:"100%",
                                 borderRadius:99,
                                 background:catAvgs[c.key]>=4?"#2d8a4e":catAvgs[c.key]>=3?T.amberMid:T.red }}/>
                             </div>
-                            <span style={{ fontSize:12, fontWeight:800, color:T.textLight,
+                            <span style={{ fontSize:14, fontWeight:800, color:T.textLight,
                               width:22, textAlign:"right" }}>{catAvgs[c.key].toFixed(1)}</span>
                           </div>
                         ))}
@@ -1378,17 +1429,17 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                   style={{ display:"flex", alignItems:"center", gap:10, borderRadius:12,
                     padding:"12px 14px", background:T.bgCard, border:`1px solid ${T.border}`,
                     cursor:"pointer" }}>
-                  <div style={{ fontSize:15, fontWeight:900, width:20,
+                  <div style={{ fontSize:17, fontWeight:900, width:20,
                     color:i===0?T.red:T.textLight }}>#{i+1}</div>
                   <div style={{ flex:1 }}>
                     <div style={{ fontWeight:900, color:T.textDark }}>@{u.username}</div>
-                    <div style={{ fontSize:13, color:T.textLight }}>
+                    <div style={{ fontSize:15, color:T.textLight }}>
                       {getLevel(u.rated).label} · {u.rated} pizza{u.rated!==1?"s":""}
                     </div>
                   </div>
                   <div style={{ textAlign:"right" }}>
-                    <div style={{ fontWeight:900, color:T.red, fontSize:17 }}>{u.avg}</div>
-                    <div style={{ fontSize:12, color:T.textLight }}>avg</div>
+                    <div style={{ fontWeight:900, color:T.red, fontSize:19 }}>{u.avg}</div>
+                    <div style={{ fontSize:14, color:T.textLight }}>avg</div>
                   </div>
                 </div>
               ))}
@@ -1406,7 +1457,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
               <div style={{ display:"flex", gap:6, marginBottom:18 }}>
                 {[["styles","By Style"],["categories","By Category"]].map(([v,label])=>(
                   <button key={v} onClick={()=>setBoardView(v)}
-                    style={{ flex:1, padding:"8px 0", borderRadius:10, fontWeight:900, fontSize:14,
+                    style={{ flex:1, padding:"8px 0", borderRadius:10, fontWeight:900, fontSize:16,
                       cursor:"pointer", border:`1.5px solid ${boardView===v?T.red:T.borderMed}`,
                       background:boardView===v?T.redLight:"white",
                       color:boardView===v?T.red:T.textMid, fontFamily:"Georgia,serif" }}>
@@ -1418,7 +1469,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
               {boardView==="styles" && <>
                 {Object.entries(styleLeaders).map(([style,list])=>(
                   <div key={style} style={{ marginBottom:22 }}>
-                    <div style={{ fontSize:13, fontWeight:900, color:T.red,
+                    <div style={{ fontSize:15, fontWeight:900, color:T.red,
                       textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
                       paddingBottom:5, borderBottom:`1px solid ${T.border}` }}>
                       {style}
@@ -1434,11 +1485,11 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                         <div>
                           <span style={{ fontWeight:900, marginRight:7,
                             color:i===0?T.red:T.textLight }}>#{i+1}</span>
-                          <span style={{ color:T.textDark, fontWeight:700, fontSize:15 }}>
+                          <span style={{ color:T.textDark, fontWeight:700, fontSize:17 }}>
                             {p.restaurant} – {p.name}
                           </span>
                           {(p.city||p.country) && (
-                            <span style={{ fontSize:13, color:T.textLight, marginLeft:5 }}>
+                            <span style={{ fontSize:15, color:T.textLight, marginLeft:5 }}>
                               📍 {[p.city,p.country].filter(Boolean).join(", ")}
                             </span>
                           )}
@@ -1450,7 +1501,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                 ))}
                 {Object.keys(cityLeaders).length>0 && (
                   <div style={{ marginTop:8 }}>
-                    <div style={{ fontSize:13, fontWeight:900, color:T.amberMid,
+                    <div style={{ fontSize:15, fontWeight:900, color:T.amberMid,
                       textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
                       paddingBottom:5, borderBottom:`1px solid ${T.border}` }}>
                       📍 Best by City
@@ -1464,8 +1515,8 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                           marginBottom:5, cursor:"pointer" }}>
                         <div>
                           <span style={{ fontWeight:900, color:T.amberMid, marginRight:7,
-                            fontSize:14 }}>📍 {city}</span>
-                          <span style={{ color:T.textDark, fontWeight:700, fontSize:15 }}>
+                            fontSize:16 }}>📍 {city}</span>
+                          <span style={{ color:T.textDark, fontWeight:700, fontSize:17 }}>
                             {p.restaurant} – {p.name}
                           </span>
                         </div>
@@ -1476,7 +1527,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                 )}
                 {shameList.length>=3 && (
                   <div style={{ marginTop:20 }}>
-                    <div style={{ fontSize:13, fontWeight:900, color:T.red,
+                    <div style={{ fontSize:15, fontWeight:900, color:T.red,
                       textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
                       paddingBottom:5, borderBottom:`1px solid rgba(201,59,10,0.2)` }}>
                       💀 Hall of Shame
@@ -1490,13 +1541,13 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                           border:`1px solid ${i===0?"rgba(201,59,10,0.25)":T.border}`,
                           marginBottom:5, cursor:"pointer" }}>
                         <div>
-                          <span style={{ fontWeight:900, marginRight:7, fontSize:15,
+                          <span style={{ fontWeight:900, marginRight:7, fontSize:17,
                             color:i===0?"#c93b0a":T.textLight }}>{i===0?"☠️":`#${i+1}`}</span>
-                          <span style={{ color:T.textDark, fontWeight:700, fontSize:15 }}>
+                          <span style={{ color:T.textDark, fontWeight:700, fontSize:17 }}>
                             {p.restaurant} – {p.name}
                           </span>
                           {(p.city||p.country) && (
-                            <span style={{ fontSize:13, color:T.textLight, marginLeft:5 }}>
+                            <span style={{ fontSize:15, color:T.textLight, marginLeft:5 }}>
                               📍 {[p.city,p.country].filter(Boolean).join(", ")}
                             </span>
                           )}
@@ -1514,12 +1565,12 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                   if (!entry) return null;
                   return (
                     <div key={c.key} style={{ marginBottom:22 }}>
-                      <div style={{ fontSize:13, fontWeight:900, color:T.amberMid,
+                      <div style={{ fontSize:15, fontWeight:900, color:T.amberMid,
                         textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:8,
                         paddingBottom:5, borderBottom:`1px solid ${T.border}`,
                         display:"flex", alignItems:"center", gap:6 }}>
-                        <span style={{ fontSize:16 }}>{c.icon}</span> {c.label}
-                        <span style={{ fontSize:12, color:T.textLight, fontWeight:700,
+                        <span style={{ fontSize:18 }}>{c.icon}</span> {c.label}
+                        <span style={{ fontSize:14, color:T.textLight, fontWeight:700,
                           textTransform:"none", letterSpacing:0 }}>— {c.desc}</span>
                       </div>
                       {entry.list.map((p,i)=>(
@@ -1533,20 +1584,20 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                           <div style={{ flex:1, minWidth:0 }}>
                             <span style={{ fontWeight:900, marginRight:7,
                               color:i===0?T.red:T.textLight }}>#{i+1}</span>
-                            <span style={{ color:T.textDark, fontWeight:700, fontSize:15 }}>
+                            <span style={{ color:T.textDark, fontWeight:700, fontSize:17 }}>
                               {p.restaurant} – {p.name}
                             </span>
                             {(p.city||p.country) && (
-                              <span style={{ fontSize:13, color:T.textLight, marginLeft:5 }}>
+                              <span style={{ fontSize:15, color:T.textLight, marginLeft:5 }}>
                                 📍 {[p.city,p.country].filter(Boolean).join(", ")}
                               </span>
                             )}
                           </div>
                           <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
-                            <span style={{ fontSize:14, fontWeight:900, color:T.amberMid }}>
+                            <span style={{ fontSize:16, fontWeight:900, color:T.amberMid }}>
                               {p.catScore.toFixed(1)}
                             </span>
-                            <span style={{ fontSize:12, color:T.textLight }}>/5</span>
+                            <span style={{ fontSize:14, color:T.textLight }}>/5</span>
                           </div>
                         </div>
                       ))}
@@ -1570,19 +1621,19 @@ function PizzaPage({ pizza, setSelectedUser, setPage }) {
       <div style={{ textAlign:"center", marginBottom:22 }}>
         <PizzaFill score={pizza.score} size={90}/>
         <div style={{ marginTop:8 }}>
-          <div style={{ fontSize:20, fontWeight:700, color:T.amberMid }}><ScoreLabel score={pizza.score}/></div>
+          <div style={{ fontSize:22, fontWeight:700, color:T.amberMid }}><ScoreLabel score={pizza.score}/></div>
         </div>
-        <h2 style={{ fontSize:26, fontWeight:900, color:T.textDark, marginTop:10, marginBottom:2 }}>
+        <h2 style={{ fontSize:28, fontWeight:900, color:T.textDark, marginTop:10, marginBottom:2 }}>
           {pizza.restaurant}
         </h2>
-        <div style={{ fontSize:16, color:T.textMid, marginBottom:2 }}>{pizza.name}</div>
-        <div style={{ fontSize:14, color:T.textLight, marginBottom:12 }}>{pizza.style}</div>
+        <div style={{ fontSize:18, color:T.textMid, marginBottom:2 }}>{pizza.name}</div>
+        <div style={{ fontSize:16, color:T.textLight, marginBottom:12 }}>{pizza.style}</div>
         {(pizza.city||pizza.country) && (
-          <div style={{ fontSize:15, color:T.textMid, marginBottom:12 }}>
+          <div style={{ fontSize:17, color:T.textMid, marginBottom:12 }}>
             📍 {[pizza.city,pizza.country].filter(Boolean).join(", ")}
           </div>
         )}
-        <div style={{ fontSize:13, color:T.textLight }}>
+        <div style={{ fontSize:15, color:T.textLight }}>
           {pizza.ratingCount} rating{pizza.ratingCount!==1?"s":""}
         </div>
       </div>
@@ -1591,17 +1642,17 @@ function PizzaPage({ pizza, setSelectedUser, setPage }) {
         <div style={{ background:"white", borderRadius:16, padding:"14px 16px",
           marginBottom:18, border:`1px solid ${T.border}`,
           boxShadow:"0 1px 8px rgba(180,100,30,0.06)" }}>
-          <div style={{ fontSize:13, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+          <div style={{ fontSize:15, fontWeight:900, color:T.red, letterSpacing:"0.1em",
             textTransform:"uppercase", marginBottom:12 }}>Score Breakdown</div>
           <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
             {CATEGORIES.map(c=>(
               <div key={c.key} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <span style={{ fontSize:16, width:22 }}>{c.icon}</span>
-                <span style={{ fontSize:13, fontWeight:800, color:T.textMid, width:62 }}>
+                <span style={{ fontSize:18, width:22 }}>{c.icon}</span>
+                <span style={{ fontSize:15, fontWeight:800, color:T.textMid, width:62 }}>
                   {c.label}
                 </span>
                 <div style={{ flex:1 }}><PizzaMeter score={pizza.cats[c.key]} showLabel={false}/></div>
-                <span style={{ fontSize:13, fontWeight:900, color:T.red, width:28,
+                <span style={{ fontSize:15, fontWeight:900, color:T.red, width:28,
                   textAlign:"right" }}>{pizza.cats[c.key]}</span>
               </div>
             ))}
@@ -1611,13 +1662,13 @@ function PizzaPage({ pizza, setSelectedUser, setPage }) {
 
       {(pizza.tags||[]).length>0 && (
         <div style={{ marginBottom:18 }}>
-          <div style={{ fontSize:13, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+          <div style={{ fontSize:15, fontWeight:900, color:T.red, letterSpacing:"0.1em",
             textTransform:"uppercase", marginBottom:9 }}>Top Notes</div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
             {pizza.tags.map(t=>{
               const neg = NEGATIVE_TAGS.some(n=>n.label===t.label);
               return (
-                <span key={t.label} style={{ padding:"5px 11px", borderRadius:99, fontSize:14,
+                <span key={t.label} style={{ padding:"5px 11px", borderRadius:99, fontSize:16,
                   fontWeight:800, display:"inline-flex", alignItems:"center", gap:4,
                   background:neg?T.deleteBg:T.greenBg,
                   color:neg?T.red:T.green,
@@ -1632,21 +1683,21 @@ function PizzaPage({ pizza, setSelectedUser, setPage }) {
 
       {(pizza.reviews||[]).filter(r=>r.text).length>0 && (
         <div>
-          <div style={{ fontSize:13, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+          <div style={{ fontSize:15, fontWeight:900, color:T.red, letterSpacing:"0.1em",
             textTransform:"uppercase", marginBottom:9 }}>Reviews</div>
           {pizza.reviews.filter(r=>r.text).map((r,i)=>(
             <div key={i} style={{ borderRadius:13, padding:13, background:"white",
               border:`1px solid ${T.border}`, marginBottom:8 }}>
               <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5 }}>
                 <span onClick={()=>{setSelectedUser(r.user);setPage("profile");}}
-                  style={{ fontWeight:900, color:T.amberMid, fontSize:15, cursor:"pointer",
+                  style={{ fontWeight:900, color:T.amberMid, fontSize:17, cursor:"pointer",
                     textDecoration:"underline",
                     textDecorationColor:"rgba(154,92,26,0.3)" }}>
                   @{r.user}
                 </span>
                 <ScoreBadge score={r.score}/>
               </div>
-              <p style={{ color:T.textDark, margin:0, fontSize:16, fontStyle:"italic" }}>
+              <p style={{ color:T.textDark, margin:0, fontSize:18, fontStyle:"italic" }}>
                 "{r.text}"
               </p>
             </div>
@@ -1683,25 +1734,25 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
       {/* Header */}
       <div style={{ background:"linear-gradient(160deg,#1a0a02,#2d1208)",
         padding:"32px 20px 24px", textAlign:"center", position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", right:-10, bottom:-10, fontSize:100,
+        <div style={{ position:"absolute", right:-10, bottom:-10, fontSize:102,
           opacity:0.06, transform:"rotate(-10deg)", pointerEvents:"none" }}>🏠</div>
         <div style={{ position:"relative", zIndex:1 }}>
           {avg>0 && <PizzaFill score={avg} size={70}/>}
-          <h2 style={{ fontSize:24, fontWeight:900, color:"white", margin:"10px 0 2px",
+          <h2 style={{ fontSize:26, fontWeight:900, color:"white", margin:"10px 0 2px",
             letterSpacing:"-0.5px" }}>{restaurant}</h2>
-          {loc && <div style={{ fontSize:14, color:"rgba(245,220,190,0.6)", marginBottom:6 }}>📍 {loc}</div>}
+          {loc && <div style={{ fontSize:16, color:"rgba(245,220,190,0.6)", marginBottom:6 }}>📍 {loc}</div>}
           <div style={{ display:"flex", justifyContent:"center", gap:24, marginTop:8 }}>
             <div>
-              <div style={{ fontSize:22, fontWeight:900, color:"#e8390e" }}>{avg||"—"}</div>
-              <div style={{ fontSize:12, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>avg score</div>
+              <div style={{ fontSize:24, fontWeight:900, color:"#e8390e" }}>{avg||"—"}</div>
+              <div style={{ fontSize:14, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>avg score</div>
             </div>
             <div>
-              <div style={{ fontSize:22, fontWeight:900, color:"rgba(245,220,190,0.9)" }}>{pizzas.length}</div>
-              <div style={{ fontSize:12, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>pizza{pizzas.length!==1?"s":""}</div>
+              <div style={{ fontSize:24, fontWeight:900, color:"rgba(245,220,190,0.9)" }}>{pizzas.length}</div>
+              <div style={{ fontSize:14, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>pizza{pizzas.length!==1?"s":""}</div>
             </div>
             <div>
-              <div style={{ fontSize:22, fontWeight:900, color:"rgba(245,220,190,0.9)" }}>{visitCount}</div>
-              <div style={{ fontSize:12, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>visit{visitCount!==1?"s":""}</div>
+              <div style={{ fontSize:24, fontWeight:900, color:"rgba(245,220,190,0.9)" }}>{visitCount}</div>
+              <div style={{ fontSize:14, color:"rgba(245,220,190,0.5)", textTransform:"uppercase", letterSpacing:"0.07em" }}>visit{visitCount!==1?"s":""}</div>
             </div>
           </div>
         </div>
@@ -1714,12 +1765,12 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
           display:"grid", gridTemplateColumns:"1fr 1fr", gap:"5px 16px" }}>
           {CATEGORIES.map(c=>(
             <div key={c.key} style={{ display:"flex", alignItems:"center", gap:6 }}>
-              <span style={{ fontSize:14 }}>{c.icon}</span>
+              <span style={{ fontSize:16 }}>{c.icon}</span>
               <div style={{ flex:1, height:4, borderRadius:99, background:"rgba(180,120,60,0.15)" }}>
                 <div style={{ width:`${(catAvgs[c.key]/5)*100}%`, height:"100%", borderRadius:99,
                   background:catAvgs[c.key]>=4?T.green:catAvgs[c.key]>=3?T.amberMid:T.red }}/>
               </div>
-              <span style={{ fontSize:12, fontWeight:800, color:T.textLight, width:24, textAlign:"right" }}>
+              <span style={{ fontSize:14, fontWeight:800, color:T.textLight, width:24, textAlign:"right" }}>
                 {catAvgs[c.key]>0 ? catAvgs[c.key].toFixed(1) : "—"}
               </span>
             </div>
@@ -1732,7 +1783,7 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
         background:T.bgCard, padding:"0 20px" }}>
         {[["menu","🍕 Menu"],["visits","📋 Visits"]].map(([id,label])=>(
           <button key={id} onClick={()=>setTab(id)}
-            style={{ padding:"11px 16px", fontSize:15, fontWeight:800, cursor:"pointer",
+            style={{ padding:"11px 16px", fontSize:17, fontWeight:800, cursor:"pointer",
               background:"none", border:"none", borderBottom:`2px solid ${tab===id?T.red:"transparent"}`,
               color:tab===id?T.red:T.textLight, transition:"all 0.13s", marginRight:4 }}>
             {label}
@@ -1748,7 +1799,7 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
             : <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {pizzas.map((p,i)=>(
                   <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <div style={{ fontSize:14, fontWeight:900, width:18, color:T.textLight,
+                    <div style={{ fontSize:16, fontWeight:900, width:18, color:T.textLight,
                       flexShrink:0 }}>#{i+1}</div>
                     <div style={{ flex:1 }}>
                       <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
@@ -1770,8 +1821,8 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
                       background:T.bgCard, border:`1px solid ${T.border}` }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
                         <div style={{ flex:1, minWidth:0 }}>
-                          <div style={{ fontWeight:900, color:T.textDark, fontSize:16 }}>{r.pizzaName}</div>
-                          <div style={{ fontSize:13, color:T.textLight, marginTop:1, display:"flex", gap:8, flexWrap:"wrap" }}>
+                          <div style={{ fontWeight:900, color:T.textDark, fontSize:18 }}>{r.pizzaName}</div>
+                          <div style={{ fontSize:15, color:T.textLight, marginTop:1, display:"flex", gap:8, flexWrap:"wrap" }}>
                             <span>{r.style}</span>
                             <span>·</span>
                             <span style={{ fontWeight:700, color:T.amberMid }}>@{r.user}</span>
@@ -1781,7 +1832,7 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
                             {vl && <span style={{ color:vl.color, fontWeight:700 }}>{vl.text}</span>}
                           </div>
                           {r.review && (
-                            <p style={{ fontSize:14, color:T.textMid, margin:"6px 0 0",
+                            <p style={{ fontSize:16, color:T.textMid, margin:"6px 0 0",
                               fontStyle:"italic", borderLeft:`2px solid ${T.border}`, paddingLeft:8 }}>
                               "{r.review}"
                             </p>
@@ -1805,7 +1856,7 @@ function BadgesDisplay({ myRatings, allRatings, username }) {
   return (
     <div style={{ marginBottom:8 }}>
       {earned.length === 0 && (
-        <div style={{ textAlign:"center", fontSize:15, color:T.textLight, padding:"8px 0", fontStyle:"italic" }}>
+        <div style={{ textAlign:"center", fontSize:17, color:T.textLight, padding:"8px 0", fontStyle:"italic" }}>
           Rate more pizzas to unlock badges 🍕
         </div>
       )}
@@ -1817,8 +1868,8 @@ function BadgesDisplay({ myRatings, allRatings, username }) {
                 background:"linear-gradient(135deg,rgba(201,59,10,0.09),rgba(184,134,11,0.09))",
                 border:"1.5px solid rgba(201,59,10,0.2)", borderRadius:12,
                 padding:"8px 10px", minWidth:60, gap:3 }}>
-              <span style={{ fontSize:22 }}>{b.icon}</span>
-              <span style={{ fontSize:9, fontWeight:800, color:T.textDark,
+              <span style={{ fontSize:24 }}>{b.icon}</span>
+              <span style={{ fontSize:11, fontWeight:800, color:T.textDark,
                 textAlign:"center", lineHeight:1.2, maxWidth:56 }}>{b.name}</span>
             </div>
           ))}
@@ -1831,8 +1882,12 @@ function BadgesDisplay({ myRatings, allRatings, username }) {
 // ─── PROFILE PAGE ─────────────────────────────────────────────────────────────
 
 function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setPage, goRate, setSelectedPizza,
-                       allPizzaMap, setEditingRating, setPrefillSession, setSelectedRestaurant }) {
+                       allPizzaMap, setEditingRating, setPrefillSession, setSelectedRestaurant,
+                       userPrefs, saveUserPrefs }) {
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [editingPrefs, setEditingPrefs]   = useState(false);
+  const [draftPrefs, setDraftPrefs]       = useState(null);
+  const [savingPrefs, setSavingPrefs]     = useState(false);
   const rated = myRatings.length;
   const level = getLevel(rated);
   const avg   = rated>0 ? Math.round(myRatings.reduce((a,r)=>a+r.score,0)/rated) : "—";
@@ -1846,27 +1901,179 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
     <div style={{ maxWidth:600, margin:"0 auto", padding:"24px 16px 90px",
       fontFamily:"Georgia,serif" }}>
       <div style={{ textAlign:"center", marginBottom:20 }}>
-        <div style={{ fontSize:48, marginBottom:6 }}>{level.icon}</div>
-        <h2 style={{ fontSize:22, fontWeight:900, color:T.textDark, marginBottom:2 }}>
+        <div style={{ fontSize:50, marginBottom:6 }}>{level.icon}</div>
+        <h2 style={{ fontSize:24, fontWeight:900, marginBottom:2,
+          color: userPrefs?.pizza_type==="white" ? "#8a6a2a" : T.red }}>
           @{username}
         </h2>
-        <div style={{ fontSize:14, fontWeight:800, color:T.red, marginBottom:14 }}>
+        <div style={{ fontSize:16, fontWeight:800, color:T.red, marginBottom:14 }}>
           {level.label}
         </div>
         <div style={{ display:"flex", justifyContent:"center", gap:40, marginBottom:16 }}>
           <div>
-            <div style={{ fontSize:28, fontWeight:900, color:T.textDark }}>{rated}</div>
-            <div style={{ fontSize:12, color:T.textLight }}>Pizzas Rated</div>
+            <div style={{ fontSize:30, fontWeight:900, color:T.textDark }}>{rated}</div>
+            <div style={{ fontSize:14, color:T.textLight }}>Pizzas Rated</div>
           </div>
           <div>
-            <div style={{ fontSize:28, fontWeight:900, color:T.textDark }}>{avg}</div>
-            <div style={{ fontSize:12, color:T.textLight }}>Avg Score</div>
+            <div style={{ fontSize:30, fontWeight:900, color:T.textDark }}>{avg}</div>
+            <div style={{ fontSize:14, color:T.textLight }}>Avg Score</div>
           </div>
         </div>
         {/* Badges */}
         {rated > 0 && (
           <BadgesDisplay myRatings={myRatings} allRatings={allRatings} username={username}/>
         )}
+
+        {/* Pizza Identity */}
+        {(() => {
+          const prefs = isMe ? userPrefs : null;
+          const hasPrefs = prefs && (prefs.pizza_type || prefs.fav_topping || prefs.fav_style);
+          const isEditing = editingPrefs;
+          const draft = draftPrefs || userPrefs || {};
+
+          const baseStyle = "white" === (isEditing ? draft.pizza_type : prefs?.pizza_type);
+          const accentColor = baseStyle ? "#8a6a2a" : T.red;
+
+          if (!isMe && !hasPrefs) return null;
+
+          return (
+            <div style={{ marginTop:18, marginBottom:4 }}>
+              {/* Display card (non-editing) */}
+              {!isEditing && (
+                <div style={{ background:"white", borderRadius:16, padding:"14px 18px",
+                  border:`1.5px solid ${T.border}`, textAlign:"left" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom: hasPrefs ? 10 : 0 }}>
+                    <span style={{ fontSize:13, fontWeight:900, color:T.textLight,
+                      letterSpacing:"0.1em", textTransform:"uppercase" }}>Pizza Identity</span>
+                    {isMe && (
+                      <button onClick={()=>{ setDraftPrefs({...userPrefs}); setEditingPrefs(true); }}
+                        style={{ background:"none", border:`1px solid ${T.border}`, borderRadius:8,
+                          padding:"3px 10px", fontSize:13, color:T.textMid, cursor:"pointer",
+                          fontFamily:"Georgia,serif" }}>
+                        {hasPrefs ? "Edit" : "Set up ✨"}
+                      </button>
+                    )}
+                  </div>
+                  {hasPrefs ? (
+                    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                      {prefs.pizza_type && (
+                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <span style={{ fontSize:20 }}>{prefs.pizza_type === "red" ? "🍅" : "🧄"}</span>
+                          <span style={{ fontSize:15, fontWeight:700, color:accentColor }}>
+                            {prefs.pizza_type === "red" ? "Red pizza person" : "White pizza person"}
+                          </span>
+                        </div>
+                      )}
+                      {prefs.fav_style && (
+                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <span style={{ fontSize:20 }}>🍕</span>
+                          <span style={{ fontSize:15, color:T.textMid }}>
+                            <span style={{ fontWeight:700, color:T.textDark }}>Fav style:</span> {prefs.fav_style}
+                          </span>
+                        </div>
+                      )}
+                      {prefs.fav_topping && (
+                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <span style={{ fontSize:20 }}>❤️</span>
+                          <span style={{ fontSize:15, color:T.textMid }}>
+                            <span style={{ fontWeight:700, color:T.textDark }}>Fav topping:</span> {prefs.fav_topping}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ) : isMe ? (
+                    <div style={{ fontSize:14, color:T.textLight, fontStyle:"italic" }}>
+                      Tell the world your pizza identity…
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {/* Edit form */}
+              {isMe && isEditing && (
+                <div style={{ background:"white", borderRadius:16, padding:"16px 18px",
+                  border:`1.5px solid ${T.border}` }}>
+                  <div style={{ fontSize:13, fontWeight:900, color:T.textLight,
+                    letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:14 }}>
+                    Pizza Identity
+                  </div>
+
+                  {/* Red vs White toggle */}
+                  <div style={{ marginBottom:14 }}>
+                    <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Are you a red or white pizza person?</div>
+                    <div style={{ display:"flex", gap:10 }}>
+                      {[{v:"red",emoji:"🍅",label:"Red"},{v:"white",emoji:"🧄",label:"White"}].map(({v,emoji,label})=>{
+                        const active = draft.pizza_type === v;
+                        return (
+                          <button key={v} onClick={()=>setDraftPrefs(d=>({...d,pizza_type:v}))}
+                            style={{ flex:1, padding:"10px 0", borderRadius:12, cursor:"pointer",
+                              fontFamily:"Georgia,serif", fontSize:15, fontWeight:active?900:600,
+                              border:`2px solid ${active?(v==="red"?T.red:"#8a6a2a"):T.border}`,
+                              background: active?(v==="red"?"rgba(201,59,10,0.08)":"rgba(138,106,42,0.08)"):"white",
+                              color: active?(v==="red"?T.red:"#8a6a2a"):T.textMid,
+                              transition:"all 0.15s" }}>
+                            {emoji} {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Fav style */}
+                  <div style={{ marginBottom:14 }}>
+                    <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite style</div>
+                    <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
+                      {STYLES.map(s=>{
+                        const active = draft.fav_style === s;
+                        return (
+                          <button key={s} onClick={()=>setDraftPrefs(d=>({...d,fav_style:active?"":s}))}
+                            style={{ padding:"7px 13px", borderRadius:20, cursor:"pointer",
+                              fontFamily:"Georgia,serif", fontSize:14, fontWeight:active?800:500,
+                              border:`1.5px solid ${active?T.red:T.border}`,
+                              background: active?"rgba(201,59,10,0.08)":"white",
+                              color: active?T.red:T.textMid, transition:"all 0.15s" }}>
+                            {s}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Fav topping */}
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite topping</div>
+                    <input value={draft.fav_topping||""} onChange={e=>setDraftPrefs(d=>({...d,fav_topping:e.target.value}))}
+                      placeholder="e.g. nduja, burrata, hot honey…"
+                      style={{ width:"100%", borderRadius:10, padding:"10px 13px",
+                        border:`1.5px solid ${T.border}`, fontSize:15, fontFamily:"Georgia,serif",
+                        color:T.textDark, outline:"none", background:T.bg, boxSizing:"border-box" }}/>
+                  </div>
+
+                  <div style={{ display:"flex", gap:10 }}>
+                    <button onClick={()=>{ setEditingPrefs(false); setDraftPrefs(null); }}
+                      style={{ flex:1, padding:"10px 0", borderRadius:12, cursor:"pointer",
+                        background:"none", border:`1.5px solid ${T.border}`,
+                        fontSize:15, color:T.textMid, fontFamily:"Georgia,serif" }}>
+                      Cancel
+                    </button>
+                    <button onClick={async()=>{
+                        setSavingPrefs(true);
+                        await saveUserPrefs(draft);
+                        setSavingPrefs(false);
+                        setEditingPrefs(false);
+                        setDraftPrefs(null);
+                      }}
+                      style={{ flex:2, padding:"10px 0", borderRadius:12, cursor:"pointer",
+                        background:T.red, border:"none",
+                        fontSize:15, fontWeight:800, color:"white", fontFamily:"Georgia,serif" }}>
+                      {savingPrefs ? "Saving…" : "Save"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {rated===0
@@ -1876,7 +2083,7 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
             action={isMe?"Rate Your First Pizza":null}
             onAction={goRate}/>
         : <>
-            <div style={{ fontSize:13, fontWeight:900, color:T.red, letterSpacing:"0.1em",
+            <div style={{ fontSize:15, fontWeight:900, color:T.red, letterSpacing:"0.1em",
               textTransform:"uppercase", marginBottom:10 }}>
               {isMe?"Your Ratings":"Ratings"}
             </div>
@@ -1895,7 +2102,7 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
                         justifyContent:"center", padding:"12px 6px", gap:4,
                         borderRight:`1px solid ${T.border}` }}>
                       <PizzaFill score={r.score} size={42}/>
-                      <span style={{ fontSize:9, fontWeight:800, color:scoreTier(r.score).color,
+                      <span style={{ fontSize:11, fontWeight:800, color:scoreTier(r.score).color,
                         textAlign:"center", lineHeight:1.2, maxWidth:58 }}>
                         {scoreTier(r.score).label}
                       </span>
@@ -1905,22 +2112,22 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:6 }}>
                         <div style={{ flex:1, cursor:"pointer", minWidth:0, overflow:"hidden" }}
                           onClick={()=>{ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap&&allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");}}}>
-                          <div style={{ fontWeight:900, color:T.textDark, fontSize:16, lineHeight:1.3,
+                          <div style={{ fontWeight:900, color:T.textDark, fontSize:18, lineHeight:1.3,
                             whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis",
                             cursor:"pointer" }}
                             onClick={e=>{ e.stopPropagation(); setSelectedRestaurant(r.restaurant); setPage("restaurant"); }}>
                             {r.restaurant}
                           </div>
-                          <div style={{ fontSize:14, color:T.amberMid, fontWeight:700, marginBottom:1,
+                          <div style={{ fontSize:16, color:T.amberMid, fontWeight:700, marginBottom:1,
                             whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                             {r.pizzaName}
                           </div>
-                          <div style={{ fontSize:12, color:T.textLight, marginBottom:r.review?6:0,
+                          <div style={{ fontSize:14, color:T.textLight, marginBottom:r.review?6:0,
                             whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                             {r.style}{r.city||r.country ? ` · 📍 ${[r.city,r.country].filter(Boolean).join(", ")}` : ""} · {r.date}
                           </div>
                           {r.review && (
-                            <p style={{ fontSize:14, color:T.textMid, margin:"0 0 4px",
+                            <p style={{ fontSize:16, color:T.textMid, margin:"0 0 4px",
                               fontStyle:"italic", lineHeight:1.45,
                               borderLeft:`2px solid ${T.border}`, paddingLeft:7,
                               display:"block", wordBreak:"break-word" }}>
@@ -1933,7 +2140,7 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
                                 const neg = NEGATIVE_TAGS.some(n=>n.label===t);
                                 const tag = ALL_TAGS.find(x=>x.label===t)||{icon:"🍕",label:t};
                                 return (
-                                  <span key={t} style={{ fontSize:12, padding:"2px 7px",
+                                  <span key={t} style={{ fontSize:14, padding:"2px 7px",
                                     borderRadius:99, fontWeight:800,
                                     background:neg?"rgba(201,59,10,0.08)":"rgba(45,138,78,0.08)",
                                     color:neg?T.red:T.green }}>
@@ -1947,19 +2154,19 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
                         {isMe && (
                           <div style={{ display:"flex", gap:4, flexShrink:0, marginLeft:8 }}>
                             <button onClick={()=>{ setEditingRating(r); setPage("rate"); }}
-                              style={{ padding:"3px 8px", borderRadius:7, fontSize:12, fontWeight:800,
+                              style={{ padding:"3px 8px", borderRadius:7, fontSize:14, fontWeight:800,
                                 cursor:"pointer", border:`1px solid ${T.amberMid}`,
                                 background:"transparent", color:T.amberMid }}>
                               Edit
                             </button>
                             <button onClick={()=>{ setPrefillSession(r); setPage("rate"); }}
-                              style={{ padding:"3px 8px", borderRadius:7, fontSize:12, fontWeight:800,
+                              style={{ padding:"3px 8px", borderRadius:7, fontSize:14, fontWeight:800,
                                 cursor:"pointer", border:`1px solid ${T.green}`,
                                 background:"transparent", color:T.green }}>
                               ＋ Pizza
                             </button>
                             <button onClick={()=>handleDelete(r.id)}
-                              style={{ padding:"3px 8px", borderRadius:7, fontSize:12, fontWeight:800,
+                              style={{ padding:"3px 8px", borderRadius:7, fontSize:14, fontWeight:800,
                                 cursor:"pointer",
                                 border:`1px solid ${confirmDelete===r.id?T.red:T.borderMed}`,
                                 background:confirmDelete===r.id?T.deleteBg:"transparent",
@@ -1972,12 +2179,12 @@ function ProfilePage({ username, isMe, myRatings, allRatings, deleteRating, setP
                     </div>
                   </div>
                   {confirmDelete===r.id && (
-                    <div style={{ fontSize:13, color:T.red, padding:"8px 14px",
+                    <div style={{ fontSize:15, color:T.red, padding:"8px 14px",
                       borderTop:`1px solid rgba(201,59,10,0.15)`,
                       display:"flex", gap:8, alignItems:"center" }}>
                       <span>Delete this rating?</span>
                       <button onClick={()=>setConfirmDelete(null)}
-                        style={{ fontSize:13, color:T.textLight, background:"none",
+                        style={{ fontSize:15, color:T.textLight, background:"none",
                           border:"none", cursor:"pointer", padding:0 }}>
                         Cancel
                       </button>
@@ -2047,7 +2254,7 @@ function AuthScreen({ onLogin }) {
 
   const inp = { width:"100%", borderRadius:12, padding:"13px 15px", color:T.textDark,
     outline:"none", background:"white", border:`1.5px solid rgba(180,120,60,0.3)`,
-    fontSize:17, boxSizing:"border-box", fontFamily:"Georgia,serif" };
+    fontSize:19, boxSizing:"border-box", fontFamily:"Georgia,serif" };
 
   async function handleSubmit() {
     const u = username.trim().toLowerCase();
@@ -2086,13 +2293,13 @@ function AuthScreen({ onLogin }) {
       padding:"24px", fontFamily:"Georgia,serif" }}>
       {/* Logo */}
       <div style={{ textAlign:"center", marginBottom:36 }}>
-        <div style={{ fontSize:52, marginBottom:10 }}>🍕</div>
+        <div style={{ fontSize:54, marginBottom:10 }}>🍕</div>
         <h1 style={{ fontFamily:"Georgia,serif", fontWeight:900, letterSpacing:"-2px",
           fontSize:"clamp(36px,9vw,64px)", color:"#e8390e",
           textShadow:"0 0 60px rgba(232,57,14,0.4)", lineHeight:0.95, marginBottom:6 }}>
           In Crust<br/>We Trust
         </h1>
-        <p style={{ fontSize:15, color:"rgba(245,220,190,0.45)", fontStyle:"italic" }}>
+        <p style={{ fontSize:17, color:"rgba(245,220,190,0.45)", fontStyle:"italic" }}>
           Pizza never lies.
         </p>
       </div>
@@ -2106,7 +2313,7 @@ function AuthScreen({ onLogin }) {
           padding:3, marginBottom:22, gap:3 }}>
           {[["login","Sign In"],["signup","Create Account"]].map(([m,l])=>(
             <button key={m} onClick={()=>{ setMode(m); setError(""); }}
-              style={{ flex:1, padding:"9px", borderRadius:9, fontSize:15, fontWeight:800,
+              style={{ flex:1, padding:"9px", borderRadius:9, fontSize:17, fontWeight:800,
                 cursor:"pointer", border:"none", transition:"all 0.15s",
                 background:mode===m?"white":"transparent",
                 color:mode===m?T.red:T.textLight,
@@ -2120,28 +2327,28 @@ function AuthScreen({ onLogin }) {
           animation: shake ? "shake 0.5s" : "none" }}>
           <style>{`@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}`}</style>
           <div>
-            <label style={{ fontSize:13, fontWeight:800, color:T.amberMid, display:"block",
+            <label style={{ fontSize:15, fontWeight:800, color:T.amberMid, display:"block",
               marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Username</label>
             <input value={username} onChange={e=>setUsername(e.target.value.toLowerCase())}
               onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
               placeholder="e.g. pizzalover99" style={inp} autoCapitalize="none" autoCorrect="off"/>
           </div>
           <div>
-            <label style={{ fontSize:13, fontWeight:800, color:T.amberMid, display:"block",
+            <label style={{ fontSize:15, fontWeight:800, color:T.amberMid, display:"block",
               marginBottom:5, letterSpacing:"0.06em", textTransform:"uppercase" }}>Password</label>
             <input type="password" value={password} onChange={e=>setPassword(e.target.value)}
               onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
               placeholder="••••••••" style={inp}/>
           </div>
           {error && (
-            <div style={{ fontSize:14, color:T.red, fontWeight:700, textAlign:"center",
+            <div style={{ fontSize:16, color:T.red, fontWeight:700, textAlign:"center",
               background:T.redLight, borderRadius:8, padding:"8px 12px" }}>
               {error}
             </div>
           )}
           <button onClick={handleSubmit} disabled={loading}
             style={{ marginTop:4, padding:"14px", borderRadius:12, fontWeight:900,
-              fontSize:17, background: loading ? T.borderMed : T.red,
+              fontSize:19, background: loading ? T.borderMed : T.red,
               color:"white", border:"none", cursor: loading ? "default" : "pointer",
               boxShadow: loading ? "none" : "0 4px 20px rgba(201,59,10,0.4)",
               transition:"all 0.15s" }}>
@@ -2150,7 +2357,7 @@ function AuthScreen({ onLogin }) {
         </div>
 
         {mode==="signup" && (
-          <p style={{ fontSize:13, color:T.textLight, textAlign:"center", marginTop:14,
+          <p style={{ fontSize:15, color:T.textLight, textAlign:"center", marginTop:14,
             lineHeight:1.5 }}>
             🔒 Private beta. Invite only.<br/>Your ratings are saved across devices.
           </p>
@@ -2164,6 +2371,7 @@ function AuthScreen({ onLogin }) {
 
 function App() {
   const [currentUser, setCurrentUser]         = useState(null); // { id, username }
+  const [userPrefs, setUserPrefs]             = useState({ pizza_type: null, fav_topping: "", fav_style: "" });
   const [page, setPage]                       = useState("home");
   const [pageHistory, setPageHistory]         = useState([]);
   const [selectedPizza, setSelectedPizza]     = useState(null);
@@ -2176,6 +2384,26 @@ function App() {
   const [exploreTab, setExploreTab]           = useState("pizzas");
 
   const username = currentUser?.username || null;
+
+  // Load user prefs on login
+  useEffect(() => {
+    if (!currentUser) return;
+    supa.query("users", { select:"pizza_type,fav_topping,fav_style", filter:`id=eq.${currentUser.id}` })
+      .then(rows => {
+        if (rows && rows[0]) {
+          setUserPrefs({
+            pizza_type:  rows[0].pizza_type  || null,
+            fav_topping: rows[0].fav_topping || "",
+            fav_style:   rows[0].fav_style   || "",
+          });
+        }
+      });
+  }, [currentUser]);
+
+  async function saveUserPrefs(prefs) {
+    setUserPrefs(prefs);
+    await supa.update("users", currentUser.id, prefs);
+  }
 
   // Load all ratings from Supabase on login
   const { useEffect } = React;
@@ -2228,8 +2456,8 @@ function App() {
     <div style={{ minHeight:"100vh", background:T.bg, display:"flex",
       alignItems:"center", justifyContent:"center", flexDirection:"column", gap:12,
       fontFamily:"Georgia,serif" }}>
-      <div style={{ fontSize:40 }}>🍕</div>
-      <div style={{ fontSize:16, color:T.textLight }}>Loading your pizza history…</div>
+      <div style={{ fontSize:42 }}>🍕</div>
+      <div style={{ fontSize:18, color:T.textLight }}>Loading your pizza history…</div>
     </div>
   );
 
@@ -2379,7 +2607,7 @@ function App() {
 
   return (
     <div style={{ minHeight:"100vh", background:T.bg, fontFamily:"Georgia,serif",
-      color:T.textDark, fontSize:16 }}>
+      color:T.textDark, fontSize:18 }}>
 
       {/* Header */}
       <header style={{ position:"sticky", top:0, zIndex:50,
@@ -2391,7 +2619,7 @@ function App() {
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           {pageHistory.length > 0 && (
             <button onClick={goBack}
-              style={{ fontSize:18, background:"none", border:"none", cursor:"pointer",
+              style={{ fontSize:20, background:"none", border:"none", cursor:"pointer",
                 color:T.textMid, padding:"0 4px 0 0", lineHeight:1 }}>
               ←
             </button>
@@ -2399,20 +2627,20 @@ function App() {
           <button onClick={()=>{setPage("home");setPageHistory([]);}}
             style={{ display:"flex", alignItems:"center", gap:7,
               background:"none", border:"none", cursor:"pointer" }}>
-            <span style={{ fontSize:20 }}>🍕</span>
-            <span style={{ fontSize:17, fontWeight:900, color:T.textDark, letterSpacing:"-0.3px" }}>
+            <span style={{ fontSize:22 }}>🍕</span>
+            <span style={{ fontSize:19, fontWeight:900, color:T.textDark, letterSpacing:"-0.3px" }}>
               In <span style={{ color:T.red }}>Crust</span> We Trust
             </span>
           </button>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <button onClick={()=>{setPage("profile");setSelectedUser(null);setPageHistory([]);}}
-            style={{ fontSize:14, fontWeight:800, color:T.amberMid, background:"none",
+            style={{ fontSize:16, fontWeight:800, color:T.amberMid, background:"none",
               border:"none", cursor:"pointer" }}>
             @{username}
           </button>
           <button onClick={()=>{ setCurrentUser(null); setAllRatings([]); setPage("home"); }}
-            style={{ fontSize:13, fontWeight:700, color:T.textLight, background:"none",
+            style={{ fontSize:15, fontWeight:700, color:T.textLight, background:"none",
               border:`1px solid ${T.border}`, borderRadius:7, padding:"4px 8px", cursor:"pointer" }}>
             Sign out
           </button>
@@ -2444,7 +2672,8 @@ function App() {
             myRatings={profileRatings} allRatings={allRatings} deleteRating={deleteRating}
             setPage={navigateTo} goRate={goRate} setSelectedPizza={setSelectedPizza} allPizzaMap={pizzaMap}
             setEditingRating={setEditingRating} setPrefillSession={setPrefillSession}
-            setSelectedRestaurant={setSelectedRestaurant}/>}
+            setSelectedRestaurant={setSelectedRestaurant}
+            userPrefs={userPrefs} saveUserPrefs={saveUserPrefs}/>}
       </main>
 
       {/* Bottom nav */}
@@ -2463,8 +2692,8 @@ function App() {
                 background:"none", border:"none", cursor:"pointer",
                 color:isActive?T.red:T.textLight,
                 borderTop:isActive?`2px solid ${T.red}`:"2px solid transparent" }}>
-              <span style={{ fontSize:18 }}>{n.icon}</span>
-              <span style={{ fontSize:9, fontWeight:800, letterSpacing:"0.04em",
+              <span style={{ fontSize:20 }}>{n.icon}</span>
+              <span style={{ fontSize:11, fontWeight:800, letterSpacing:"0.04em",
                 textTransform:"uppercase" }}>{n.label}</span>
             </button>
           );
@@ -2474,8 +2703,8 @@ function App() {
   );
 }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App/>);
-  </script>
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
 </body>
 </html>
