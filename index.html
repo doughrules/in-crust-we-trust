@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
+<html lang="en"><head><meta charset="UTF-8"/><!-- v1773248039242 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍕</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -89,6 +89,23 @@ const NEGATIVE_TAGS = [
   { label:"Trash",       icon:"🗑️" },
 ];
 const ALL_TAGS = [...POSITIVE_TAGS, ...NEGATIVE_TAGS];
+function rankMedal(i) {
+  if (i===0) return "🥇";
+  if (i===1) return "🥈";
+  if (i===2) return "🥉";
+  return `#${i+1}`;
+}
+const TAG_LABEL_MAP = {
+  "Flavor Bomb": "Flavor Town",
+  "Great Dough":  "Dough Rules",
+  "Perfect Char": "Def Leopard",
+};
+function normalizeTag(t) {
+  if (!t) return t;
+  const newLabel = TAG_LABEL_MAP[t.label] || t.label;
+  const found = ALL_TAGS.find(x=>x.label===newLabel);
+  return found ? found : { ...t, label: newLabel };
+}
 
 
 // ── BADGES ────────────────────────────────────────────────────────────────────
@@ -396,7 +413,7 @@ function PizzaCard({ pizza, onClick, highlightCat }) {
         </div>
       </div>
       <div style={{ display:"flex", flexWrap:"wrap", gap:4, marginTop:8 }}>
-        {(pizza.tags||[]).slice(0,3).map(t=>{
+        {(pizza.tags||[]).slice(0,3).map(t=>{ t = normalizeTag(t);
           const isNeg = NEGATIVE_TAGS.some(n=>n.label===t.label);
           const tagColor = isNeg ? "#c93b0a" : "#2d8a4e";
           const tagBg    = isNeg ? "rgba(201,59,10,0.09)" : "rgba(45,138,78,0.09)";
@@ -1316,6 +1333,22 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
     if (top.length) styleLeaders[s] = top;
   });
 
+  // Best-of labels per restaurant
+  const restaurantAwards = {};
+  // #1 overall
+  if (restaurants.length > 0) {
+    restaurantAwards[restaurants[0].name] = restaurantAwards[restaurants[0].name] || [];
+    restaurantAwards[restaurants[0].name].push({ label:"#1 Overall", color:"#c93b0a" });
+  }
+  // Best of each style
+  Object.entries(styleLeaders).forEach(([style, list]) => {
+    if (list.length > 0) {
+      const topRest = list[0].restaurant;
+      restaurantAwards[topRest] = restaurantAwards[topRest] || [];
+      restaurantAwards[topRest].push({ label:`Best ${style}`, color:"#9a5c1a" });
+    }
+  });
+
   // Location leaderboard — top pizza per city
   const cityLeaders = {};
   allPizzas.forEach(p=>{
@@ -1419,8 +1452,8 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
             : <div style={{ display:"grid", gap:9 }}>
                 {filtered.map((p,i)=>(
                   <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <div style={{ fontSize:18, fontWeight:900, width:18, textAlign:"right",
-                      color:T.textLight }}>#{i+1}</div>
+                    <div style={{ fontSize:i<3?22:16, fontWeight:900, width:24, textAlign:"right",
+                      color:i===0?T.red:T.textLight }}>{rankMedal(i)}</div>
                     <div style={{ flex:1 }}>
                       <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}
                         highlightCat={sort.startsWith("cat_") ? sort.replace("cat_","") : null}/>
@@ -1462,7 +1495,16 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                     <div style={{ display:"flex", justifyContent:"space-between",
                       alignItems:"flex-start", padding:"13px 15px 10px" }}>
                       <div>
-                        <div style={{ fontWeight:900, color:T.textDark, fontSize:19 }}>{r.name}</div>
+                        <div style={{ display:"flex", alignItems:"center", gap:7, flexWrap:"wrap" }}>
+                          <span style={{ fontWeight:900, color:T.textDark, fontSize:19 }}>{r.name}</span>
+                          {(restaurantAwards[r.name]||[]).map((a,ai)=>(
+                            <span key={ai} style={{ fontSize:11, fontWeight:900, padding:"2px 7px",
+                              borderRadius:99, background:a.color==="#c93b0a"?"rgba(201,59,10,0.1)":"rgba(154,92,26,0.1)",
+                              color:a.color, letterSpacing:"0.04em", textTransform:"uppercase", whiteSpace:"nowrap" }}>
+                              {a.color==="#c93b0a"?"🏆":""}{a.label}
+                            </span>
+                          ))}
+                        </div>
                         {(r.city||r.country) && (
                           <div style={{ fontSize:15, color:T.textLight, marginTop:1 }}>
                             📍 {[r.city,r.country].filter(Boolean).join(", ")}
@@ -1519,8 +1561,8 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                   style={{ display:"flex", alignItems:"center", gap:10, borderRadius:12,
                     padding:"12px 14px", background:T.bgCard, border:`1px solid ${T.border}`,
                     cursor:"pointer" }}>
-                  <div style={{ fontSize:17, fontWeight:900, width:20,
-                    color:i===0?T.red:T.textLight }}>#{i+1}</div>
+                  <div style={{ fontSize:i<3?22:17, fontWeight:900, width:24,
+                    color:i===0?T.red:T.textLight }}>{rankMedal(i)}</div>
                   <div style={{ flex:1 }}>
                     <div style={{ fontWeight:900, color:T.textDark }}>@{u.username}</div>
                     <div style={{ fontSize:15, color:T.textLight }}>
@@ -1574,7 +1616,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                           marginBottom:5, cursor:"pointer" }}>
                         <div>
                           <span style={{ fontWeight:900, marginRight:7,
-                            color:i===0?T.red:T.textLight }}>#{i+1}</span>
+                            color:i===0?T.red:T.textLight }}>{rankMedal(i)}</span>
                           <span style={{ color:T.textDark, fontWeight:700, fontSize:17 }}>
                             {p.restaurant} – {p.name}
                           </span>
@@ -1673,7 +1715,7 @@ function ExplorePage({ setPage, goRate, setSelectedPizza, setSelectedRestaurant,
                             marginBottom:5, cursor:"pointer" }}>
                           <div style={{ flex:1, minWidth:0 }}>
                             <span style={{ fontWeight:900, marginRight:7,
-                              color:i===0?T.red:T.textLight }}>#{i+1}</span>
+                              color:i===0?T.red:T.textLight }}>{rankMedal(i)}</span>
                             <span style={{ color:T.textDark, fontWeight:700, fontSize:17 }}>
                               {p.restaurant} – {p.name}
                             </span>
@@ -1751,48 +1793,49 @@ function PizzaPage({ pizza, setSelectedUser, setPage }) {
         </div>
       )}
 
-      {(pizza.tags||[]).length>0 && (
-        <div style={{ marginBottom:18 }}>
-          <div style={{ fontSize:15, fontWeight:900, color:T.red, letterSpacing:"0.1em",
-            textTransform:"uppercase", marginBottom:9 }}>Top Notes</div>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-            {pizza.tags.map(t=>{
-              const neg = NEGATIVE_TAGS.some(n=>n.label===t.label);
-              return (
-                <span key={t.label} style={{ padding:"5px 11px", borderRadius:99, fontSize:16,
-                  fontWeight:800, display:"inline-flex", alignItems:"center", gap:4,
-                  background:neg?T.deleteBg:T.greenBg,
-                  color:neg?T.red:T.green,
-                  border:`1px solid ${neg?"rgba(201,59,10,0.2)":"rgba(45,138,78,0.2)"}` }}>
-                  {t.icon} {t.label}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {(pizza.reviews||[]).filter(r=>r.text).length>0 && (
+      {(pizza.reviews||[]).length>0 && (
         <div>
           <div style={{ fontSize:15, fontWeight:900, color:T.red, letterSpacing:"0.1em",
             textTransform:"uppercase", marginBottom:9 }}>Reviews</div>
-          {pizza.reviews.filter(r=>r.text).map((r,i)=>(
-            <div key={i} style={{ borderRadius:13, padding:13, background:"white",
-              border:`1px solid ${T.border}`, marginBottom:8 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:5 }}>
-                <span onClick={()=>{setSelectedUser(r.user);setPage("profile");}}
-                  style={{ fontWeight:900, color:T.amberMid, fontSize:17, cursor:"pointer",
-                    textDecoration:"underline",
-                    textDecorationColor:"rgba(154,92,26,0.3)" }}>
-                  @{r.user}
-                </span>
-                <ScoreBadge score={r.score}/>
+          {pizza.reviews.map((r,i)=>{
+            const rTags = (r.tags||[]).map(t=>{
+              const obj = typeof t === "string" ? (ALL_TAGS.find(x=>x.label===t)||{label:t,icon:"🍕"}) : t;
+              return normalizeTag(obj);
+            });
+            return (
+              <div key={i} style={{ borderRadius:13, padding:13, background:"white",
+                border:`1px solid ${T.border}`, marginBottom:8 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:6 }}>
+                  <span onClick={()=>{setSelectedUser(r.user);setPage("profile");}}
+                    style={{ fontWeight:900, color:T.amberMid, fontSize:17, cursor:"pointer",
+                      textDecoration:"underline", textDecorationColor:"rgba(154,92,26,0.3)" }}>
+                    @{r.user}
+                  </span>
+                  <ScoreBadge score={r.score}/>
+                </div>
+                {rTags.length>0 && (
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:r.text?7:0 }}>
+                    {rTags.map(t=>{
+                      const neg = NEGATIVE_TAGS.some(n=>n.label===t.label);
+                      return (
+                        <span key={t.label} style={{ padding:"3px 9px", borderRadius:99, fontSize:14,
+                          fontWeight:800, display:"inline-flex", alignItems:"center", gap:3,
+                          background:neg?T.deleteBg:T.greenBg, color:neg?T.red:T.green,
+                          border:`1px solid ${neg?"rgba(201,59,10,0.2)":"rgba(45,138,78,0.2)"}` }}>
+                          {t.icon} {t.label}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                {r.text && (
+                  <p style={{ color:T.textDark, margin:0, fontSize:18, fontStyle:"italic" }}>
+                    "{r.text}"
+                  </p>
+                )}
               </div>
-              <p style={{ color:T.textDark, margin:0, fontSize:18, fontStyle:"italic" }}>
-                "{r.text}"
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -1890,8 +1933,8 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
             : <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {pizzas.map((p,i)=>(
                   <div key={p.id} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <div style={{ fontSize:16, fontWeight:900, width:18, color:T.textLight,
-                      flexShrink:0 }}>#{i+1}</div>
+                    <div style={{ fontSize:i<3?20:16, fontWeight:900, width:24, color:i===0?T.red:T.textLight,
+                      flexShrink:0 }}>{rankMedal(i)}</div>
                     <div style={{ flex:1 }}>
                       <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
                     </div>
@@ -2605,15 +2648,15 @@ function App() {
       }).filter(v=>typeof v === "number" && v > 0);
       cats[c.key] = vals.length ? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*2)/2 : 0;
     });
-    // Aggregate tags
-    const tagCounts = {};
-    p.ratings.forEach(r=>(r.tags||[]).forEach(t=>{ tagCounts[t]=(tagCounts[t]||0)+1; }));
-    const tags = Object.entries(tagCounts)
-      .sort((a,b)=>b[1]-a[1]).slice(0,4)
-      .map(([label])=>ALL_TAGS.find(t=>t.label===label)||{label,icon:"🍕"});
+    // Use most recent rating's tags (not merged across raters)
+    const latestRating = p.ratings[p.ratings.length - 1];
+    const rawTags = latestRating ? (latestRating.tags || []) : [];
+    const tags = rawTags.map(t => {
+      if (typeof t === "string") return ALL_TAGS.find(x=>x.label===t) || {label:t, icon:"🍕"};
+      return normalizeTag(t);
+    });
     const reviews = p.ratings
-      .map(r=>({ user:r.user, score:r.score, text:r.review||"" }))
-      .filter(r=>r.text);
+      .map(r=>({ user:r.user, score:r.score, text:r.review||"", tags:r.tags||[] }));
     return { ...p, score, cats, tags, reviews, ratingCount:n };
   }).sort((a,b)=>b.score-a.score);
 
