@@ -2116,9 +2116,9 @@ function App() {
 
   // Intercept browser back button to navigate within app instead of leaving
   useEffect(() => {
-    window.history.pushState({ spa: true }, "");
+    try { window.history.pushState({ spa: true }, ""); } catch(e) {}
     const handlePop = (e) => {
-      window.history.pushState({ spa: true }, "");
+      try { window.history.pushState({ spa: true }, ""); } catch(e) {}
       setPageHistory(h => {
         if (!h.length) return h;
         const prev = h[h.length - 1];
