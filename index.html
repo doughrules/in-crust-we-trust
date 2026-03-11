@@ -2312,7 +2312,7 @@ function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, dra
             </div>
           </div>
           <div style={{ marginBottom:16 }}>
-            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite topping</div>
+            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite toppings</div>
             <input value={draft.fav_topping||""} onChange={e=>setDraftPrefs(d=>({...d,fav_topping:e.target.value}))}
               placeholder="e.g. nduja, burrata, hot honey…"
               style={{ width:"100%", borderRadius:10, padding:"10px 13px",
