@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><!-- v1773251280985 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
+<html lang="en"><head><meta charset="UTF-8"/><!-- v1773302481179 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍕</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -2110,27 +2110,27 @@ function PizzaPassport({ myRatings }) {
   return (
     <div style={{fontFamily:"Georgia,serif"}}>
       {/* Passport cover stats */}
-      <div style={{ background:"linear-gradient(135deg,#f5c4a0,#f0b088)", borderRadius:16,
+      <div style={{ background:"linear-gradient(135deg,#8b2e00,#b84010)", borderRadius:16,
         padding:"20px 20px 18px", marginBottom:16, position:"relative", overflow:"hidden",
         boxShadow:"0 4px 20px rgba(0,0,0,0.18)" }}>
         <div style={{ position:"absolute", right:-12, bottom:-12, fontSize:100,
           opacity:0.05, transform:"rotate(-15deg)", pointerEvents:"none" }}>🍕</div>
         <div style={{ position:"absolute", top:0, left:0, right:0, height:3,
           background:"linear-gradient(90deg,transparent,rgba(255,220,150,0.6),rgba(255,230,170,0.9),rgba(255,220,150,0.6),transparent)" }}/>
-        <div style={{ fontSize:16, fontWeight:900, color:"#7a3a10", letterSpacing:"0.08em",
+        <div style={{ fontSize:16, fontWeight:900, color:"#fde8c0", letterSpacing:"0.08em",
           textTransform:"uppercase", marginBottom:14 }}>Pizza Passport</div>
         <div style={{ display:"flex", gap:0, borderRadius:10, overflow:"hidden",
-          border:"1px solid rgba(201,162,74,0.2)" }}>
+          border:"1px solid rgba(255,210,120,0.3)" }}>
           {[
             {val:myRatings.length, label:"Pizzas"},
             {val:countries.length, label:countries.length===1?"Country":"Countries"},
             {val:cities.length,    label:cities.length===1?"City":"Cities"},
           ].map((s,i)=>(
             <div key={i} style={{ flex:1, textAlign:"center", padding:"9px 4px",
-              background:i%2===0?"rgba(201,162,74,0.07)":"rgba(201,162,74,0.03)",
-              borderRight:i<2?"1px solid rgba(201,162,74,0.15)":"none" }}>
-              <div style={{fontSize:24,fontWeight:900,color:"#7a3a10"}}>{s.val}</div>
-              <div style={{fontSize:11,color:"rgba(245,220,168,0.5)",textTransform:"uppercase",
+              background:i%2===0?"rgba(0,0,0,0.15)":"rgba(0,0,0,0.08)",
+              borderRight:i<2?"1px solid rgba(255,210,120,0.2)":"none" }}>
+              <div style={{fontSize:24,fontWeight:900,color:"#ffffff"}}>{s.val}</div>
+              <div style={{fontSize:11,color:"rgba(255,220,160,0.9)",textTransform:"uppercase",
                 letterSpacing:"0.08em"}}>{s.label}</div>
             </div>
           ))}
@@ -2312,7 +2312,7 @@ function PizzaIdentityCard({ isMe, userPrefs, editingPrefs, setEditingPrefs, dra
             </div>
           </div>
           <div style={{ marginBottom:16 }}>
-            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite toppings</div>
+            <div style={{ fontSize:14, fontWeight:700, color:T.textDark, marginBottom:8 }}>Favorite topping</div>
             <input value={draft.fav_topping||""} onChange={e=>setDraftPrefs(d=>({...d,fav_topping:e.target.value}))}
               placeholder="e.g. nduja, burrata, hot honey…"
               style={{ width:"100%", borderRadius:10, padding:"10px 13px",
