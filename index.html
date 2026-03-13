@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><!-- v1773369901077 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
+<html lang="en"><head><meta charset="UTF-8"/><!-- v1773370465679 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍕</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -581,27 +581,62 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings, al
             action="Rate a Pizza" onAction={goRate}/>
         ) : (
           <>
-            <h2 style={{ fontSize:20, fontWeight:900, color:T.textDark, margin:"8px 0 12px" }}>
-              🔥 Top Rated
+            <h2 style={{ fontSize:20, fontWeight:900, color:T.textDark, margin:"24px 0 4px" }}>
+              🏆 Best Of
             </h2>
+            <div style={{ fontSize:13, color:T.textLight, marginBottom:12 }}>Top 3 rated + best by style</div>
             <div style={{ display:"grid", gap:9 }}>
-              {allPizzas.slice(0,5).map(p=>(
-                <PizzaCard key={p.id} pizza={p}
-                  onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
+              {allPizzas.slice(0,3).map((p,i)=>(
+                <div key={p.id}>
+                  <div style={{ fontSize:11, fontWeight:900, color:T.textLight,
+                    letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:5 }}>
+                    {i===0?'🥇 #1 Overall':i===1?'🥈 #2 Overall':'🥉 #3 Overall'}
+                  </div>
+                  <PizzaCard pizza={p} onClick={pizza=>{setSelectedPizza(pizza);setPage("pizza");}}/>
+                </div>
               ))}
             </div>
+            {(()=>{
+              const STYLES=["Neapolitan","New York","Detroit","Roman","Sicilian","Tokyo","Bar Style","Wildcard"];
+              const bestByStyle=STYLES.map(s=>{
+                const top=allPizzas.filter(p=>p.style===s).sort((a,b)=>b.score-a.score)[0];
+                return top?{style:s,pizza:top}:null;
+              }).filter(Boolean).filter(({pizza})=>!allPizzas.slice(0,3).find(p=>p.id===pizza.id));
+              if(bestByStyle.length===0) return null;
+              return (
+                <>
+                  <div style={{ margin:"24px 0 12px", display:"flex", alignItems:"center", gap:10 }}>
+                    <div style={{ flex:1, height:1, background:T.border }}/>
+                    <span style={{ fontSize:11, fontWeight:900, color:T.textLight,
+                      letterSpacing:"0.12em", textTransform:"uppercase" }}>Best by Style</span>
+                    <div style={{ flex:1, height:1, background:T.border }}/>
+                  </div>
+                  <div style={{ display:"grid", gap:14 }}>
+                    {bestByStyle.map(({style,pizza})=>(
+                      <div key={style}>
+                        <div style={{ fontSize:11, fontWeight:900, color:T.textLight,
+                          letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:5 }}>{style}</div>
+                        <PizzaCard pizza={pizza} onClick={p=>{setSelectedPizza(p);setPage("pizza");}}/>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
           </>
         )}
         {recent.length>0 && (
           <>
             <h2 style={{ fontSize:20, fontWeight:900, color:T.textDark, margin:"28px 0 12px" }}>
-              🕐 Recent Activity
+              🕐 Activity Feed
             </h2>
             <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
               {recent.map((r,i)=>{
                 const tier = scoreTier(r.score);
-                const tags = (r.tags||[]).slice(0,3).map(t=>normalizeTag(t)).filter(Boolean);
-                const initials = (r.user||"?").slice(0,2).toUpperCase();
+                const tags = (r.tags||[]).slice(0,3).map(t=>{
+                  if (typeof t === 'string') return ALL_TAGS.find(x=>x.label===t) || {label:t, icon:'🍕'};
+                  return normalizeTag(t);
+                }).filter(Boolean);
                 const isHighScore = r.score >= 85;
                 return (
                   <div key={i} onClick={()=>{ if(allPizzaMap){ const key=`${r.restaurant}|||${r.pizzaName}`; if(allPizzaMap[key]){setSelectedPizza(allPizzaMap[key]);setPage("pizza");} }}}
@@ -627,13 +662,7 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings, al
                       {/* Content */}
                       <div style={{ flex:1, padding:"12px 14px", minWidth:0 }}>
                         {/* User row */}
-                        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                          <div style={{ width:26, height:26, borderRadius:"50%", flexShrink:0,
-                            background:`linear-gradient(135deg,${T.red},${T.amberMid})`,
-                            display:"flex", alignItems:"center", justifyContent:"center",
-                            fontSize:11, fontWeight:900, color:"white" }}>
-                            {initials}
-                          </div>
+                        <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
                           <span style={{ fontWeight:900, color:T.amberMid, fontSize:15 }}>@{r.user}</span>
                           <span style={{ color:T.textLight, fontSize:13 }}>rated</span>
                         </div>
@@ -651,15 +680,21 @@ function HomePage({ setPage, goRate, setSelectedPizza, allPizzas, allRatings, al
                         {/* Tags */}
                         {tags.length>0 && (
                           <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
-                            {tags.map((t,ti)=>(
-                              <span key={ti} style={{ fontSize:11, fontWeight:700,
-                                background:"rgba(201,59,10,0.08)", color:T.red,
-                                border:"1px solid rgba(201,59,10,0.15)",
-                                borderRadius:99, padding:"2px 9px",
-                                letterSpacing:"0.02em" }}>
-                                {t.icon} {t.label}
-                              </span>
-                            ))}
+                            {tags.map((t,ti)=>{
+                              const isNeg = NEGATIVE_TAGS.some(n=>n.label===t.label);
+                              const tagColor = isNeg ? T.red : "#2d8a4e";
+                              const tagBg = isNeg ? "rgba(201,59,10,0.08)" : "rgba(45,138,78,0.08)";
+                              const tagBorder = isNeg ? "rgba(201,59,10,0.2)" : "rgba(45,138,78,0.2)";
+                              return (
+                                <span key={ti} style={{ fontSize:12, fontWeight:700,
+                                  background:tagBg, color:tagColor,
+                                  border:`1px solid ${tagBorder}`,
+                                  borderRadius:99, padding:"3px 10px",
+                                  letterSpacing:"0.01em", whiteSpace:"nowrap" }}>
+                                  {t.icon} {t.label}
+                                </span>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
