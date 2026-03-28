@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><!-- v1773370465679 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
+<html lang="en"><head><meta charset="UTF-8"/><!-- v1774724937198 --><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>In Crust We Trust</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;background:#fdf6ec;color:#2a1a08;font-size:18px}input,textarea,select{font-family:Georgia,serif}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f5e8d4}::-webkit-scrollbar-thumb{background:#c17b3a;border-radius:3px}</style>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',system-ui,sans-serif;background:#fdf6ec;color:#2a1a08;font-size:17px;line-height:1.5}h1,h2,h3,.serif{font-family:Georgia,serif}input,textarea,select{font-family:'DM Sans',system-ui,sans-serif}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f5e8d4}::-webkit-scrollbar-thumb{background:#c17b3a;border-radius:3px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
@@ -101,6 +104,55 @@ const TAG_LABEL_MAP = {
   "Perfect Char": "Def Leopard",
   "Cheesy Heaven":"Say Cheese!",
 };
+
+// ─── 50 TOP PIZZA RANKINGS ────────────────────────────────────────────────────
+// APAC 2026 (announced March 2026) + USA 2025 (announced July 2025)
+const FIFTY_TOP = {
+  // ── ASIA-PACIFIC 2026 ──────────────────────────────────────────────────────
+  "RistoPizza by Napoli Sta Ca":   { rank:1,  list:"Asia-Pacific 2026" },
+  "RistoPizza by Napoli sta ca":   { rank:1,  list:"Asia-Pacific 2026" },
+  "The Pizza Bar on 38th":         { rank:2,  list:"Asia-Pacific 2026" },
+  "Fiata":                         { rank:3,  list:"Asia-Pacific 2026" },
+  "gigi's":                        { rank:3,  list:"Asia-Pacific 2026" },
+  "Spacca Napoli":                 { rank:4,  list:"Asia-Pacific 2026" },
+  "Crosta":                        { rank:5,  list:"Asia-Pacific 2026" },
+  "Crosta Pizzeria":               { rank:5,  list:"Asia-Pacific 2026" },
+  "Massilia":                      { rank:6,  list:"Asia-Pacific 2026" },
+  "SHOP225":                       { rank:7,  list:"Asia-Pacific 2026" },
+  "Pizzeria Braceria Cesari":      { rank:8,  list:"Asia-Pacific 2026" },
+  "a mano":                        { rank:9,  list:"Asia-Pacific 2026" },
+  "A Mano":                        { rank:9,  list:"Asia-Pacific 2026" },
+  "Bottega":                       { rank:10, list:"Asia-Pacific 2026" },
+  "Margherí":                      { rank:12, list:"Asia-Pacific 2026" },
+  "Anto":                          { rank:15, list:"Asia-Pacific 2026" },
+  "ANTO":                          { rank:15, list:"Asia-Pacific 2026" },
+  "L'OLIVA":                       { rank:20, list:"Asia-Pacific 2026" },
+  "Proof Pizza":                   { rank:50, list:"Asia-Pacific 2026" },
+  // ── USA 2025 ────────────────────────────────────────────────────────────────
+  "Una Pizza Napoletana":          { rank:1,  list:"USA 2025" },
+  "Pizzeria Sei":                  { rank:2,  list:"USA 2025" },
+  "Tony's Pizza Napoletana":       { rank:3,  list:"USA 2025" },
+  "Jay's":                         { rank:4,  list:"USA 2025" },
+  "Ribalta":                       { rank:5,  list:"USA 2025" },
+  "Robert's Pizza and Dough Co":   { rank:6,  list:"USA 2025" },
+  "Don Antonio":                   { rank:7,  list:"USA 2025" },
+  "Truly Pizza":                   { rank:9,  list:"USA 2025" },
+  "La Leggenda":                   { rank:10, list:"USA 2025" },
+  "O Munaciello":                  { rank:10, list:"USA 2025" },
+  "'O Munaciello":                 { rank:10, list:"USA 2025" },
+  "Inferno Pizzeria Napoletana":   { rank:21, list:"USA 2025" },
+  "Zeneli":                        { rank:22, list:"USA 2025" },
+  "Pizza Rock":                    { rank:30, list:"USA 2025" },
+  "Angeli's":                      { rank:47, list:"USA 2025" },
+  "L'industrie Pizzeria":          { rank:1,  list:"USA 2025 (Best Slice)" },
+};
+function getFiftyTop(name) {
+  if (!name) return null;
+  const n = name.toLowerCase();
+  return Object.entries(FIFTY_TOP).find(([k]) => n.includes(k.toLowerCase()) || k.toLowerCase().includes(n))?.[1] || null;
+}
+
+
 function normalizeTag(t) {
   if (!t) return t;
   const newLabel = TAG_LABEL_MAP[t.label] || t.label;
@@ -1953,6 +2005,7 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
   const loc = visits.length ? [visits[0].city, visits[0].country].filter(Boolean).join(", ") : "";
 
   if (!restaurant) return <EmptyState icon="🏠" title="No restaurant selected" sub=""/>;
+  const fiftyTop = getFiftyTop(restaurant);
 
   const catAvgs = {};
   CATEGORIES.forEach(c=>{
@@ -1974,6 +2027,16 @@ function RestaurantPage({ restaurant, allPizzas, allRatings, setSelectedPizza, s
           {avg>0 && <PizzaFill score={avg} size={70}/>}
           <h2 style={{ fontSize:26, fontWeight:900, color:"white", margin:"10px 0 2px",
             letterSpacing:"-0.5px" }}>{restaurant}</h2>
+          {fiftyTop && (
+            <div style={{ display:"inline-flex", alignItems:"center", gap:6,
+              background:"rgba(255,210,80,0.15)", border:"1px solid rgba(255,210,80,0.4)",
+              borderRadius:99, padding:"4px 12px", marginBottom:6 }}>
+              <span style={{ fontSize:14 }}>🏅</span>
+              <span style={{ fontSize:12, fontWeight:800, color:"#ffd84a", letterSpacing:"0.05em" }}>
+                #{fiftyTop.rank} · 50 Top Pizza {fiftyTop.list}
+              </span>
+            </div>
+          )}
           {loc && <div style={{ fontSize:16, color:"rgba(245,220,190,0.6)", marginBottom:6 }}>📍 {loc}</div>}
           <div style={{ display:"flex", justifyContent:"center", gap:24, marginTop:8 }}>
             <div>
